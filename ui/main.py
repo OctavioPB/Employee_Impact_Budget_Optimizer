@@ -13,6 +13,7 @@ import streamlit as st
 
 from ui.components.brand import inject_css, render_nav, render_footer
 from ui.info_page import business_view, engineering_view
+from ui import dashboard
 
 
 # ---------------------------------------------------------------------------
@@ -155,8 +156,8 @@ def _render_sidebar() -> None:
 
 def _sprint_status() -> None:
     sprints = [
-        ("Sprint 1", "Foundation", "in_progress"),
-        ("Sprint 2", "Analytics", "pending"),
+        ("Sprint 1", "Foundation", "completed"),
+        ("Sprint 2", "Analytics", "in_progress"),
         ("Sprint 3", "Simulation", "pending"),
         ("Sprint 4", "Drill-Down", "pending"),
         ("Sprint 5", "Predictive", "pending"),
@@ -279,7 +280,7 @@ def main() -> None:
     if page == "info":
         _render_info_page()
     elif page == "dashboard":
-        _render_coming_soon("Analytics Dashboard", "Sprint 2", "sprint 2 · weeks 3–4")
+        dashboard.render()
     elif page == "simulation":
         _render_coming_soon("Budget Simulation", "Sprint 3", "sprint 3 · weeks 5–6")
     elif page == "drilldown":
