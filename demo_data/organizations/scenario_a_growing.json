@@ -1,0 +1,23 @@
+{
+  "id": "A",
+  "name": "Growing Company",
+  "industry": "Software & Technology",
+  "description": "Fast-growing tech company that scaled headcount 3x in 18 months. Engineering is over-budget with critical talent concentrated in a few key individuals. Classic hypergrowth growing pains.",
+  "departments": [
+    {"name": "Engineering",   "budget_multiplier": 1.25, "headcount_pct": 0.40, "concentration_risk": "high",   "is_over_budget": true},
+    {"name": "Product",       "budget_multiplier": 1.10, "headcount_pct": 0.15, "concentration_risk": "medium", "is_over_budget": false},
+    {"name": "Sales",         "budget_multiplier": 1.05, "headcount_pct": 0.20, "concentration_risk": "low",    "is_over_budget": false},
+    {"name": "Marketing",     "budget_multiplier": 0.95, "headcount_pct": 0.10, "concentration_risk": "low",    "is_over_budget": false},
+    {"name": "Operations",    "budget_multiplier": 1.00, "headcount_pct": 0.10, "concentration_risk": "medium", "is_over_budget": false},
+    {"name": "HR & People",   "budget_multiplier": 0.90, "headcount_pct": 0.05, "concentration_risk": "low",    "is_over_budget": false}
+  ],
+  "challenges": [
+    "Engineering team over-budget by 25%",
+    "3 engineers hold 80% of critical architecture knowledge",
+    "DevOps skill gap: only 1 qualified person",
+    "No succession plan for VP of Engineering"
+  ],
+  "total_budget_variance": 1.12,
+  "nexus_employee_fraction": 0.06,
+  "critical_skill_gaps": ["DevOps", "Security Engineering", "ML Infrastructure"]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "C",
+  "name": "Merger Integration",
+  "industry": "Healthcare Technology",
+  "description": "Two healthcare tech companies completed a merger 6 months ago. Significant role duplication, overlapping team structures, and culture friction. Integration requires thoughtful consolidation while preserving unique capabilities from both legacy organizations.",
+  "departments": [
+    {"name": "Engineering",   "budget_multiplier": 1.45, "headcount_pct": 0.35, "concentration_risk": "medium", "is_over_budget": true},
+    {"name": "Product",       "budget_multiplier": 1.30, "headcount_pct": 0.12, "concentration_risk": "high",   "is_over_budget": true},
+    {"name": "Clinical",      "budget_multiplier": 1.05, "headcount_pct": 0.15, "concentration_risk": "high",   "is_over_budget": false},
+    {"name": "Sales",         "budget_multiplier": 1.25, "headcount_pct": 0.18, "concentration_risk": "low",    "is_over_budget": true},
+    {"name": "Operations",    "budget_multiplier": 1.20, "headcount_pct": 0.12, "concentration_risk": "medium", "is_over_budget": true},
+    {"name": "HR & People",   "budget_multiplier": 1.15, "headcount_pct": 0.08, "concentration_risk": "low",    "is_over_budget": false}
+  ],
+  "challenges": [
+    "Two CTO-equivalent roles, two product leadership structures",
+    "Duplicate backend teams building competing implementations",
+    "Clinical team: unique HIPAA expertise from legacy org at risk",
+    "Combined sales headcount 70% above optimal for territory coverage"
+  ],
+  "total_budget_variance": 1.38,
+  "nexus_employee_fraction": 0.05,
+  "critical_skill_gaps": ["HIPAA Compliance Architecture", "Healthcare Interoperability (HL7/FHIR)", "Integration Engineering"]
+}

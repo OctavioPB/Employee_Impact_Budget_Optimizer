@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: eibo_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-eibo_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eibo_local_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-eibo_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./data_pipeline/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-eibo_user} -d ${POSTGRES_DB:-eibo_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eibo_streamlit
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-eibo_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-eibo_local_dev}
+      - POSTGRES_DB=${POSTGRES_DB:-eibo_db}
+      - DUCKDB_PATH=/data/eibo_analytics.db
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - DEMO_MODE_ENABLED=true
+    volumes:
+      - ./:/app
+      - duckdb_data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: streamlit run ui/main.py --server.port 8501 --server.address 0.0.0.0
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: eibo_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@eibo.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    profiles:
+      - dev
+
+volumes:
+  postgres_data:
+  duckdb_data:
