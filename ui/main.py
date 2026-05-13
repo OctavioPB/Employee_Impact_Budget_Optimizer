@@ -13,7 +13,7 @@ import streamlit as st
 
 from ui.components.brand import inject_css, render_nav, render_footer
 from ui.info_page import business_view, engineering_view
-from ui import dashboard, simulator, drilldown
+from ui import dashboard, simulator, drilldown, predictive
 
 
 # ---------------------------------------------------------------------------
@@ -81,6 +81,7 @@ def _render_sidebar() -> None:
             "simulation":  "🎯  Simulation",
             "drilldown":   "🔍  Drill-Down",
             "scenarios":   "📁  Scenarios",
+            "predictive":  "🔮  Predictive",
             "strategic":   "🗺  Strategic",
             "admin":       "⚙  Admin",
         }
@@ -160,7 +161,7 @@ def _sprint_status() -> None:
         ("Sprint 2", "Analytics", "completed"),
         ("Sprint 3", "Simulation", "completed"),
         ("Sprint 4", "Drill-Down", "completed"),
-        ("Sprint 5", "Predictive", "pending"),
+        ("Sprint 5", "Predictive", "completed"),
         ("Sprint 6", "Strategic", "pending"),
         ("Sprint 7", "Enterprise", "pending"),
     ]
@@ -287,6 +288,8 @@ def main() -> None:
         drilldown.render()
     elif page == "scenarios":
         simulator.render()  # scenario manager is embedded in the simulator page
+    elif page == "predictive":
+        predictive.render()
     elif page == "strategic":
         _render_coming_soon("Strategic Planner", "Sprint 6", "sprint 6 · weeks 11–12")
     elif page == "admin":
