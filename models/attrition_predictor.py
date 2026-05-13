@@ -76,9 +76,9 @@ class AttritionResult:
 
 def compute_attrition_risk(
     employees_df: pd.DataFrame,
-    performance_df: pd.DataFrame,
-    centrality_df: pd.DataFrame,
-    impact_scores_df: pd.DataFrame,
+    performance_df: pd.DataFrame | None = None,
+    centrality_df: pd.DataFrame | None = None,
+    impact_scores_df: pd.DataFrame | None = None,
     attrition_labels: pd.DataFrame | None = None,
 ) -> AttritionResult:
     """Convenience wrapper around AttritionPredictor.
@@ -132,9 +132,9 @@ class AttritionPredictor:
     def predict(
         self,
         employees_df: pd.DataFrame,
-        performance_df: pd.DataFrame,
-        centrality_df: pd.DataFrame,
-        impact_scores_df: pd.DataFrame,
+        performance_df: pd.DataFrame | None = None,
+        centrality_df: pd.DataFrame | None = None,
+        impact_scores_df: pd.DataFrame | None = None,
         attrition_labels: pd.DataFrame | None = None,
     ) -> AttritionResult:
         features = self._build_features(
@@ -158,31 +158,49 @@ class AttritionPredictor:
     def _build_features(
         self,
         employees_df: pd.DataFrame,
-        performance_df: pd.DataFrame,
-        centrality_df: pd.DataFrame,
-        impact_scores_df: pd.DataFrame,
+        performance_df: pd.DataFrame | None,
+        centrality_df: pd.DataFrame | None,
+        impact_scores_df: pd.DataFrame | None,
     ) -> pd.DataFrame:
         """Build the feature matrix aligned on employee_id."""
         if employees_df.empty:
             return pd.DataFrame()
 
-        emp = employees_df[["employee_id", "department",
-                             "annual_salary", "hire_date"]].copy()
+        keep_cols = ["employee_id"]
+        for col in ("department", "annual_salary", "hire_date"):
+            if col in employees_df.columns:
+                keep_cols.append(col)
+        emp = employees_df[keep_cols].copy()
+
+        # Ensure required columns exist with defaults
+        if "department" not in emp.columns:
+            emp["department"] = "Unknown"
+        if "annual_salary" not in emp.columns:
+            emp["annual_salary"] = 70_000.0
+        if "hire_date" not in emp.columns:
+            emp["hire_date"] = pd.NaT
 
         # Tenure in years
         today = pd.Timestamp.today().normalize()
         emp["tenure_years"] = (
             (today - pd.to_datetime(emp["hire_date"], errors="coerce")).dt.days / 365.25
-        ).clip(lower=0).fillna(0)
+        ).clip(lower=0).fillna(3.0)
 
-        # Department median salary for ratio computation
-        dept_median = (
-            emp.groupby("department")["annual_salary"]
-            .transform("median")
-            .fillna(emp["annual_salary"].median())
-        )
-        emp["salary_ratio"] = (
-            emp["annual_salary"] / dept_median.replace(0, np.nan)
+        # Salary ratio vs market rate (preferred) or department median (fallback)
+        if "market_salary" in employees_df.columns:
+            mkt = employees_df["market_salary"].values.astype(float)
+            emp["salary_ratio"] = (
+                emp["annual_salary"].values / np.where(mkt > 0, mkt, np.nan)
+            )
+        else:
+            dept_median = (
+                emp.groupby("department")["annual_salary"]
+                .transform("median")
+                .fillna(emp["annual_salary"].median())
+            )
+            emp["salary_ratio"] = emp["annual_salary"] / dept_median.replace(0, np.nan)
+        emp["salary_ratio"] = pd.to_numeric(
+            emp["salary_ratio"], errors="coerce"
         ).fillna(1.0).clip(0.5, 2.0)
 
         # KPI features from performance history
@@ -192,9 +210,10 @@ class AttritionPredictor:
         emp["kpi_trend"]  = pd.to_numeric(emp.get("kpi_trend"), errors="coerce").fillna(0.0)
 
         # Network centrality
-        if not centrality_df.empty and "combined_centrality" in centrality_df.columns:
+        _cent = centrality_df
+        if _cent is not None and not _cent.empty and "combined_centrality" in _cent.columns:
             emp = emp.merge(
-                centrality_df[["employee_id", "combined_centrality"]],
+                _cent[["employee_id", "combined_centrality"]],
                 on="employee_id", how="left"
             )
         else:
@@ -204,9 +223,10 @@ class AttritionPredictor:
         ).fillna(0.0)
 
         # Impact score
-        if not impact_scores_df.empty and "impact_score" in impact_scores_df.columns:
+        _imp = impact_scores_df
+        if _imp is not None and not _imp.empty and "impact_score" in _imp.columns:
             emp = emp.merge(
-                impact_scores_df[["employee_id", "impact_score"]],
+                _imp[["employee_id", "impact_score"]],
                 on="employee_id", how="left"
             )
         else:
@@ -217,9 +237,9 @@ class AttritionPredictor:
 
         return emp.reset_index(drop=True)
 
-    def _kpi_features(self, performance_df: pd.DataFrame) -> pd.DataFrame:
+    def _kpi_features(self, performance_df: pd.DataFrame | None) -> pd.DataFrame:
         """Compute avg_kpi and kpi_trend per employee from historical reviews."""
-        if performance_df.empty:
+        if performance_df is None or performance_df.empty:
             return pd.DataFrame(columns=["employee_id", "avg_kpi", "kpi_trend"])
 
         perf = performance_df[["employee_id", "kpi_score", "review_date"]].copy()
@@ -341,7 +361,13 @@ class AttritionPredictor:
         )
         return AttritionResult(
             scores=scores_df,
-            feature_importance={},
+            feature_importance={
+                "salary":    _W_SALARY,
+                "kpi_trend": _W_KPI_TREND,
+                "tenure":    _W_TENURE,
+                "network":   _W_NETWORK,
+                "impact":    _W_IMPACT,
+            },
             model_auc=0.0,
             mode="heuristic",
         )

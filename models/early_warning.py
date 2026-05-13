@@ -199,7 +199,7 @@ class EarlyWarningEvaluator:
         for group_id, grp in merged.groupby(group_col):
             if len(grp) < 3:
                 continue
-            high_risk = grp["risk_category"].isin(["High", "Critical"]).sum()
+            high_risk = grp["risk_category"].isin(["High Risk", "Critical Risk"]).sum()
             fraction = high_risk / len(grp)
 
             if fraction >= self._t.attrition_spike_critical:
@@ -210,7 +210,7 @@ class EarlyWarningEvaluator:
                 continue
 
             affected = grp.loc[
-                grp["risk_category"].isin(["High", "Critical"]), "employee_id"
+                grp["risk_category"].isin(["High Risk", "Critical Risk"]), "employee_id"
             ].astype(str).tolist()
 
             alerts.append(Alert(

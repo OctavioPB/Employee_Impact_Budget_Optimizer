@@ -39,10 +39,10 @@ _C = {
 _FONT = "'Plus Jakarta Sans', sans-serif"
 
 _RISK_COLORS = {
-    "Low":      "#27B97C",
-    "Moderate": "#C8982A",
-    "High":     "#F07020",
-    "Critical": "#7C4DBD",
+    "Low Risk":      "#27B97C",
+    "Moderate Risk": "#C8982A",
+    "High Risk":     "#F07020",
+    "Critical Risk": "#7C4DBD",
 }
 
 _SEVERITY_COLORS = {

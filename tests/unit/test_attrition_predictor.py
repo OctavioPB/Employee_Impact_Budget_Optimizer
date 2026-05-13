@@ -68,26 +68,26 @@ def _make_impact(employee_ids: list[str], seed: int = 2) -> pd.DataFrame:
 
 class TestRiskCategoryHelper:
     def test_low_boundary(self):
-        assert risk_category(0) == "Low"
-        assert risk_category(30) == "Low"
+        assert risk_category(0) == "Low Risk"
+        assert risk_category(30) == "Low Risk"
 
     def test_moderate_boundary(self):
-        assert risk_category(31) == "Moderate"
-        assert risk_category(60) == "Moderate"
+        assert risk_category(31) == "Moderate Risk"
+        assert risk_category(60) == "Moderate Risk"
 
     def test_high_boundary(self):
-        assert risk_category(61) == "High"
-        assert risk_category(80) == "High"
+        assert risk_category(61) == "High Risk"
+        assert risk_category(80) == "High Risk"
 
     def test_critical_boundary(self):
-        assert risk_category(81) == "Critical"
-        assert risk_category(100) == "Critical"
+        assert risk_category(81) == "Critical Risk"
+        assert risk_category(100) == "Critical Risk"
 
     def test_mid_values(self):
-        assert risk_category(15) == "Low"
-        assert risk_category(45) == "Moderate"
-        assert risk_category(70) == "High"
-        assert risk_category(95) == "Critical"
+        assert risk_category(15) == "Low Risk"
+        assert risk_category(45) == "Moderate Risk"
+        assert risk_category(70) == "High Risk"
+        assert risk_category(95) == "Critical Risk"
 
 
 # ===========================================================================
@@ -114,7 +114,7 @@ class TestAttritionResultShape:
     def test_risk_category_values(self):
         emp = _make_employees(20)
         result = compute_attrition_risk(emp)
-        valid = {"Low", "Moderate", "High", "Critical"}
+        valid = {"Low Risk", "Moderate Risk", "High Risk", "Critical Risk"}
         assert set(result.scores["risk_category"].unique()).issubset(valid)
 
     def test_mode_is_heuristic_without_labels(self):
@@ -151,8 +151,9 @@ class TestHeuristicMode:
         for _, row in result.scores.iterrows():
             score = row["attrition_risk"]
             cat = row["risk_category"]
-            assert cat == risk_category(score), \
-                f"Score {score:.0f} should be {risk_category(score)} but got {cat}"
+            expected = risk_category(score)
+            assert cat == expected, \
+                f"Score {score:.0f} should be '{expected}' but got '{cat}'"
 
     def test_high_salary_ratio_lowers_risk(self):
         """Employee paid above market should have lower salary driver."""
@@ -207,7 +208,7 @@ class TestHeuristicMode:
     def test_top_driver_is_a_string(self):
         emp = _make_employees(10)
         result = compute_attrition_risk(emp)
-        assert result.scores["top_driver"].dtype == object
+        assert pd.api.types.is_string_dtype(result.scores["top_driver"])
 
     def test_single_employee(self):
         emp = _make_employees(1)
@@ -337,11 +338,15 @@ class TestEdgeCases:
         assert len(result.scores) == 10
 
     def test_driver_sum_adds_up_approximately(self):
-        """Driver scores should contribute to overall risk proportionally."""
+        """Numeric driver scores should all be positive."""
         emp = _make_employees(20)
         result = compute_attrition_risk(emp)
-        driver_cols = [c for c in result.scores.columns if c.endswith("_driver")]
-        if len(driver_cols) >= 2:
-            driver_sum = result.scores[driver_cols].sum(axis=1)
-            # Not a strict equality, but proportional — driver sum should be positive
+        # top_driver is a string label — exclude it, sum only numeric drivers
+        numeric_driver_cols = [
+            c for c in result.scores.columns
+            if c.endswith("_driver") and c != "top_driver"
+            and pd.api.types.is_numeric_dtype(result.scores[c])
+        ]
+        if len(numeric_driver_cols) >= 2:
+            driver_sum = result.scores[numeric_driver_cols].sum(axis=1)
             assert (driver_sum > 0).all()
