@@ -13,7 +13,7 @@ import streamlit as st
 
 from ui.components.brand import inject_css, render_nav, render_footer
 from ui.info_page import business_view, engineering_view
-from ui import dashboard, simulator, drilldown, predictive, strategic, admin
+from ui import dashboard, simulator, drilldown, predictive, strategic, admin, notifications_ui
 
 
 # ---------------------------------------------------------------------------
@@ -83,6 +83,7 @@ def _render_sidebar() -> None:
             "scenarios":   "📁  Scenarios",
             "predictive":  "🔮  Predictive",
             "strategic":   "🗺  Strategic",
+            "notifications": "🔔  Notifications",
             "admin":       "⚙  Admin",
         }
 
@@ -164,6 +165,7 @@ def _sprint_status() -> None:
         ("Sprint 5", "Predictive", "completed"),
         ("Sprint 6", "Strategic", "completed"),
         ("Sprint 7", "Enterprise", "completed"),
+        ("Sprint 8", "Notifications", "completed"),
     ]
     st.markdown(
         '<div style="font-family:\'Plus Jakarta Sans\',sans-serif; font-size:8px; '
@@ -292,6 +294,8 @@ def main() -> None:
         predictive.render()
     elif page == "strategic":
         strategic.render()
+    elif page == "notifications":
+        notifications_ui.render()
     elif page == "admin":
         admin.render()
 
