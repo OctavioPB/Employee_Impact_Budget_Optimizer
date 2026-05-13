@@ -166,6 +166,7 @@ def _sprint_status() -> None:
         ("Sprint 6", "Strategic", "completed"),
         ("Sprint 7", "Enterprise", "completed"),
         ("Sprint 8", "Notifications", "completed"),
+        ("Sprint 9", "Hardening",      "completed"),
     ]
     st.markdown(
         '<div style="font-family:\'Plus Jakarta Sans\',sans-serif; font-size:8px; '
