@@ -13,7 +13,7 @@ import streamlit as st
 
 from ui.components.brand import inject_css, render_nav, render_footer
 from ui.info_page import business_view, engineering_view
-from ui import dashboard, simulator, drilldown, predictive, strategic
+from ui import dashboard, simulator, drilldown, predictive, strategic, admin
 
 
 # ---------------------------------------------------------------------------
@@ -163,7 +163,7 @@ def _sprint_status() -> None:
         ("Sprint 4", "Drill-Down", "completed"),
         ("Sprint 5", "Predictive", "completed"),
         ("Sprint 6", "Strategic", "completed"),
-        ("Sprint 7", "Enterprise", "pending"),
+        ("Sprint 7", "Enterprise", "completed"),
     ]
     st.markdown(
         '<div style="font-family:\'Plus Jakarta Sans\',sans-serif; font-size:8px; '
@@ -293,7 +293,7 @@ def main() -> None:
     elif page == "strategic":
         strategic.render()
     elif page == "admin":
-        _render_coming_soon("Admin Panel", "Sprint 7", "sprint 7 · weeks 13–14")
+        admin.render()
 
     render_footer()
 
