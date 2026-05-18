@@ -1,7 +1,3 @@
-// UI_Decisions.md §9: Eyebrow component.
-// Renders a gold rule + uppercase label. Props: children, light?.
-// Labels are max 4 words. No leading numbers.
-
 import React from 'react'
 
 interface EyebrowProps {

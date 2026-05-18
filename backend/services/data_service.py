@@ -375,3 +375,91 @@ def mark_notification_read(notification_id: str) -> bool:
         _read_state[notification_id] = True
         return True
     return False
+
+
+# ---------------------------------------------------------------------------
+# Forecasting
+# ---------------------------------------------------------------------------
+
+def build_forecast_data(scenario: str, size: str) -> dict:
+    """Run Prophet/linear budget and headcount forecasts."""
+    from forecasting.budget_forecaster import forecast_budget
+
+    org = get_org(scenario.upper(), size.lower())
+    emp_df = org.employees.copy()
+    emp_df["total_cost"] = emp_df["annual_salary"]
+
+    result = forecast_budget(emp_df, dept_col="department", cost_col="total_cost")
+
+    def _series(s) -> dict:
+        hist = s.history.copy()
+        fc   = s.forecast.copy()
+        hist["ds"] = hist["ds"].dt.strftime("%Y-%m-%d")
+        fc["ds"]   = fc["ds"].dt.strftime("%Y-%m-%d")
+        return {
+            "label":    s.label,
+            "metric":   s.metric,
+            "model":    s.model,
+            "mape":     round(s.mape, 2),
+            "history":  hist.to_dict("records"),
+            "forecast": fc.round(2).to_dict("records"),
+        }
+
+    return {
+        "generated_at":  result.generated_at,
+        "total_spend":   _series(result.total_spend),
+        "headcount":     _series(result.headcount) if result.headcount else None,
+        "by_department": [_series(s) for s in result.by_department],
+    }
+
+
+def build_montecarlo_data(scenario: str, size: str) -> dict:
+    """Run Monte Carlo budget stress test (2 000 simulations)."""
+    import pandas as pd
+    from forecasting.monte_carlo import run_monte_carlo
+
+    org = get_org(scenario.upper(), size.lower())
+    emp_df = org.employees.copy()
+    emp_df["total_cost"] = emp_df["annual_salary"]
+    annual_budget = float(org.teams["annual_budget"].sum())
+
+    # Per-employee attrition risk (0-100) — same heuristic as the dashboard
+    rng          = np.random.default_rng(42)
+    sal_rank     = emp_df["annual_salary"].rank(pct=True)
+    sal_inv_rank = 1 - sal_rank
+    nexus_retain = emp_df["_is_nexus"].astype(float) * 0.15
+    attr_raw     = sal_inv_rank * 0.6 + rng.uniform(0, 0.4, len(emp_df)) - nexus_retain
+    attrition_df = pd.DataFrame({
+        "employee_id":    emp_df["employee_id"].values,
+        "attrition_risk": np.clip(attr_raw * 100, 1.0, 99.0),
+    })
+
+    result = run_monte_carlo(
+        employee_df=emp_df,
+        annual_budget=annual_budget,
+        attrition_result=attrition_df,
+        cost_col="total_cost",
+        n_simulations=2000,
+    )
+
+    fan = result.fan_chart.copy()
+    fan["ds"] = fan["ds"].dt.strftime("%Y-%m-%d")
+
+    exc = result.exceedance_prob.copy()
+    exc["ds"] = exc["ds"].dt.strftime("%Y-%m-%d")
+
+    return {
+        "n_simulations":            result.n_simulations,
+        "annual_budget":            round(annual_budget, 2),
+        "monthly_budget":           round(annual_budget / 12, 2),
+        "prob_overspend_any_month": round(result.prob_overspend_any_month, 3),
+        "final_month": {
+            "p10":  round(result.final_month_p10, 2),
+            "p50":  round(result.final_month_p50, 2),
+            "p90":  round(result.final_month_p90, 2),
+            "mean": round(result.final_month_mean, 2),
+        },
+        "fan_chart":       fan.round(2).to_dict("records"),
+        "exceedance_prob": exc.round(4).to_dict("records"),
+        "notes":           result.notes,
+    }

@@ -1,7 +1,3 @@
-// UI_Decisions.md §7: Page routing — single useState<Page>, no router library.
-// Adding a new page: (1) add to Page union, (2) add case to renderPage,
-// (3) add entry to Nav's pages array.
-
 import { useState } from 'react'
 import Nav             from './components/Nav'
 import Footer          from './components/Footer'
@@ -9,6 +5,7 @@ import InfoPage        from './pages/InfoPage'
 import DashboardPage   from './pages/DashboardPage'
 import SimulationPage  from './pages/SimulationPage'
 import DrillDownPage   from './pages/DrillDownPage'
+import ForecastPage    from './pages/ForecastPage'
 import PredictivePage  from './pages/PredictivePage'
 import StrategicPage   from './pages/StrategicPage'
 import NotificationsPage from './pages/NotificationsPage'
@@ -20,6 +17,7 @@ export type Page =
   | 'simulation'
   | 'drilldown'
   | 'predictive'
+  | 'forecast'
   | 'strategic'
   | 'notifications'
   | 'admin'
@@ -34,6 +32,7 @@ export default function App() {
       case 'simulation':    return <SimulationPage />
       case 'drilldown':     return <DrillDownPage />
       case 'predictive':    return <PredictivePage />
+      case 'forecast':      return <ForecastPage />
       case 'strategic':     return <StrategicPage />
       case 'notifications': return <NotificationsPage />
       case 'admin':         return <AdminPage />

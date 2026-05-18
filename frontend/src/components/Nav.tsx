@@ -1,7 +1,3 @@
-// UI_Decisions.md §7: Top navigation bar.
-// Sticky 52px navy bar. Active links use gold-light + rgba(201,168,76,0.12) bg.
-// backgroundColor: 'transparent' on base prevents white flash on deactivation.
-
 import React from 'react'
 import type { Page } from '../App'
 import { useTheme } from '../hooks/useTheme'
@@ -17,6 +13,7 @@ const pages: { id: Page; label: string }[] = [
   { id: 'simulation',    label: 'Simulation' },
   { id: 'drilldown',     label: 'Drill-Down' },
   { id: 'predictive',    label: 'Predictive' },
+  { id: 'forecast',      label: 'Forecast'   },
   { id: 'strategic',     label: 'Strategic'  },
   { id: 'notifications', label: 'Alerts'     },
   { id: 'admin',         label: 'Admin'      },
@@ -39,7 +36,7 @@ const navStyle: React.CSSProperties = {
 
 const navLinkBase: React.CSSProperties = {
   background:      'none',
-  backgroundColor: 'transparent',
+  backgroundColor: 'transparent',  // prevents white flash when deactivating in light mode
   border:          'none',
   color:           'rgba(255,255,255,0.45)',
   cursor:          'pointer',

@@ -1,7 +1,3 @@
-// Standalone landing page — UI_Decisions.md §8 page structure.
-// Has its own sticky nav bar; main Nav is hidden (see App.tsx).
-// Tab bar at bottom of hero bridges to content below (marginBottom: -1).
-
 import React, { useState } from 'react'
 import Eyebrow from '../components/Eyebrow'
 
@@ -331,7 +327,7 @@ function EngineeringView() {
 export default function InfoPage({ onLaunch }: InfoPageProps) {
   const [tab, setTab] = useState<InfoTab>('business')
 
-  const tabBtn = (id: InfoTab, _label: string): React.CSSProperties => ({
+  const tabBtn = (id: InfoTab): React.CSSProperties => ({
     background:       'none',
     backgroundColor:  'transparent',
     border:           'none',
@@ -392,10 +388,10 @@ export default function InfoPage({ onLaunch }: InfoPageProps) {
 
           {/* Tab bar — bottom of hero, marginBottom: -1 merges border */}
           <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.1)', marginTop: 16 }}>
-            <button style={tabBtn('business',    'business')}    onClick={() => setTab('business')}>
+            <button style={tabBtn('business')}    onClick={() => setTab('business')}>
               Business View
             </button>
-            <button style={tabBtn('engineering', 'engineering')} onClick={() => setTab('engineering')}>
+            <button style={tabBtn('engineering')} onClick={() => setTab('engineering')}>
               Engineering View
             </button>
           </div>

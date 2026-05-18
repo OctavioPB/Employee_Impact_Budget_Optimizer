@@ -1,6 +1,3 @@
-// UI_Decisions.md §11: Zustand — no Provider, no reducers.
-// Demo settings persist across page navigations within the session.
-
 import { create } from 'zustand'
 
 export type Scenario = 'A' | 'B' | 'C'

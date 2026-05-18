@@ -1,7 +1,3 @@
-// Executive Dashboard — all charts are pure SVG, zero external dependencies.
-// Data comes from a single /api/dashboard fetch; all derived metrics are
-// computed here so the backend stays thin.
-
 import React, { useEffect, useState } from 'react'
 import Eyebrow from '../components/Eyebrow'
 import { api, type DashboardData, type DepartmentRow, type EmployeeRow } from '../services/api'
@@ -59,7 +55,7 @@ function varianceBorder(v: number) {
 
 // ── Hero KPI stat ─────────────────────────────────────────────────────────────
 
-function HeroStat({ value, label, sub }: { value: string; label: string; accent?: string; sub?: string }) {
+function HeroStat({ value, label, sub }: { value: string; label: string; sub?: string }) {
   return (
     <div style={{ borderLeft: '2px solid var(--gold)', paddingLeft: 18, minWidth: 120 }}>
       <div style={{ fontFamily: 'var(--fd)', fontSize: 32, fontWeight: 300, color: 'var(--gold-light)', lineHeight: 1 }}>
@@ -550,14 +546,14 @@ function EmployeeTable({ rows }: { rows: EmployeeRow[] }) {
       return sortAsc ? cmp : -cmp
     })
 
-  const th = (_label: string, _key: keyof EmployeeRow, align: 'left' | 'right' | 'center' = 'left'): React.CSSProperties => ({
+  const th = (align: 'left' | 'right' | 'center' = 'left'): React.CSSProperties => ({
     fontFamily: 'var(--fb)', fontSize: 9, fontWeight: 600, letterSpacing: '2px',
     textTransform: 'uppercase', padding: '11px 14px', textAlign: align,
     color: '#fff', background: 'var(--primary)', cursor: 'pointer', whiteSpace: 'nowrap',
   })
 
   const header = (label: string, key: keyof EmployeeRow, align?: 'left' | 'right' | 'center') => (
-    <th style={th(label, key, align)} onClick={() => toggle(key)}>
+    <th style={th(align)} onClick={() => toggle(key)}>
       {label}{sortKey === key ? (sortAsc ? ' ▴' : ' ▾') : ''}
     </th>
   )
@@ -586,7 +582,7 @@ function EmployeeTable({ rows }: { rows: EmployeeRow[] }) {
               {header('Salary',     'annual_salary', 'right')}
               {header('Impact',     'impact_score',  'right')}
               {header('Attrition', 'attrition_risk', 'right')}
-              <th style={th('Flags', 'is_nexus', 'center')}>Flags</th>
+              <th style={th('center')}>Flags</th>
             </tr>
           </thead>
           <tbody>

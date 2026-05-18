@@ -33,7 +33,7 @@ const cardStyle: React.CSSProperties = {
 
 // ── Configure tab sub-components ──────────────────────────────────────────────
 
-function StatBox({ value, caption }: { value: string; caption: string; accent?: string }) {
+function StatBox({ value, caption }: { value: string; caption: string }) {
   return (
     <div style={{ borderLeft: '3px solid var(--gold)', paddingLeft: 16, flex: 1 }}>
       <div style={{ fontFamily: 'var(--fd)', fontSize: 28, fontWeight: 700, color: 'var(--primary)' }}>{value}</div>
@@ -698,16 +698,15 @@ export default function SimulationPage() {
 
                   {/* Stats strip */}
                   <div style={{ ...cardStyle, display: 'flex', gap: 28, marginBottom: 20 }}>
-                    <StatBox value={String(result.retained_count)}              caption="Retained"          accent="var(--status-green)"  />
-                    <StatBox value={String(result.at_risk_count)}               caption="Not Retained"      accent="var(--mid)"           />
-                    <StatBox value={`${result.budget_used_pct.toFixed(1)}%`}   caption="Budget Used"       accent="var(--gold)"          />
-                    <StatBox value={result.total_impact.toFixed(0)}             caption="Total Impact"      accent="var(--status-purple)" />
+                    <StatBox value={String(result.retained_count)}            caption="Retained"          />
+                    <StatBox value={String(result.at_risk_count)}             caption="Not Retained"      />
+                    <StatBox value={`${result.budget_used_pct.toFixed(1)}%`} caption="Budget Used"       />
+                    <StatBox value={result.total_impact.toFixed(0)}           caption="Total Impact"      />
                   </div>
 
-                  {/* Cost strip */}
                   <div style={{ ...cardStyle, display: 'flex', gap: 28, marginBottom: 24 }}>
                     <StatBox value={`$${(result.total_retained_cost / 1e6).toFixed(2)}M`} caption="Retained Payroll"     />
-                    <StatBox value={`$${(result.total_at_risk_cost  / 1e6).toFixed(2)}M`} caption="Not-Retained Payroll" accent="var(--mid)" />
+                    <StatBox value={`$${(result.total_at_risk_cost  / 1e6).toFixed(2)}M`} caption="Not-Retained Payroll" />
                   </div>
 
                   {/* Prompt to view Impact Analysis */}

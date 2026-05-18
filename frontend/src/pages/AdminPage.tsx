@@ -42,8 +42,6 @@ const ROLE_COLORS: Record<string, string> = {
   Admin:     'var(--status-red)',
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
-
 type AdminTab = 'health' | 'users' | 'rbac' | 'audit' | 'demo'
 
 function StatusDot({ ok }: { ok: boolean }) {
@@ -55,8 +53,6 @@ function StatusDot({ ok }: { ok: boolean }) {
     }} />
   )
 }
-
-// ── Page ──────────────────────────────────────────────────────────────────────
 
 // ── Scenario metadata ─────────────────────────────────────────────────────────
 

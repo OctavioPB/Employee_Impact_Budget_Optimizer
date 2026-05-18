@@ -1,7 +1,3 @@
-// UI_Decisions.md §12: All HTTP calls go through this module.
-// No component imports fetch directly.
-// Pagination is unwrapped here — callers receive T[], not { items: T[] }.
-
 // ── Types ────────────────────────────────────────────────────────────────
 
 export interface HealthResponse {
@@ -108,6 +104,61 @@ export interface Notification {
   read:       boolean
 }
 
+export interface ForecastHistoryPoint {
+  ds: string
+  y:  number
+}
+
+export interface ForecastFuturePoint {
+  ds:            string
+  yhat:          number
+  yhat_lower_80: number
+  yhat_upper_80: number
+  yhat_lower_95: number
+  yhat_upper_95: number
+}
+
+export interface ForecastSeries {
+  label:    string
+  metric:   string
+  model:    string
+  mape:     number
+  history:  ForecastHistoryPoint[]
+  forecast: ForecastFuturePoint[]
+}
+
+export interface ForecastData {
+  generated_at:  string
+  total_spend:   ForecastSeries
+  headcount:     ForecastSeries | null
+  by_department: ForecastSeries[]
+}
+
+export interface FanChartPoint {
+  ds:          string
+  p10:         number
+  p50:         number
+  p90:         number
+  mean:        number
+  budget_line: number
+}
+
+export interface ExceedancePoint {
+  ds:               string
+  prob_over_budget: number
+}
+
+export interface MonteCarloData {
+  n_simulations:            number
+  annual_budget:            number
+  monthly_budget:           number
+  prob_overspend_any_month: number
+  final_month:              { p10: number; p50: number; p90: number; mean: number }
+  fan_chart:                FanChartPoint[]
+  exceedance_prob:          ExceedancePoint[]
+  notes:                    string[]
+}
+
 export interface GenerateRequest {
   scenario:        string
   size:            string
@@ -188,5 +239,16 @@ export const api = {
         method: 'POST',
         body:   JSON.stringify(body),
       }),
+  },
+
+  forecast: {
+    budget: (scenario: string, size: string, demo = true) =>
+      request<ForecastData>(
+        `/api/forecast/budget?scenario=${scenario}&size=${size}&demo=${demo}`,
+      ),
+    monteCarlo: (scenario: string, size: string, demo = true) =>
+      request<MonteCarloData>(
+        `/api/forecast/montecarlo?scenario=${scenario}&size=${size}&demo=${demo}`,
+      ),
   },
 }

@@ -4,7 +4,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import dashboard, simulation, predictive, notifications, admin
+from backend.routers import dashboard, simulation, predictive, notifications, admin, forecast
 
 app = FastAPI(
     title="EIBO API",
@@ -17,7 +17,7 @@ app = FastAPI(
 # In Docker: requests come from the same origin via nginx proxy.
 _ALLOWED_ORIGINS = os.getenv(
     "CORS_ORIGINS",
-    "http://localhost:3000,http://localhost:5173,http://localhost:8501",
+    "http://localhost:3000,http://localhost:5173",
 ).split(",")
 
 app.add_middleware(
@@ -34,6 +34,7 @@ app.include_router(simulation.router,   prefix="/api", tags=["simulation"])
 app.include_router(predictive.router,   prefix="/api", tags=["predictive"])
 app.include_router(notifications.router,prefix="/api", tags=["notifications"])
 app.include_router(admin.router,         prefix="/api", tags=["admin"])
+app.include_router(forecast.router,      prefix="/api", tags=["forecast"])
 
 
 @app.get("/api/health", tags=["system"])

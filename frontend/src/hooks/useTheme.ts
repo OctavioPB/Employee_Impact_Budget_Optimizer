@@ -1,7 +1,3 @@
-// UI_Decisions.md §10: Theme stored in localStorage under 'spb-theme'.
-// Applied by setting data-theme on document.documentElement.
-// Defaults to light — OS preference is intentionally ignored.
-
 import { useState, useEffect } from 'react'
 
 export type Theme = 'light' | 'dark'
