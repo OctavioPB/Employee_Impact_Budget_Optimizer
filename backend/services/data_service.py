@@ -1,11 +1,9 @@
 """
 Data service: wraps demo_data.generator without any Streamlit dependency.
-Uses functools.lru_cache so each (scenario, size) pair is generated once per process.
+Orgs are cached in a plain dict so the cache can be cleared or overwritten at runtime.
 """
 
 import sys
-import os
-from functools import lru_cache
 from pathlib import Path
 
 # Ensure repo root is importable regardless of working directory
@@ -13,15 +11,56 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+import dataclasses
 import numpy as np
 
 from demo_data.generator import DemoGenerator, GeneratedOrg
+from demo_data.scenarios import load_scenario
+
+# Module-level org cache: (scenario_id, org_size) → GeneratedOrg
+_org_cache: dict[tuple[str, str], GeneratedOrg] = {}
 
 
-@lru_cache(maxsize=9)  # 3 scenarios × 3 sizes
 def get_org(scenario_id: str, org_size: str) -> GeneratedOrg:
-    """Generate (or return cached) a synthetic org for the given scenario and size."""
-    return DemoGenerator(scenario_id=scenario_id, org_size=org_size).generate()
+    """Return a cached org, generating it on first access."""
+    key = (scenario_id, org_size)
+    if key not in _org_cache:
+        _org_cache[key] = DemoGenerator(scenario_id=scenario_id, org_size=org_size).generate()
+    return _org_cache[key]
+
+
+def reset_cache() -> int:
+    """Evict all cached orgs. Returns the number of entries cleared."""
+    count = len(_org_cache)
+    _org_cache.clear()
+    return count
+
+
+def generate_org_with_params(
+    scenario_id: str,
+    org_size: str,
+    seed: int,
+    org_name_override: str | None,
+    nexus_fraction_override: float,
+    budget_variance_override: float,
+) -> GeneratedOrg:
+    """Generate a synthetic org with custom parameters and store it in the cache."""
+    base    = load_scenario(scenario_id)
+    patched = dataclasses.replace(
+        base,
+        nexus_employee_fraction=nexus_fraction_override,
+        total_budget_variance=budget_variance_override,
+    )
+
+    gen          = DemoGenerator(scenario_id=scenario_id, org_size=org_size, seed=seed)
+    gen.scenario = patched
+    org          = gen.generate()
+
+    if org_name_override:
+        org = dataclasses.replace(org, org_name=org_name_override)
+
+    _org_cache[(scenario_id, org_size)] = org
+    return org
 
 
 # ---------------------------------------------------------------------------

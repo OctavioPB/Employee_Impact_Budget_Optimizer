@@ -108,6 +108,29 @@ export interface Notification {
   read:       boolean
 }
 
+export interface GenerateRequest {
+  scenario:        string
+  size:            string
+  seed:            number
+  org_name:        string
+  nexus_fraction:  number
+  budget_variance: number
+}
+
+export interface GenerateResult {
+  status:      string
+  org_name:    string
+  scenario_id: string
+  org_size:    string
+  headcount:   number
+  departments: number
+}
+
+export interface ResetResult {
+  status:          string
+  cleared_entries: number
+}
+
 // ── Base request ─────────────────────────────────────────────────────────
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -155,5 +178,15 @@ export const api = {
       request<Notification[]>('/api/notifications'),
     markRead: (id: string) =>
       request<void>(`/api/notifications/${id}/read`, { method: 'POST' }),
+  },
+
+  admin: {
+    resetDemo: () =>
+      request<ResetResult>('/api/admin/demo/reset', { method: 'POST' }),
+    generateDemo: (body: GenerateRequest) =>
+      request<GenerateResult>('/api/admin/demo/generate', {
+        method: 'POST',
+        body:   JSON.stringify(body),
+      }),
   },
 }
