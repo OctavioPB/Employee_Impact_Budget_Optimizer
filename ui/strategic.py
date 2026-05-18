@@ -479,17 +479,19 @@ def _render_gap_detail_table(sa) -> None:
     rows_html = ""
     for g in sa.gaps:
         gap_str = f"+{g.gap}" if g.gap >= 0 else str(g.gap)
+        critical_star = '<span style="color:#C8982A;margin-left:4px;">★</span>' if g.is_critical else ""
+        cost_str = "${:,.0f}".format(min(g.build_cost_total, g.buy_cost_total)) if g.gap < 0 else "—"
         rows_html += (
             f"<tr style='border-bottom:1px solid #E0EAF4;'>"
             f"<td style='padding:8px 12px;font-weight:600;'>{g.skill_name}"
-            f"{'<span style=\"color:#C8982A;margin-left:4px;\">★</span>' if g.is_critical else ''}</td>"
+            f"{critical_star}</td>"
             f"<td style='padding:8px 12px;text-align:center;'>{g.required_headcount}</td>"
             f"<td style='padding:8px 12px;text-align:center;'>{g.current_holders}</td>"
             f"<td style='padding:8px 12px;text-align:center;'>{gap_str}</td>"
             f"<td style='padding:8px 12px;'>{_sev_badge(g.severity)}</td>"
             f"<td style='padding:8px 12px;'>{_rec_badge(g.recommendation)}</td>"
             f"<td style='padding:8px 12px;color:#6B7280;font-size:11px;'>"
-            f"{'${:,.0f}'.format(min(g.build_cost_total, g.buy_cost_total)) if g.gap < 0 else '—'}</td>"
+            f"{cost_str}</td>"
             f"</tr>"
         )
 

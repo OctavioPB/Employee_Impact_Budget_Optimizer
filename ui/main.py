@@ -1,30 +1,34 @@
 """EIBO — Employee Impact & Budget Optimizer.
 
 Entry point: streamlit run ui/main.py
+
+Navigation model (UI_Decisions.md §7):
+  - Sticky top nav bar: OPB monogram | app title | page links | theme toggle
+  - Info/Overview page is standalone full-screen (nav hidden, its own bar)
+  - No sidebar — navigation lives entirely in the top bar
 """
 
 import sys
 from pathlib import Path
 
-# Make project root importable when running with `streamlit run ui/main.py`
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import streamlit as st
 
-from ui.components.brand import inject_css, render_nav, render_footer
+from ui.components.brand import inject_css, render_footer
 from ui.info_page import business_view, engineering_view
 from ui import dashboard, simulator, drilldown, predictive, strategic, admin, notifications_ui
 
 
 # ---------------------------------------------------------------------------
-# Page config (must be first Streamlit call)
+# Page config
 # ---------------------------------------------------------------------------
 
 st.set_page_config(
     page_title="EIBO — Employee Impact & Budget Optimizer",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 
@@ -32,243 +36,240 @@ st.set_page_config(
 # Session state defaults
 # ---------------------------------------------------------------------------
 
-def _init_state() -> None:
-    defaults = {
-        "page": "info",
-        "info_tab": "business",
-        "demo_mode": True,
-        "demo_scenario": "A",
-        "demo_size": "medium",
-    }
-    for k, v in defaults.items():
-        if k not in st.session_state:
-            st.session_state[k] = v
+_DEFAULTS = {
+    "page":          "info",
+    "theme":         "light",
+    "demo_mode":     True,
+    "demo_scenario": "A",
+    "demo_size":     "small",
+}
 
-
-_init_state()
+for _k, _v in _DEFAULTS.items():
+    if _k not in st.session_state:
+        st.session_state[_k] = _v
 
 
 # ---------------------------------------------------------------------------
-# Sidebar navigation
+# Navigation — top bar pages (UI_Decisions.md §7)
+#
+# Pages listed here appear in the top nav bar.
+# The info/overview page is reached via the "Overview" link at the end.
 # ---------------------------------------------------------------------------
 
-def _render_sidebar() -> None:
-    with st.sidebar:
-        # OPB monogram
+_NAV_PAGES = [
+    ("dashboard",     "Dashboard"),
+    ("simulation",    "Simulation"),
+    ("drilldown",     "Drill-Down"),
+    ("predictive",    "Predictive"),
+    ("strategic",     "Strategic"),
+    ("notifications", "Alerts"),
+    ("admin",         "Admin"),
+    ("info",          "Overview"),
+]
+
+
+# ---------------------------------------------------------------------------
+# Top navigation bar
+# UI_Decisions.md §7: sticky 52px navy bar, OPB monogram left, links right,
+# active link = gold-light + rgba(201,168,76,0.12) background.
+# Sentinel div enables CSS targeting of the following Streamlit element.
+# ---------------------------------------------------------------------------
+
+def _render_top_nav() -> None:
+    # Sentinel marker — CSS uses `.opb-nav-sentinel + div` to style the
+    # Streamlit block that immediately follows this element.
+    st.markdown('<div class="opb-nav-sentinel"></div>', unsafe_allow_html=True)
+
+    # Column proportions:
+    # [monogram=2] [title=5] [nav×8 each=2] [theme=1] [demo-badge=2]
+    nav_col_weights = [2] * len(_NAV_PAGES)
+    col_widths = [2, 5] + nav_col_weights + [1, 2]
+    cols = st.columns(col_widths)
+
+    # ── OPB monogram (UI_Decisions.md §7 — Fraunces, O white / PB gold italic)
+    with cols[0]:
         st.markdown(
             """
-            <div style="padding:28px 20px 20px; border-bottom:1px solid rgba(255,255,255,0.1);">
-              <span style="font-family:'Fraunces',Georgia,serif; font-size:22px;
-                           font-weight:300; color:#fff;">O</span>
-              <em style="font-family:'Fraunces',Georgia,serif; font-size:22px;
-                         font-weight:300; font-style:italic; color:#E8C46A;">PB</em>
-              <div style="font-family:'Plus Jakarta Sans',sans-serif; font-size:8px;
-                          letter-spacing:3px; text-transform:uppercase;
-                          color:rgba(255,255,255,0.35); margin-top:6px;">
-                EIBO Platform
-              </div>
+            <div style="display:flex;align-items:baseline;gap:1px;padding-left:4px;">
+              <span style="font-family:'Fraunces',Georgia,serif;font-size:20px;
+                           font-weight:300;color:#fff;line-height:1;">O</span>
+              <em style="font-family:'Fraunces',Georgia,serif;font-size:20px;
+                         font-weight:300;font-style:italic;color:#e8c46a;line-height:1;">PB</em>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        st.markdown("<div style='height:16px;'></div>", unsafe_allow_html=True)
-
-        # Page navigation
-        pages = {
-            "info":        "📋  Info",
-            "dashboard":   "📊  Dashboard",
-            "simulation":  "🎯  Simulation",
-            "drilldown":   "🔍  Drill-Down",
-            "scenarios":   "📁  Scenarios",
-            "predictive":  "🔮  Predictive",
-            "strategic":   "🗺  Strategic",
-            "notifications": "🔔  Notifications",
-            "admin":       "⚙  Admin",
-        }
-
+    # ── App title (9px uppercase, muted)
+    with cols[1]:
         st.markdown(
-            '<div style="font-family:\'Plus Jakarta Sans\',sans-serif; font-size:8px; '
-            'letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.3); '
-            'padding:0 20px; margin-bottom:8px;">NAVIGATION</div>',
+            """
+            <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;
+                         letter-spacing:3px;text-transform:uppercase;
+                         color:rgba(255,255,255,0.4);">
+              EMPLOYEE IMPACT &amp; BUDGET OPTIMIZER
+            </span>
+            """,
             unsafe_allow_html=True,
         )
 
-        for page_key, label in pages.items():
-            is_active = st.session_state.page == page_key
-            btn_style = (
-                "background:rgba(201,168,76,0.15); color:#E8C46A; border:none;"
-                if is_active
-                else "background:none; color:rgba(255,255,255,0.45); border:none;"
-            )
-            if st.button(
-                label,
-                key=f"nav_{page_key}",
-                use_container_width=True,
-                help=None,
-            ):
-                st.session_state.page = page_key
-                st.rerun()
+    # ── Nav page links
+    page = st.session_state.page
+    for i, (key, label) in enumerate(_NAV_PAGES):
+        with cols[2 + i]:
+            if page == key:
+                # Active: styled HTML div (non-interactive, already here)
+                st.markdown(
+                    f'<div class="opb-nav-active">{label}</div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                if st.button(label, key=f"nav_{key}"):
+                    st.session_state.page = key
+                    st.rerun()
 
-        st.markdown("<hr style='border-color:rgba(255,255,255,0.1); margin:16px 0;'>",
-                    unsafe_allow_html=True)
-
-        # Demo mode controls
-        st.markdown(
-            '<div style="font-family:\'Plus Jakarta Sans\',sans-serif; font-size:8px; '
-            'letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.3); '
-            'padding:0 20px; margin-bottom:8px;">DEMO MODE</div>',
-            unsafe_allow_html=True,
-        )
-
-        demo_on = st.toggle("Use demo data", value=st.session_state.demo_mode)
-        if demo_on != st.session_state.demo_mode:
-            st.session_state.demo_mode = demo_on
+    # ── Theme toggle (◑ Dark / ☀ Light)
+    with cols[-2]:
+        theme = st.session_state.theme
+        icon = "☀" if theme == "dark" else "◑"
+        if st.button(icon, key="nav_theme_toggle"):
+            st.session_state.theme = "dark" if theme == "light" else "light"
             st.rerun()
 
+    # ── Demo mode badge
+    with cols[-1]:
         if st.session_state.demo_mode:
-            scenario = st.selectbox(
-                "Scenario",
-                options=["A — Growing Company", "B — Restructuring", "C — Merger Integration"],
-                index=["A", "B", "C"].index(st.session_state.demo_scenario),
-            )
-            st.session_state.demo_scenario = scenario[0]
-
-            size = st.selectbox(
-                "Org size",
-                options=["Small (50 emp)", "Medium (500 emp)", "Large (5,000 emp)"],
-                index=["small", "medium", "large"].index(st.session_state.demo_size),
-            )
-            st.session_state.demo_size = size.split(" ")[0].lower()
-
-        else:
             st.markdown(
-                '<div style="font-family:\'Plus Jakarta Sans\',sans-serif; font-size:11px; '
-                'color:rgba(255,255,255,0.4); padding:0 4px; line-height:1.6;">'
-                'Upload your data file via the Dashboard page.</div>',
+                '<span style="font-family:\'Plus Jakarta Sans\',sans-serif;'
+                'font-size:8px;letter-spacing:2px;text-transform:uppercase;'
+                'color:rgba(232,196,106,0.55);white-space:nowrap;">DEMO</span>',
                 unsafe_allow_html=True,
             )
 
-        st.markdown("<hr style='border-color:rgba(255,255,255,0.1); margin:16px 0;'>",
-                    unsafe_allow_html=True)
 
-        # Sprint status badge
-        _sprint_status()
+# ---------------------------------------------------------------------------
+# Demo data controls — rendered as a compact bar below the nav on app pages
+# ---------------------------------------------------------------------------
 
+def _render_demo_controls() -> None:
+    """Compact demo scenario / size selector strip (app pages only)."""
+    if not st.session_state.demo_mode:
+        return
 
-def _sprint_status() -> None:
-    sprints = [
-        ("Sprint 1", "Foundation", "completed"),
-        ("Sprint 2", "Analytics", "completed"),
-        ("Sprint 3", "Simulation", "completed"),
-        ("Sprint 4", "Drill-Down", "completed"),
-        ("Sprint 5", "Predictive", "completed"),
-        ("Sprint 6", "Strategic", "completed"),
-        ("Sprint 7", "Enterprise", "completed"),
-        ("Sprint 8", "Notifications", "completed"),
-        ("Sprint 9", "Hardening",      "completed"),
-    ]
     st.markdown(
-        '<div style="font-family:\'Plus Jakarta Sans\',sans-serif; font-size:8px; '
-        'letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.3); '
-        'padding:0 20px; margin-bottom:8px;">SPRINT STATUS</div>',
+        '<div style="background:rgba(0,51,102,0.06);border-bottom:1px solid #e0eaf4;'
+        'padding:6px 40px;display:flex;align-items:center;gap:8px;">'
+        '<span style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:8px;'
+        'letter-spacing:2px;text-transform:uppercase;color:#6b7280;">DEMO DATA</span>'
+        '</div>',
         unsafe_allow_html=True,
     )
-    status_colors = {
-        "completed":    ("#27B97C", "✓"),
-        "in_progress":  ("#C8982A", "→"),
-        "pending":      ("rgba(255,255,255,0.2)", "·"),
-    }
-    for sprint, desc, status in sprints:
-        color, icon = status_colors[status]
+    c1, c2, c3, _ = st.columns([1, 2, 2, 8])
+    with c1:
         st.markdown(
-            f'<div style="font-family:\'Plus Jakarta Sans\',sans-serif; font-size:10px; '
-            f'color:{color}; padding:2px 20px; line-height:1.8;">'
-            f'{icon} {sprint}: {desc}</div>',
+            '<span style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:9px;'
+            'letter-spacing:1px;text-transform:uppercase;color:#6b7280;'
+            'display:block;padding-top:8px;">Scenario</span>',
             unsafe_allow_html=True,
         )
+    with c2:
+        scenario = st.selectbox(
+            "Scenario",
+            options=["A — Growing Company", "B — Restructuring", "C — Merger Integration"],
+            index=["A", "B", "C"].index(st.session_state.demo_scenario),
+            label_visibility="collapsed",
+            key="demo_scenario_select",
+        )
+        st.session_state.demo_scenario = scenario[0]
+    with c3:
+        size = st.selectbox(
+            "Org size",
+            options=["Small (50 emp)", "Medium (500 emp)", "Large (5,000 emp)"],
+            index=["small", "medium", "large"].index(st.session_state.demo_size),
+            label_visibility="collapsed",
+            key="demo_size_select",
+        )
+        st.session_state.demo_size = size.split(" ")[0].lower()
 
 
 # ---------------------------------------------------------------------------
-# Page renderers
+# Info / Overview page — standalone, full-screen
+# No top nav bar. Has its own brand header + tab bar.
+# UI_Decisions.md §8 tab bar pattern: borderBottom with gold-light on active.
 # ---------------------------------------------------------------------------
 
-def _render_info_page() -> None:
-    # Tab switcher for Business / Engineering views
-    hero_bg = (
-        "background-color:#003366; background-image:"
-        "linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),"
-        "linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);"
-        "background-size:48px 48px;"
-    )
-    st.markdown(
-        f"""
-        <div style="{hero_bg} padding:0;">
-          <div style="max-width:1200px; margin:0 auto; padding:24px 48px 0;">
-            <div style="display:flex; gap:4px; border-bottom:1px solid rgba(255,255,255,0.1);">
-        """,
-        unsafe_allow_html=True,
-    )
+_INFO_NAV_HTML = """
+<div style="
+  background: rgba(0,51,102,0.97);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 0 40px;
+  height: 52px;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+">
+  <div style="display:flex;align-items:baseline;gap:1px;">
+    <span style="font-family:'Fraunces',Georgia,serif;font-size:20px;
+                 font-weight:300;color:#fff;line-height:1;">O</span>
+    <em style="font-family:'Fraunces',Georgia,serif;font-size:20px;
+               font-weight:300;font-style:italic;color:#e8c46a;line-height:1;">PB</em>
+  </div>
+  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;
+               letter-spacing:3px;text-transform:uppercase;
+               color:rgba(255,255,255,0.4);">
+    EMPLOYEE IMPACT &amp; BUDGET OPTIMIZER &nbsp;&middot;&nbsp; PLATFORM OVERVIEW
+  </span>
+  <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;
+               letter-spacing:2px;text-transform:uppercase;
+               color:rgba(232,196,106,0.4);">
+    EIBO v1.0
+  </span>
+</div>
+"""
 
-    col_bus, col_eng, _ = st.columns([1.5, 1.5, 8])
-    with col_bus:
-        if st.button(
-            "Business View",
-            key="tab_business",
-            use_container_width=True,
-            type="primary" if st.session_state.info_tab == "business" else "secondary",
-        ):
-            st.session_state.info_tab = "business"
+def _render_info() -> None:
+    """Standalone full-screen Overview page — its own brand header, no app nav."""
+    # Own decorative nav bar (HTML, not interactive)
+    st.markdown(_INFO_NAV_HTML, unsafe_allow_html=True)
+
+    # Launch application CTA — right-aligned below the nav bar
+    _, cta_col = st.columns([5, 1])
+    with cta_col:
+        st.markdown(
+            """
+            <style>
+            div[data-testid="column"]:last-child .stButton > button {
+              background-color: #c8982a !important;
+              color: #fff !important;
+              border: none !important;
+              font-weight: 700 !important;
+              font-size: 9px !important;
+              letter-spacing: 1.5px !important;
+              margin-top: 10px;
+            }
+            div[data-testid="column"]:last-child .stButton > button:hover {
+              background-color: #e8c46a !important;
+              color: #003366 !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("Launch Application →", key="info_launch_app", use_container_width=True):
+            st.session_state.page = "dashboard"
             st.rerun()
 
-    with col_eng:
-        if st.button(
-            "Engineering View",
-            key="tab_engineering",
-            use_container_width=True,
-            type="primary" if st.session_state.info_tab == "engineering" else "secondary",
-        ):
-            st.session_state.info_tab = "engineering"
-            st.rerun()
-
-    st.markdown("</div></div></div>", unsafe_allow_html=True)
-
-    if st.session_state.info_tab == "business":
+    # Tab bar — Business View / Engineering View
+    # UI_Decisions.md §8: tab bar at bottom of hero merges with content below
+    tab_b, tab_e = st.tabs(["  Business View  ", "  Engineering View  "])
+    with tab_b:
         business_view.render()
-    else:
+    with tab_e:
         engineering_view.render()
-
-
-def _render_coming_soon(page_name: str, sprint: str, sprint_num: str) -> None:
-    st.markdown(
-        f"""
-        <div style="background-color:#003366; background-image:
-          linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-          background-size:48px 48px; padding:80px 48px; text-align:center;">
-          <div style="font-family:'Plus Jakarta Sans',sans-serif; font-size:9px;
-                      font-weight:700; letter-spacing:4px; text-transform:uppercase;
-                      color:rgba(255,255,255,0.35); margin-bottom:16px;">
-            {sprint_num.upper()}
-          </div>
-          <h1 style="font-family:'Fraunces',Georgia,serif; font-size:32px;
-                     font-weight:300; color:#fff; margin:0 0 12px;">
-            {page_name} — <em style="color:#E8C46A; font-style:italic;">coming soon</em>
-          </h1>
-          <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:14px;
-                    color:rgba(255,255,255,0.6); max-width:480px; margin:0 auto;">
-            This module is scheduled for {sprint}. The Info page is fully
-            functional — explore the platform capabilities there.
-          </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    st.info(
-        "📋 While this page is under development, use the **Info** page to explore "
-        "platform capabilities and the Business / Engineering views.",
-        icon="ℹ️",
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -277,20 +278,25 @@ def _render_coming_soon(page_name: str, sprint: str, sprint_num: str) -> None:
 
 def main() -> None:
     inject_css()
-    _render_sidebar()
 
     page = st.session_state.page
 
+    # Info / Overview page: standalone full-screen, its own nav bar, no top nav
     if page == "info":
-        _render_info_page()
-    elif page == "dashboard":
+        _render_info()
+        render_footer()
+        return
+
+    # All other pages: sticky top nav + demo controls strip
+    _render_top_nav()
+    _render_demo_controls()
+
+    if page == "dashboard":
         dashboard.render()
     elif page == "simulation":
         simulator.render()
     elif page == "drilldown":
         drilldown.render()
-    elif page == "scenarios":
-        simulator.render()  # scenario manager is embedded in the simulator page
     elif page == "predictive":
         predictive.render()
     elif page == "strategic":

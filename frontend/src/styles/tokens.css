@@ -1,0 +1,105 @@
+/* OPB Design System — UI_Decisions.md §3
+   All values are CSS custom properties. No value is ever hardcoded elsewhere.
+   Using a raw hex colour in a component is a bug. */
+
+:root {
+  /* ── Brand colours ─────────────────────────────────────────────────── */
+  --primary:    #003366;   /* Navy — nav background, hero, table thead   */
+  --primary-80: #1a4d80;   /* Hover states on dark surfaces              */
+  --primary-60: #336699;   /* Links, mid-weight accents                  */
+  --primary-30: #99bbdd;   /* Decorative borders, ghosted elements       */
+  --primary-10: #e0eaf4;   /* Card backgrounds, table row stripes        */
+  --gold:       #c8982a;   /* Eyebrows, accent bars, left-border callouts */
+  --gold-light: #e8c46a;   /* Active nav links, hero italic text         */
+  --dark:       #1c1c2e;   /* Primary body text                          */
+  --mid:        #6b7280;   /* Secondary text, captions, metadata         */
+  --light:      #f4f6f9;   /* Page background, card backgrounds          */
+  --white:      #ffffff;   /* Card surfaces                              */
+
+  /* ── Semantic status colours (UI_Decisions.md §3) ─────────────────── */
+  --status-green:       #27b97c;
+  --status-red:         #e03448;
+  --status-orange:      #f07020;
+  --status-purple:      #7c4dbd;
+  --status-blue:        #003366;
+
+  --status-green-bg:    rgba(39, 185, 124, 0.08);
+  --status-green-text:  #0d5c3a;
+  --status-red-bg:      rgba(224, 52, 72, 0.08);
+  --status-red-text:    #7a1020;
+  --status-orange-bg:   rgba(240, 112, 32, 0.08);
+  --status-orange-text: #7a3800;
+  --status-purple-bg:   rgba(124, 77, 189, 0.08);
+  --status-purple-text: #3d1f70;
+  --status-blue-bg:     rgba(0, 51, 102, 0.08);
+  --status-blue-text:   #001f4d;
+
+  /* ── Typography ────────────────────────────────────────────────────── */
+  --fd: 'Fraunces', Georgia, serif;       /* Display / titles — never bold */
+  --fb: 'Plus Jakarta Sans', sans-serif;  /* Interface / body / labels     */
+
+  /* ── Spacing (8-point grid) ─────────────────────────────────────────── */
+  --space-4:  4px;   --space-8:  8px;   --space-12: 12px;
+  --space-16: 16px;  --space-24: 24px;  --space-32: 32px;
+  --space-40: 40px;  --space-48: 48px;  --space-64: 64px;
+
+  /* ── Border radius ─────────────────────────────────────────────────── */
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   14px;
+  --radius-pill: 20px;
+
+  /* ── Shadows ───────────────────────────────────────────────────────── */
+  --shadow-card: 0 1px 4px rgba(0, 51, 102, 0.08);
+  --shadow-soft: 0 1px 6px rgba(0, 51, 102, 0.09);
+
+  /* ── Layout ────────────────────────────────────────────────────────── */
+  --max-width-content:   1200px;
+  --max-width-dashboard: 1300px;
+  --nav-height:          52px;
+}
+
+/* ── Dark mode overrides (UI_Decisions.md §10) ──────────────────────────
+   Navy, gold, and status colours stay the same in dark mode.
+   Only --light (page bg) and --white (card surface) change.            */
+html[data-theme="dark"] {
+  --light:       #0f1117;
+  --white:       #1a1d27;
+  --dark:        #e2e8f0;
+  --mid:         #8b9099;
+  --primary-10:  rgba(255, 255, 255, 0.07);
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.35);
+  --shadow-soft: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Base reset ─────────────────────────────────────────────────────────
+   UI_Decisions.md §14 Step 3: box-sizing + body defaults.              */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+body {
+  margin:           0;
+  background-color: var(--light);
+  font-family:      var(--fb);
+  font-size:        15px;
+  line-height:      1.7;
+  color:            var(--dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Data visualisation colour series (UI_Decisions.md §5) ─────────────
+   Use in this order for multi-series charts. Never pick outside this set. */
+:root {
+  --chart-1: #003366;  /* corporate blue */
+  --chart-2: #27b97c;  /* green          */
+  --chart-3: #7c4dbd;  /* purple         */
+  --chart-4: #f07020;  /* orange         */
+  --chart-5: #e05080;  /* pink           */
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--light); }
+::-webkit-scrollbar-thumb { background: var(--primary-30); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }

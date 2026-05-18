@@ -2,7 +2,9 @@
 
 > **Decision support for organizational leaders who need to balance budget constraints with critical talent retention — without losing the humans at the center of the decision.**
 
-EIBO is a Capital and Budget Optimization Platform (COCP) that combines data science, graph theory, integer linear programming, and predictive analytics into a single, locally-deployed Streamlit application. It does not make workforce decisions. It illuminates them: surfacing impact scores, attrition risk, collaboration dependencies, and budget trade-offs so that leaders can make better-informed choices with full transparency and human override at every step.
+EIBO is a Capital and Budget Optimization Platform (COCP) that combines data science, graph theory, integer linear programming, and predictive analytics into a locally-deployed application. It does not make workforce decisions. It illuminates them: surfacing impact scores, attrition risk, collaboration dependencies, and budget trade-offs so that leaders can make better-informed choices with full transparency and human override at every step.
+
+The machine suggests. People decide.
 
 ---
 
@@ -21,8 +23,7 @@ EIBO is a Capital and Budget Optimization Platform (COCP) that combines data sci
 - [Optimization Engine](#optimization-engine)
 - [Security & Privacy](#security--privacy)
 - [Testing](#testing)
-- [Documentation](#documentation)
-- [Project Status](#project-status)
+- [Key Commands](#key-commands)
 
 ---
 
@@ -41,15 +42,13 @@ EIBO addresses this with a decision support system that:
 - **Simulates budget stress scenarios** with Monte Carlo analysis and Prophet time-series forecasting, so leaders see uncertainty ranges — not false point estimates
 - **Records every human override** with full audit trail, ensuring the machine's suggestion and the human's decision are always distinguishable
 
-The machine suggests. People decide.
-
 ---
 
 ## Core Design Principles
 
 ### 1. Human-in-the-Loop — Non-Negotiable
 
-Every model output supports manual override with annotation and audit trail. The UI is designed to present recommendations as starting points for discussion, not verdicts. Confidence intervals are shown, not hidden. Language is always respectful:
+Every model output supports manual override with annotation and audit trail. The UI presents recommendations as starting points for discussion, not verdicts. Confidence intervals are shown, not hidden. Language is always respectful:
 
 | Never | Always |
 |---|---|
@@ -97,7 +96,7 @@ Formulates workforce retention as an Integer Linear Programming problem:
 - **Configurable constraints**: Minimum team size, succession depth, diversity thresholds
 - **Multi-objective**: Pareto frontier showing the budget vs. total impact trade-off curve
 - **Sensitivity analysis**: Automatic ±5%, ±10%, ±20% budget scenario comparison
-- **Infeasibility diagnosis**: When constraints cannot all be satisfied simultaneously, EIBO identifies which constraints conflict and proposes resolution options
+- **Infeasibility diagnosis**: When constraints cannot all be satisfied, EIBO identifies which constraints conflict and proposes resolution options
 
 ### Collaboration Network Analysis
 Builds a directed weighted graph from collaboration data using NetworkX:
@@ -106,64 +105,28 @@ Builds a directed weighted graph from collaboration data using NetworkX:
 - Louvain community detection for natural team cluster discovery
 - **Organizational Nexus** flag: employees with betweenness centrality > 0.70 whose removal would significantly fragment the information network
 - **Team Fragility Score**: how dependent a team is on a small number of individuals
-- Interactive graph visualization with community coloring, node sizing by impact score, and edge weight rendering
 
 ### Attrition Risk Prediction
 Classification model with probability calibration:
 
 - Four risk tiers: Low Risk, Moderate Risk, High Risk, Critical Risk
-- SHAP-explained drivers per employee (tenure, engagement trend, market salary gap, manager change frequency, etc.)
+- SHAP-explained drivers per employee
 - **Early Warning System**: configurable threshold alerts that fire when high-risk clusters appear in a department
-- Handles class imbalance (attrition is rare) via SMOTE sampling
+- Handles class imbalance via SMOTE sampling
 - Retraining triggered on monthly schedule or when data drift is detected
 
 ### Budget Forecasting
 Dual-method forecasting with full uncertainty quantification:
 
-- **Prophet time series**: seasonality detection (annual review cycles, quarterly planning), holiday injection, 80% and 95% confidence intervals
-- **Monte Carlo stress testing**: 5,000 simulation runs sampling attrition events and cost shocks, returning P10/P50/P90 fan chart trajectories
+- **Prophet time series**: seasonality detection, 80% and 95% confidence intervals
+- **Monte Carlo stress testing**: 5,000 simulation runs returning P10/P50/P90 fan chart trajectories
 - MAPE target: <15% for 3-month horizon
-- Forecasts always show intervals, never false point estimates
 
 ### Strategic Workforce Planning
-Forward-looking organizational modeling:
-
-- **Future State Designer**: model proposed org structures with cost and impact impact calculations
-- **Skills Gap Analysis**: compare current skill inventory against target state, with adjacency scoring (how close existing skills are to required skills) and build-vs-buy recommendations
+- **Future State Designer**: model proposed org structures with cost and impact calculations
+- **Skills Gap Analysis**: build-vs-buy recommendations with adjacency scoring
 - **Transition Planner**: realistic timeline roadmaps with buffer for uncertainty
-- **Strategy Comparator**: weighted scoring of multiple transition strategies against user-defined priorities
-
-### Drill-Down Navigation
-Hierarchical exploration from macro to individual:
-
-- Organization → Department → Team → Individual
-- Individual profiles include radar chart (4-dimension impact), performance sparklines, skill matrix with criticality ratings, collaboration network excerpt, and attrition risk with SHAP breakdown
-- Simulation status visible on every profile card, with inline override capability
-- Export at any level: CSV, Excel, PDF (formatted report, not raw data dump)
-
-### Notifications & Workflow Engine
-- Lightweight Prefect-compatible `@task`/`@flow` decorator system
-- Smart notification bundling: same source + same time window → single digest, not alert fatigue
-- Multi-channel dispatch: in-app, email (SMTP), webhook (Slack/Teams/custom)
-- Three built-in automated flows: data pipeline refresh, model retraining, weekly risk digest
-
-### Enterprise HRIS Integration
-Abstract connector interface with three concrete implementations:
-
-- **Workday** connector
-- **SAP SuccessFactors** connector
-- **BambooHR** connector
-- **Generic REST API** connector for any HRIS with a JSON API
-
-Field mapping engine with transform support (type coercion, unit conversion, format normalization) and preview-before-apply validation.
-
-### Audit Trail
-Full immutable event log covering every user action:
-
-- Login/logout, simulation runs, overrides, exports, configuration changes, permission denials
-- Thread-safe singleton logger with JSON-lines disk persistence and in-memory ring buffer for fast recent-event access
-- Queryable by category, user, date range, outcome, and severity
-- JSONL and CSV export for compliance reporting
+- **Strategy Comparator**: weighted scoring of multiple transition strategies
 
 ---
 
@@ -172,9 +135,14 @@ Full immutable event log covering every user action:
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │  PRESENTATION LAYER                                                  │
-│  Streamlit SPA · ui/main.py entry point                              │
+│  React 18 + TypeScript (Vite 5 SPA)                                  │
 │  Dashboard · Simulation · Drill-Down · Predictive · Strategic        │
 │  Notifications · Admin · Info (Business + Engineering views)         │
+├──────────────────────────────────────────────────────────────────────┤
+│  API LAYER                                                           │
+│  FastAPI (Python) · REST endpoints · Pydantic schemas               │
+│  /api/dashboard · /api/simulate · /api/predictive/attrition          │
+│  /api/notifications · /api/health                                    │
 ├──────────────────────────────────────────────────────────────────────┤
 │  ANALYTICS & DECISION LAYER                                          │
 │  Impact Scorer (scikit-learn + SHAP)                                 │
@@ -193,7 +161,6 @@ Full immutable event log covering every user action:
 │  Notifications (engine · channels · bundler)                         │
 │  Workflow Engine (Prefect-compatible @task/@flow)                    │
 │  Integration Hub (Workday · SuccessFactors · BambooHR · generic)    │
-│  Health Checker · Structured Logging · Input Sanitization            │
 ├──────────────────────────────────────────────────────────────────────┤
 │  INFRASTRUCTURE                                                      │
 │  PostgreSQL (persistent data · audit logs · user management)         │
@@ -214,7 +181,7 @@ HRIS / CSV Upload
       │
       ▼ Gold: DuckDB aggregated views (fast query layer)
       │
-      ├──► Impact Scorer ──► ILP Optimizer ──► Simulation UI
+      ├──► Impact Scorer ──► ILP Optimizer ──► FastAPI ──► React UI
       │
       ├──► Network Analysis ──► Drill-Down / Graph UI
       │
@@ -227,9 +194,27 @@ HRIS / CSV Upload
 
 ## Tech Stack
 
+### Frontend
 | Layer | Technology | Version | License |
 |---|---|---|---|
-| UI Framework | Streamlit | ≥1.32 | Apache 2.0 |
+| UI Framework | React | 18.3 | MIT |
+| Language | TypeScript | 5.5 (strict) | Apache 2.0 |
+| Build Tool | Vite | 5.4 | MIT |
+| State Management | Zustand | 4.5 | MIT |
+| Fonts | Plus Jakarta Sans, Fraunces | — | OFL |
+
+No external UI component library — all styling is inline `React.CSSProperties` via the OPB design token system.
+
+### Backend (API Layer)
+| Layer | Technology | Version | License |
+|---|---|---|---|
+| API Framework | FastAPI | ≥0.111 | MIT |
+| ASGI Server | Uvicorn | ≥0.29 | BSD |
+| Schema Validation | Pydantic v2 | built-in | MIT |
+
+### Analytics Engine (Python)
+| Layer | Technology | Version | License |
+|---|---|---|---|
 | Analytics DB | DuckDB | ≥0.10 | MIT |
 | Relational DB | PostgreSQL | ≥15 | PostgreSQL |
 | Session Cache | Redis | ≥7 (optional) | BSD |
@@ -239,10 +224,7 @@ HRIS / CSV Upload
 | Forecasting | Prophet | ≥1.1 | MIT |
 | Anomaly Detection | PyOD | ≥1.1 | BSD |
 | Explainability | SHAP | ≥0.45 | MIT |
-| HTTP Client | httpx | ≥0.27 | BSD |
 | Data Processing | pandas, numpy | ≥2.0 / ≥1.26 | BSD |
-| Visualization | Plotly | ≥5.20 | MIT |
-| Workflow | Prefect-compatible decorators | built-in | — |
 | Containerization | Docker Compose | ≥2.20 | Apache 2.0 |
 
 All dependencies are permissively licensed. No proprietary or usage-metered libraries.
@@ -254,45 +236,75 @@ All dependencies are permissively licensed. No proprietary or usage-metered libr
 ```
 eibo/
 │
-├── ui/                         # Streamlit pages
-│   ├── main.py                 # App entry point and routing
-│   ├── dashboard.py            # Executive dashboard
-│   ├── simulator.py            # Budget simulation & scenario management
-│   ├── drilldown.py            # Org → Dept → Team → Individual
-│   ├── predictive.py           # Attrition risk & forecasts
-│   ├── strategic.py            # Future state designer
-│   ├── notifications_ui.py     # Notification center
-│   ├── admin.py                # RBAC, config, health monitor
-│   ├── info_page/              # Business & Engineering info views
-│   └── components/             # Reusable Streamlit components
+├── frontend/                   # React 18 + TypeScript SPA
+│   ├── src/
+│   │   ├── App.tsx             # Page routing (useState, no router lib)
+│   │   ├── pages/
+│   │   │   ├── InfoPage.tsx    # Landing page (Business + Engineering views)
+│   │   │   ├── DashboardPage.tsx
+│   │   │   ├── SimulationPage.tsx
+│   │   │   ├── DrillDownPage.tsx
+│   │   │   ├── PredictivePage.tsx
+│   │   │   ├── StrategicPage.tsx
+│   │   │   ├── NotificationsPage.tsx
+│   │   │   └── AdminPage.tsx
+│   │   ├── components/
+│   │   │   ├── Nav.tsx         # Sticky top nav bar
+│   │   │   ├── Footer.tsx
+│   │   │   └── Eyebrow.tsx     # Gold rule + label component
+│   │   ├── hooks/
+│   │   │   └── useTheme.ts     # Dark/light mode (localStorage)
+│   │   ├── stores/
+│   │   │   └── demoStore.ts    # Zustand: scenario, size, demo flag
+│   │   ├── services/
+│   │   │   └── api.ts          # All HTTP calls (no direct fetch in components)
+│   │   └── styles/
+│   │       └── tokens.css      # OPB design tokens (CSS custom properties)
+│   ├── index.html
+│   ├── vite.config.ts          # /api/* proxied to localhost:8000
+│   ├── tsconfig.json           # Strict TypeScript
+│   ├── package.json
+│   ├── Dockerfile              # Multi-stage: build → nginx
+│   └── nginx.conf              # /api/* → backend:8000, SPA fallback
+│
+├── backend/                    # FastAPI REST API
+│   ├── main.py                 # FastAPI app + CORS + router registration
+│   ├── routers/
+│   │   ├── dashboard.py        # GET /api/dashboard
+│   │   ├── simulation.py       # POST /api/simulate
+│   │   ├── predictive.py       # GET /api/predictive/attrition
+│   │   └── notifications.py    # GET/POST /api/notifications
+│   ├── services/
+│   │   └── data_service.py     # Wraps demo_data.generator (lru_cache, no Streamlit)
+│   └── Dockerfile
 │
 ├── models/                     # ML models
-│   ├── impact_scorer.py        # Composite 0–100 impact score
-│   ├── network_analysis.py     # Graph construction & centrality
-│   ├── attrition_predictor.py  # Attrition risk classification
-│   └── early_warning.py        # Threshold-based alert system
+│   ├── impact_scorer.py
+│   ├── network_analysis.py
+│   ├── attrition_predictor.py
+│   └── early_warning.py
 │
 ├── optimization_engine/        # ILP workforce optimization
-│   ├── ilp_solver.py           # solve() — PuLP CBC entry point
-│   ├── constraints.py          # ConstraintConfig dataclass
-│   ├── multi_objective.py      # Pareto frontier analysis
-│   └── sensitivity.py          # Budget sensitivity scenarios
+│   ├── ilp_solver.py
+│   ├── constraints.py
+│   ├── multi_objective.py
+│   └── sensitivity.py
 │
-├── forecasting/                # Time-series & Monte Carlo
-│   ├── budget_forecaster.py    # Prophet 12-month budget forecast
-│   └── monte_carlo.py          # 5,000-run P10/P50/P90 fan charts
+├── forecasting/
+│   ├── budget_forecaster.py
+│   └── monte_carlo.py
 │
-├── strategic_planner/          # Workforce planning modules
-│   ├── future_state.py         # Proposed org structure modeler
-│   ├── skills_gap.py           # Skill inventory & adjacency scoring
-│   ├── transition_planner.py   # Roadmap generation
-│   └── strategy_comparator.py  # Weighted strategy scoring
+├── strategic_planner/
+│   ├── future_state.py
+│   ├── skills_gap.py
+│   ├── transition_planner.py
+│   └── strategy_comparator.py
 │
 ├── data_pipeline/              # Medallion ETL
-│   ├── bronze_ingest.py        # Raw data ingestion
-│   ├── silver_cleanse.py       # Normalization & validation
-│   ├── gold_aggregate.py       # DuckDB materialized views
-│   └── validators.py           # Schema & quality validators
+│   ├── bronze_ingest.py
+│   ├── silver_cleanse.py
+│   ├── gold_aggregate.py
+│   └── validators.py
 │
 ├── demo_data/                  # Synthetic org generator
 │   ├── generator.py            # DemoGenerator class
@@ -300,55 +312,43 @@ eibo/
 │   ├── seed_demo.py            # CLI database seeder
 │   └── organizations/          # Scenario JSON configs (A, B, C)
 │
-├── auth/                       # Access control
-│   ├── rbac.py                 # 6-tier Role + Permission model
-│   └── session_manager.py      # OAuth2/OIDC + local auth
+├── auth/
+│   ├── rbac.py
+│   └── session_manager.py
 │
-├── audit/                      # Immutable event trail
-│   ├── logger.py               # Thread-safe singleton logger
-│   ├── trail_viewer.py         # Query & export interface
-│   └── compliance_reports.py   # Formatted compliance output
+├── audit/
+│   ├── logger.py
+│   ├── trail_viewer.py
+│   └── compliance_reports.py
 │
-├── notifications/              # Notification engine
-│   ├── engine.py               # Store + bundler + dispatcher
-│   └── channels/               # in_app, email, webhook
+├── notifications/
+│   ├── engine.py
+│   └── channels/
 │
-├── workflows/                  # Prefect-compatible flows
-│   ├── engine.py               # @task / @flow decorators
-│   ├── data_pipeline_flow.py   # Scheduled data refresh
-│   ├── model_retraining_flow.py
-│   └── report_generation_flow.py
+├── workflows/
+│   ├── engine.py
+│   ├── data_pipeline_flow.py
+│   └── model_retraining_flow.py
 │
-├── integration_hub/            # HRIS connectors
-│   ├── base_connector.py       # Abstract connector interface
+├── integration_hub/
+│   ├── base_connector.py
 │   ├── workday_connector.py
 │   ├── bamboohr_connector.py
-│   ├── generic_api_connector.py
-│   └── ConnectorRegistry
-│
-├── health/
-│   └── checker.py              # Component health + latency checks
-│
-├── utils/
-│   ├── logging_config.py       # JSON + dev formatter
-│   ├── sanitization.py         # SQL/XSS/path-traversal defense
-│   └── secrets_validator.py    # Env var validation
+│   └── generic_api_connector.py
 │
 ├── tests/
-│   ├── unit/                   # 573 unit tests
-│   ├── integration/            # End-to-end pipeline tests
-│   ├── performance/            # Wall-clock benchmark tests
-│   └── security/               # RBAC & injection security tests
+│   ├── unit/
+│   ├── integration/
+│   ├── performance/
+│   └── security/
 │
-├── docs/
-│   ├── user_guide/quickstart.md
-│   ├── admin_guide/deployment.md
-│   └── developer_guide/contributing.md
+├── ui/                         # Legacy Streamlit UI (kept for reference)
+│   └── main.py
 │
-├── docker-compose.yml
+├── docker-compose.yml          # postgres + backend + frontend + pgadmin
 ├── docker-compose.prod.yml
 ├── .env.example
-├── requirements.txt
+├── requirements.txt            # Python deps (includes fastapi, uvicorn)
 └── requirements-dev.txt
 ```
 
@@ -358,105 +358,152 @@ eibo/
 
 ### Prerequisites
 
-- Docker ≥ 24.0 and Docker Compose ≥ 2.20
-- Or: Python 3.11+ with a virtual environment (for local development)
+- Docker ≥ 24.0 and Docker Compose ≥ 2.20 (for containerized deployment)
+- Or: Python 3.11+ and Node.js 20+ (for local development)
 
-### 1. Clone the Repository
+### Option A — Docker (Recommended)
+
+#### 1. Clone
 
 ```bash
 git clone https://github.com/your-org/eibo.git
 cd eibo
 ```
 
-### 2. Configure Environment
+#### 2. Configure Environment
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and set the required variables:
+Edit `.env` — required variables:
 
 ```bash
-# Database — required
 POSTGRES_USER=eibo_user
 POSTGRES_PASSWORD=<strong-password>
 POSTGRES_DB=eibo_db
-POSTGRES_HOST=postgres
-
-# Application security — required
 SECRET_KEY=<64-character-random-hex>
-
-# Mode
-DEMO_MODE_ENABLED=true    # true = no real data required
+DEMO_MODE_ENABLED=true
 LOG_LEVEL=INFO
 ```
 
-Generate a secure `SECRET_KEY`:
+Generate a `SECRET_KEY`:
 
 ```bash
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
-### 3. Start the Stack
+#### 3. Start the Full Stack
 
 ```bash
 docker-compose up -d
 ```
 
-First run downloads images and runs database migrations (~2–3 minutes).
+This starts four services:
 
-### 4. Open the App
+| Service | URL | Description |
+|---|---|---|
+| **frontend** | http://localhost:3000 | React SPA (nginx) |
+| **backend** | http://localhost:8000 | FastAPI REST API |
+| **postgres** | localhost:5432 | PostgreSQL database |
+| **pgadmin** | http://localhost:5050 | DB admin UI (dev profile only) |
 
-Navigate to `http://localhost:8501` in your browser.
+First run takes ~2–3 minutes to build images. The app starts in demo mode with pre-loaded synthetic data — no further configuration needed.
 
-The app starts in demo mode with a pre-loaded synthetic organization. No further configuration is required to explore every feature.
+#### 4. Seed Demo Data (Optional)
 
-### 5. (Optional) Seed the Demo Database
+The API generates demo data in-memory on first request — **seeding is not required** to use the app. It only populates the PostgreSQL database for persistence across restarts.
 
 ```bash
-docker-compose exec streamlit python demo_data/seed_demo.py --scenario all --size medium
+# Requires the stack to be running first (docker-compose up -d)
+docker-compose exec backend python demo_data/seed_demo.py --scenario all --size medium
+
+# Alternatively, run it locally (requires PostgreSQL on localhost:5432 and a .env file)
+python demo_data/seed_demo.py --scenario all --size medium
 ```
 
-### Local Development (Without Docker)
+---
+
+### Option B — Local Development (Hot Reload)
+
+Best for active development — runs the frontend and backend separately with live reload.
+
+#### 1. Python Backend
 
 ```bash
+# Create and activate virtual environment
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements-dev.txt
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # macOS/Linux
 
-cp .env.example .env               # edit as above
+# Install dependencies
+pip install -r requirements.txt
 
-streamlit run ui/main.py --server.runOnSave true
+# Start FastAPI with hot reload
+uvicorn backend.main:app --reload --port 8000
+```
+
+API is now available at http://localhost:8000. Interactive docs at http://localhost:8000/docs.
+
+#### 2. React Frontend
+
+```bash
+cd frontend
+
+# Install npm dependencies (first time only)
+npm install
+
+# Start Vite dev server with HMR
+npm run dev
+```
+
+Frontend is now available at http://localhost:5173. The Vite dev server automatically proxies `/api/*` requests to `localhost:8000`.
+
+#### 3. Verify
+
+```bash
+curl http://localhost:8000/api/health
+# {"status": "ok", "service": "eibo-api"}
+
+curl "http://localhost:8000/api/dashboard?scenario=A&size=small&demo=true" | python -m json.tool | head -20
+```
+
+---
+
+### Option C — Production Deployment
+
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 ---
 
 ## Demo Scenarios
 
-EIBO ships with three fully synthetic demo organizations covering the most common workforce budget situations:
+EIBO ships with three fully synthetic demo organizations:
 
 ### Scenario A — Growing Company
 **Industry**: Software & Technology
 
-A fast-growing tech company that scaled headcount 3x in 18 months. Engineering is overbudget, critical architecture knowledge is concentrated in three engineers, and there is no succession plan for the VP of Engineering.
+A fast-growing tech company that scaled headcount 3× in 18 months. Engineering is overbudget, critical architecture knowledge is concentrated in three engineers, and there is no succession plan for the VP of Engineering.
 
 **Key challenges**: DevOps skill gap (single qualified person), engineering overbudget by 25%, no leadership succession.
 
 ### Scenario B — Restructuring
 **Industry**: Financial Services
 
-A mid-size financial services firm facing a board-mandated 20% cost reduction. Multiple departments have overlapping roles, 60% of the technology team is on legacy COBOL systems with declining demand, and the Risk & Compliance function has a single expert on a new regulatory framework.
+A mid-size financial services firm facing a board-mandated 20% cost reduction. Multiple departments have overlapping roles, 60% of the technology team is on legacy COBOL systems, and the Risk & Compliance function has a single expert on a new regulatory framework.
 
 **Key challenges**: Operations redundancy, technology skills mismatch, single-point-of-failure compliance expertise.
 
 ### Scenario C — Merger Integration
 **Industry**: Healthcare Technology
 
-Two healthcare tech companies completed a merger six months ago. Duplicate leadership structures exist across both legacy entities, competing backend implementations are being built by teams that haven't yet unified, and unique HIPAA expertise from the acquired company is at attrition risk.
+Two healthcare tech companies completed a merger six months ago. Duplicate leadership structures exist, competing backend implementations are being built by teams that haven't unified, and unique HIPAA expertise from the acquired company is at attrition risk.
 
 **Key challenges**: Duplicate C-suite, role overlap, clinical domain knowledge at risk.
 
-Each scenario is available in three sizes: **Small** (50 employees), **Medium** (500), and **Large** (5,000).
+Each scenario is available in three sizes: **Small** (50 employees), **Medium** (500), **Large** (5,000).
 
 ---
 
@@ -473,7 +520,7 @@ Six-tier role hierarchy enforcing data isolation at both the permission and depa
 | **Executive** | 5 | Org-wide access, audit log visibility |
 | **Admin** | 6 | User management, system config, full audit export |
 
-Data isolation is enforced at query time: a Manager with `department="Engineering"` cannot access, simulate, or export data for any other department. Salary and PII visibility cascade independently of simulation permissions.
+Data isolation is enforced at query time: a Manager with `department="Engineering"` cannot access, simulate, or export data for any other department.
 
 ---
 
@@ -485,113 +532,84 @@ EIBO uses a three-layer medallion architecture:
 Source Data (CSV / HRIS API)
         │
         ▼
-   Bronze Layer
-   Raw ingestion, no transformation.
-   Original format preserved.
-   bronze_ingest.py
+   Bronze Layer — Raw ingestion, no transformation. Original format preserved.
         │
         ▼
-   Silver Layer
-   Cleansing: type coercion, normalization,
-   duplicate detection, null handling,
-   PII tokenization, schema validation.
-   silver_cleanse.py
+   Silver Layer — Cleansing, type coercion, normalization, PII tokenization.
         │
         ▼
-   Gold Layer
-   DuckDB materialized views.
-   Pre-aggregated for millisecond query latency.
-   Incremental refresh on source changes.
-   gold_aggregate.py
+   Gold Layer — DuckDB materialized views. Pre-aggregated for millisecond latency.
         │
         ▼
-   Analytics & UI
+   FastAPI — Serves aggregated data to the React frontend
 ```
 
 **Key invariants**:
 - Bronze data is write-once, never modified
 - Silver cleansing is idempotent and replayable
-- Gold views are derived and can be rebuilt from Silver at any time
-- Demo data uses a separate schema/prefix — it can never mix with real data
+- Gold views can be rebuilt from Silver at any time
+- Demo data uses a separate schema prefix — it can never mix with real data
 
 ---
 
 ## Optimization Engine
-
-The ILP formulation:
 
 ```
 Maximize:    Σ (impact_score_i × x_i)    for all employees i
 
 Subject to:
   Budget:    Σ (cost_i × x_i) ≤ available_budget
-  
+
   Leadership: for each team t:
               Σ (x_i × is_leader_i) ≥ 1
-  
+
   Critical skills: for each skill s:
               Σ (x_i × has_skill_s_i) ≥ min_holders_s
-  
-  Optionally:
-    Min team size:  Σ (x_i | team_i = t) ≥ min_team_size
-    Succession:     Σ (x_i × has_skill_s_i) ≥ succession_depth + 1
-  
+
   Domain:    x_i ∈ {0, 1}
 ```
 
-Where `cost_i = annual_salary_i + annual_benefits_i`.
+The CBC (Coin-or Branch and Cut) solver handles problems up to 5,000 employees within a configurable time limit. For infeasible problems, EIBO identifies conflicting constraints and proposes resolution paths.
 
-The CBC (Coin-or Branch and Cut) solver handles problems up to 5,000 employees within a configurable time limit (default 30s). For infeasible problems, EIBO identifies conflicting constraints and proposes resolution paths (e.g., "Increase budget by $X to satisfy leadership constraint for Team Y").
+The backend falls back to a greedy impact/cost-ratio sort when PuLP is unavailable, ensuring the simulation endpoint always returns a result.
 
 ---
 
 ## Security & Privacy
 
-EIBO is designed for HR data, which is PII-dense and regulation-sensitive.
-
 | Control | Implementation |
 |---|---|
 | No external data transfer | All computation is local; zero API calls with employee data |
-| Input sanitization | SQL injection, XSS, path traversal detection at all entry points (`utils/sanitization.py`) |
+| Input sanitization | SQL injection, XSS, path traversal detection at all entry points |
 | PII masking | Role-based, applied at query time before UI rendering |
-| Secrets validation | Startup check rejects placeholder values and enforces minimum entropy (`utils/secrets_validator.py`) |
-| Audit trail | Every simulation, override, login, and config change is logged with user, timestamp, and outcome |
+| Secrets validation | Startup check rejects placeholder values and enforces minimum entropy |
+| Audit trail | Every simulation, override, login, and config change is logged |
 | RBAC enforcement | `AccessControl.require()` raises `PermissionError` before any data access |
 | Department isolation | Query filters applied server-side based on `user.departments` scope |
-| Structured logging | JSON-lines format in production; PII never logged, only anonymized IDs |
+| CORS | FastAPI CORS middleware — only configured origins accepted |
 
 ---
 
 ## Testing
 
-734 tests across four suites:
-
-```
-tests/unit/          573 tests   Fast, isolated, no external dependencies
-tests/integration/    50 tests   Multi-module vertical slices, no infrastructure mocking
-tests/performance/    30 tests   Wall-clock benchmarks with defined thresholds
-tests/security/       81 tests   RBAC boundaries, data leakage, injection prevention
-```
-
-Run the full suite:
-
 ```bash
+# Full Python test suite
 pytest tests/ -v
-```
 
-Run specific suites:
+# By suite
+pytest tests/unit/ -v                   # 573 tests — fast, no infrastructure
+pytest tests/integration/ -v            # end-to-end pipeline flows
+pytest tests/performance/ -v            # wall-clock benchmark thresholds
+pytest tests/security/ -v              # RBAC boundaries, injection prevention
 
-```bash
-pytest tests/unit/ -v                           # fast, no infrastructure needed
-pytest tests/integration/ -v                   # end-to-end flows
-pytest tests/performance/ -v --tb=short        # benchmark thresholds
-pytest tests/security/ -v                      # OWASP-aligned security checks
-```
-
-With coverage:
-
-```bash
+# With coverage
 pytest tests/ --cov=. --cov-report=html
+
+# Frontend type check + build
+cd frontend && npm run build
+
+# Frontend lint
+cd frontend && npx tsc --noEmit
 ```
 
 Performance thresholds (small org, 50 employees):
@@ -603,32 +621,77 @@ Performance thresholds (small org, 50 employees):
 | Impact scoring | ≤ 5 seconds |
 | ILP solve (70% budget) | ≤ 10 seconds |
 | Attrition prediction | ≤ 5 seconds |
-| Workflow pipeline flow | ≤ 5 seconds |
-
-Security test coverage (OWASP-aligned):
-- **A01 Broken Access Control**: 9 permissions × 6 roles = exhaustive boundary matrix
-- **A03 Injection**: SQL injection, XSS, and path traversal — parametrized payload sets
-- **Data leakage**: salary tier and PII tier verified for all 6 roles independently
-- **Department isolation**: manager scope, executive scope, viewer denial
-- **Secrets management**: placeholder detection, entropy minimums, demo vs production mode
+| API dashboard endpoint | ≤ 200ms |
+| React build | ≤ 2 minutes |
 
 ---
 
-## Documentation
+## Key Commands
 
-| Document | Location | Audience |
-|---|---|---|
-| Quickstart (5 min) | `docs/user_guide/quickstart.md` | All users |
-| Deployment & Admin | `docs/admin_guide/deployment.md` | System administrators |
-| Contributing & Architecture | `docs/developer_guide/contributing.md` | Engineers |
-| Info Page (Business View) | In-app → Info → Business View | HR / People Analytics stakeholders |
-| Info Page (Engineering View) | In-app → Info → Engineering View | Technical evaluators |
+```bash
+# ── Docker ────────────────────────────────────────────────────────────────
+
+# Start all services (frontend :3000, backend :8000, postgres :5432)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Production deployment
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+# ── Local Development ─────────────────────────────────────────────────────
+
+# Python backend (hot reload)
+uvicorn backend.main:app --reload --port 8000
+
+# React frontend (HMR)
+cd frontend && npm run dev
+
+# ── Data & Models ─────────────────────────────────────────────────────────
+
+# Seed demo database into PostgreSQL (optional — API generates data in-memory without this)
+# Run locally, or with the stack up: docker-compose exec backend python demo_data/seed_demo.py --scenario all --size medium
+python demo_data/seed_demo.py --scenario all --size medium
+
+# Run data pipeline
+python workflows/data_pipeline_flow.py --input data/payroll.csv
+
+# Retrain models
+python workflows/model_retraining_flow.py --force
+
+# ── API ───────────────────────────────────────────────────────────────────
+
+# Health check
+curl http://localhost:8000/api/health
+
+# Dashboard data (Scenario A, small org, demo mode)
+curl "http://localhost:8000/api/dashboard?scenario=A&size=small&demo=true"
+
+# Run simulation
+curl -X POST http://localhost:8000/api/simulate \
+  -H "Content-Type: application/json" \
+  -d '{"scenario":"A","size":"small","budget_pct":80,"force_retain":[],"exclude":[],"leadership_constraint":true,"skills_constraint":true}'
+
+# Interactive API docs
+open http://localhost:8000/docs
+
+# ── Testing ───────────────────────────────────────────────────────────────
+
+# Full test suite
+pytest tests/ -v
+
+# Frontend type check
+cd frontend && npx tsc --noEmit
+
+# Frontend production build
+cd frontend && npm run build
+```
 
 ---
 
 ## Project Status
-
-All nine sprints are complete:
 
 | Sprint | Capability | Status |
 |---|---|---|
@@ -641,50 +704,18 @@ All nine sprints are complete:
 | 7 | RBAC, audit trail, enterprise readiness | Complete |
 | 8 | Notifications, workflow engine, HRIS integrations | Complete |
 | 9 | Testing suite, documentation, production hardening | Complete |
+| **10** | **React 18 + FastAPI migration (UI layer)** | **Complete** |
 
-**Codebase**: 94 Python modules · 22,000+ lines · 734 tests passing
-
----
-
-## Key Commands
-
-```bash
-# Start the full stack
-docker-compose up -d
-
-# Production deployment
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-
-# Seed demo database
-python demo_data/seed_demo.py --scenario all --size medium
-
-# Run data pipeline
-python workflows/data_pipeline_flow.py --input data/payroll.csv
-
-# Retrain models
-python workflows/model_retraining_flow.py --force
-
-# Check system health
-python -c "from health.checker import get_health_summary; import json; print(json.dumps(get_health_summary(), indent=2))"
-
-# Run full test suite
-pytest tests/ -v
-
-# Validate production secrets
-python -c "from utils.secrets_validator import assert_production_secrets; assert_production_secrets()"
-
-# Streamlit dev with hot reload
-streamlit run ui/main.py --server.runOnSave true
-```
+**Codebase**: 94 Python modules · React SPA (8 pages) · FastAPI REST layer · 22,000+ lines · 734 tests
 
 ---
 
 ## License
 
-This project uses exclusively permissively-licensed open-source dependencies (MIT, Apache 2.0, BSD). See `requirements.txt` for the full dependency list with version pins.
+This project uses exclusively permissively-licensed open-source dependencies (MIT, Apache 2.0, BSD). See `requirements.txt` and `frontend/package.json` for the full dependency lists.
 
 ---
 
 *EIBO — Employee Impact & Budget Optimizer*
-*OPB AI Mastery Lab · Octavio Pérez Bravo · Data & AI Strategy Architect*
+*OPB · Octavio Pérez Bravo · Data & AI Strategy Architect*
 *From pipeline to decision.*

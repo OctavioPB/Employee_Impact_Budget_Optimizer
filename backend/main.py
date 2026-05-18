@@ -1,0 +1,40 @@
+"""FastAPI backend for EIBO — wraps Python analytics modules as REST endpoints."""
+
+import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from backend.routers import dashboard, simulation, predictive, notifications
+
+app = FastAPI(
+    title="EIBO API",
+    description="Employee Impact & Budget Optimizer — API layer",
+    version="1.0.0",
+)
+
+# ── CORS ──────────────────────────────────────────────────────────────────────
+# In dev: Vite runs on 3000, FastAPI on 8000.
+# In Docker: requests come from the same origin via nginx proxy.
+_ALLOWED_ORIGINS = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:3000,http://localhost:5173,http://localhost:8501",
+).split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ── Routers ───────────────────────────────────────────────────────────────────
+app.include_router(dashboard.router,    prefix="/api", tags=["dashboard"])
+app.include_router(simulation.router,   prefix="/api", tags=["simulation"])
+app.include_router(predictive.router,   prefix="/api", tags=["predictive"])
+app.include_router(notifications.router,prefix="/api", tags=["notifications"])
+
+
+@app.get("/api/health", tags=["system"])
+def health() -> dict:
+    return {"status": "ok", "service": "eibo-api"}
