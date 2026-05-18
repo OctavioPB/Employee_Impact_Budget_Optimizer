@@ -117,12 +117,12 @@ export default function NotificationsPage() {
           {/* Counts */}
           <div style={{ display: 'flex', gap: 28 }}>
             {[
-              { val: String(unreadCount),    label: 'Unread',   color: 'var(--gold-light)'  },
-              { val: String(criticalCount),  label: 'Critical', color: 'var(--status-red)'  },
-              { val: String(warningCount),   label: 'Warnings', color: 'var(--status-orange)' },
-            ].map(({ val, label, color }) => (
-              <div key={label} style={{ borderLeft: `3px solid ${color}`, paddingLeft: 14 }}>
-                <div style={{ fontFamily: 'var(--fd)', fontSize: 28, fontWeight: 700, color }}>{val}</div>
+              { val: String(unreadCount),   label: 'Unread'   },
+              { val: String(criticalCount), label: 'Critical' },
+              { val: String(warningCount),  label: 'Warnings' },
+            ].map(({ val, label }) => (
+              <div key={label} style={{ borderLeft: '3px solid var(--gold)', paddingLeft: 14 }}>
+                <div style={{ fontFamily: 'var(--fd)', fontSize: 28, fontWeight: 700, color: 'var(--gold-light)' }}>{val}</div>
                 <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>{label}</div>
               </div>
             ))}

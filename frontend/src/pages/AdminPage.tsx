@@ -36,9 +36,9 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
 const ROLE_COLORS: Record<string, string> = {
   Viewer:    'var(--mid)',
   Analyst:   'var(--primary-60)',
-  Manager:   'var(--gold)',
-  Director:  'var(--status-orange)',
-  Executive: 'var(--status-purple)',
+  Manager:   'var(--primary)',
+  Director:  'var(--primary-80)',
+  Executive: 'var(--gold)',
   Admin:     'var(--status-red)',
 }
 

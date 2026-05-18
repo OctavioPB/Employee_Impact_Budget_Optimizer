@@ -18,4 +18,5 @@ experiments/
 *.pkl
 backups/
 logs/
+planning/
 .streamlit/secrets.toml

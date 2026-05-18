@@ -164,7 +164,7 @@ function BusinessView() {
             { value: '3×',    label: 'Faster budget scenario analysis vs. manual modeling', color: 'var(--status-green)' },
             { value: '< 2s',  label: 'Optimization runtime for 5,000 employees', color: 'var(--primary-60)' },
           ].map(({ value, label, color }) => (
-            <div key={value} style={{ ...card, borderTop: `3px solid ${color}` }}>
+            <div key={value} style={{ ...card, borderTop: '3px solid var(--gold)' }}>
               <div style={{ fontFamily: 'var(--fd)', fontSize: 32, fontWeight: 300, color, lineHeight: 1, marginBottom: 8 }}>{value}</div>
               <p style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--mid)', lineHeight: 1.6, margin: 0 }}>{label}</p>
             </div>
@@ -219,17 +219,17 @@ function EngineeringView() {
         {/* Architecture flow */}
         <div style={{ display: 'flex', alignItems: 'stretch', gap: 0, marginBottom: 40 }}>
           {[
-            { label: 'HRIS / ERP', sub: 'Workday · BambooHR · SuccessFactors · CSV', color: 'var(--mid)' },
-            { label: 'Bronze', sub: 'Raw ingestion — immutable source of truth', color: 'var(--primary-60)' },
-            { label: 'Silver', sub: 'Cleansing · normalisation · validation', color: 'var(--primary)' },
-            { label: 'Gold', sub: 'Aggregated views · impact scores · centrality', color: 'var(--gold)' },
-            { label: 'UI / API', sub: 'React frontend → FastAPI → DuckDB', color: 'var(--status-green)' },
-          ].map(({ label, sub, color }, i) => (
+            { label: 'HRIS / ERP', sub: 'Workday · BambooHR · SuccessFactors · CSV' },
+            { label: 'Bronze',     sub: 'Raw ingestion — immutable source of truth'   },
+            { label: 'Silver',     sub: 'Cleansing · normalisation · validation'       },
+            { label: 'Gold',       sub: 'Aggregated views · impact scores · centrality' },
+            { label: 'UI / API',   sub: 'React frontend → FastAPI → DuckDB'            },
+          ].map(({ label, sub }, i) => (
             <React.Fragment key={label}>
               {i > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', color: 'var(--primary-30)', fontFamily: 'var(--fb)', fontSize: 18, padding: '0 4px' }}>→</div>
               )}
-              <div style={{ flex: 1, background: 'var(--white)', border: `1px solid var(--primary-10)`, borderTop: `3px solid ${color}`, borderRadius: 8, padding: '16px 18px' }}>
+              <div style={{ flex: 1, background: 'var(--white)', border: '1px solid var(--primary-10)', borderTop: '3px solid var(--gold)', borderRadius: 8, padding: '16px 18px' }}>
                 <div style={{ fontFamily: 'var(--fd)', fontSize: 15, fontWeight: 400, color: 'var(--dark)', marginBottom: 6 }}>{label}</div>
                 <div style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--mid)', lineHeight: 1.5 }}>{sub}</div>
               </div>

@@ -9,7 +9,7 @@ import { useDemoStore } from '../stores/demoStore'
 
 // ── Design constants ──────────────────────────────────────────────────────────
 
-const PALETTE = ['#003366', '#1a4d80', '#336699', '#c8982a', '#e8c46a', '#27b97c', '#7c4dbd', '#f07020', '#99bbdd']
+const PALETTE = ['#003366', '#1a4d80', '#336699', '#4d7099', '#99bbdd', '#c8982a', '#e8c46a', '#b07820', '#ccdde8']
 
 const hero: React.CSSProperties = {
   backgroundColor: 'var(--primary)',
@@ -44,12 +44,24 @@ function riskColor(r: number) {
 function varianceColor(v: number) {
   return v > 10 ? 'var(--status-red)' : v > 4 ? 'var(--status-orange)' : v < -4 ? 'var(--status-green)' : 'var(--gold)'
 }
+function varianceBg(v: number) {
+  return v > 10 ? 'var(--status-red-bg)'
+       : v > 4  ? 'var(--status-orange-bg)'
+       : v < -4 ? 'var(--status-green-bg)'
+       : 'rgba(200,152,42,0.10)'
+}
+function varianceBorder(v: number) {
+  return v > 10 ? 'rgba(224,52,72,0.25)'
+       : v > 4  ? 'rgba(240,112,32,0.25)'
+       : v < -4 ? 'rgba(39,185,124,0.25)'
+       : 'rgba(200,152,42,0.25)'
+}
 
 // ── Hero KPI stat ─────────────────────────────────────────────────────────────
 
-function HeroStat({ value, label, accent, sub }: { value: string; label: string; accent?: string; sub?: string }) {
+function HeroStat({ value, label, sub }: { value: string; label: string; accent?: string; sub?: string }) {
   return (
-    <div style={{ borderLeft: `2px solid ${accent ?? 'var(--gold)'}`, paddingLeft: 18, minWidth: 120 }}>
+    <div style={{ borderLeft: '2px solid var(--gold)', paddingLeft: 18, minWidth: 120 }}>
       <div style={{ fontFamily: 'var(--fd)', fontSize: 32, fontWeight: 300, color: 'var(--gold-light)', lineHeight: 1 }}>
         {value}
       </div>
@@ -193,11 +205,11 @@ function SpendDonut({ rows }: { rows: DepartmentRow[] }) {
 
 function ImpactHistogram({ employees }: { employees: EmployeeRow[] }) {
   const buckets = [
-    { label: '0–20',   min: 0,  max: 20,  color: '#e03448' },
-    { label: '20–40',  min: 20, max: 40,  color: '#f07020' },
-    { label: '40–60',  min: 40, max: 60,  color: '#c8982a' },
-    { label: '60–80',  min: 60, max: 80,  color: '#27b97c' },
-    { label: '80–100', min: 80, max: 101, color: '#00a86b' },
+    { label: '0–20',   min: 0,  max: 20,  color: '#99bbdd' },
+    { label: '20–40',  min: 20, max: 40,  color: '#4d7099' },
+    { label: '40–60',  min: 40, max: 60,  color: '#336699' },
+    { label: '60–80',  min: 60, max: 80,  color: '#1a4d80' },
+    { label: '80–100', min: 80, max: 101, color: '#c8982a' },
   ]
   const counts = buckets.map(b => employees.filter(e => e.impact_score >= b.min && e.impact_score < b.max).length)
   const maxC   = Math.max(...counts, 1)
@@ -292,7 +304,7 @@ function QuadrantChart({ employees }: { employees: EmployeeRow[] }) {
     const hi = e.attrition_risk >= RX && e.impact_score >= IY
     const hp = e.attrition_risk < RX  && e.impact_score >= IY
     const rv = e.attrition_risk >= RX && e.impact_score < IY
-    return hi ? '#e03448' : hp ? '#27b97c' : rv ? '#f07020' : '#c0cfe0'
+    return hi ? '#e03448' : hp ? '#27b97c' : rv ? '#f07020' : '#99bbdd'
   }
 
   // Quadrant counts
@@ -357,7 +369,7 @@ function QuadrantChart({ employees }: { employees: EmployeeRow[] }) {
           { color: '#27b97c', label: 'Protect — high impact, low risk'   },
           { color: '#e03448', label: 'Act Now — high impact, high risk'  },
           { color: '#f07020', label: 'Review — low impact, high risk'    },
-          { color: '#c0cfe0', label: 'Monitor — low impact, low risk'    },
+          { color: '#99bbdd', label: 'Monitor — low impact, low risk'    },
         ].map(({ color, label }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: color }} />
@@ -479,9 +491,9 @@ function DeptTable({ rows }: { rows: DepartmentRow[] }) {
                 </td>
                 <td style={{ padding: '11px 14px', textAlign: 'center' }}>
                   <span style={{ fontFamily: 'var(--fb)', fontSize: 10, fontWeight: 700, color: vColor,
-                    backgroundColor: `${vColor.replace('var(', '').replace(')', '')}14`,
+                    backgroundColor: varianceBg(r.budget_variance_pct),
                     borderRadius: 'var(--radius-pill)', padding: '2px 9px',
-                    border: `1px solid ${vColor}30`,
+                    border: `1px solid ${varianceBorder(r.budget_variance_pct)}`,
                   }}>
                     {r.budget_variance_pct >= 0 ? '+' : ''}{r.budget_variance_pct.toFixed(1)}%
                   </span>
@@ -671,13 +683,13 @@ export default function DashboardPage() {
             People analytics · budget health · talent risk · network intelligence
           </p>
           <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap' }}>
-            <HeroStat value={fmtK(data.total_headcount)}                           label="Employees"         accent="var(--primary-60)" />
-            <HeroStat value={fmt$M(data.total_budget)}                             label="Annual Budget"     accent="var(--gold)" />
-            <HeroStat value={fmt$M(data.total_spend)}                              label="Total Spend"       accent={data.budget_variance_pct > 5 ? 'var(--status-orange)' : 'var(--status-green)'}
+            <HeroStat value={fmtK(data.total_headcount)}                label="Employees" />
+            <HeroStat value={fmt$M(data.total_budget)}                label="Annual Budget" />
+            <HeroStat value={fmt$M(data.total_spend)}                 label="Total Spend"
                       sub={`${data.budget_variance_pct >= 0 ? '+' : ''}${data.budget_variance_pct.toFixed(1)}% vs budget`} />
-            <HeroStat value={data.avg_impact_score.toFixed(1)}                     label="Avg Impact Score"  accent="var(--status-green)" />
-            <HeroStat value={String(data.n_nexus_employees)}                       label="Nexus Employees"   accent="var(--gold)" sub="Network anchors" />
-            <HeroStat value={String(criticalAttrition + highAttrition)}            label="High/Critical Risk" accent="var(--status-red)" sub="Retention priority" />
+            <HeroStat value={data.avg_impact_score.toFixed(1)}        label="Avg Impact Score" />
+            <HeroStat value={String(data.n_nexus_employees)}          label="Nexus Employees"   sub="Network anchors" />
+            <HeroStat value={String(criticalAttrition + highAttrition)} label="High/Critical Risk" sub="Retention priority" />
           </div>
         </div>
       </div>

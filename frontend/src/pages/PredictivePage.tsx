@@ -83,12 +83,12 @@ export default function PredictivePage() {
           {data && (
             <div style={{ display: 'flex', gap: 32, marginTop: 32 }}>
               {[
-                { val: String(data.high_risk_count),     label: 'High Risk',     color: 'var(--status-orange)' },
-                { val: String(data.critical_risk_count), label: 'Critical Risk', color: 'var(--status-red)' },
-                { val: `${(data.avg_risk * 100).toFixed(1)}%`, label: 'Avg Risk Score', color: 'var(--gold-light)' },
-              ].map(({ val, label, color }) => (
-                <div key={label} style={{ borderLeft: `3px solid ${color}`, paddingLeft: 14 }}>
-                  <div style={{ fontFamily: 'var(--fd)', fontSize: 30, fontWeight: 700, color }}>{val}</div>
+                { val: String(data.high_risk_count),                  label: 'High Risk'      },
+                { val: String(data.critical_risk_count),              label: 'Critical Risk'  },
+                { val: `${(data.avg_risk * 100).toFixed(1)}%`,        label: 'Avg Risk Score' },
+              ].map(({ val, label }) => (
+                <div key={label} style={{ borderLeft: '3px solid var(--gold)', paddingLeft: 14 }}>
+                  <div style={{ fontFamily: 'var(--fd)', fontSize: 30, fontWeight: 700, color: 'var(--gold-light)' }}>{val}</div>
                   <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>{label}</div>
                 </div>
               ))}

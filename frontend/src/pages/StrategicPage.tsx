@@ -40,8 +40,8 @@ const ROADMAP: Milestone[] = [
 ]
 
 const REC_COLORS: Record<string, string> = {
-  build:  'var(--status-green)',
-  buy:    'var(--status-purple)',
+  build:  'var(--primary)',
+  buy:    'var(--primary-60)',
   hybrid: 'var(--gold)',
 }
 
@@ -202,7 +202,7 @@ export default function StrategicPage() {
                         backgroundColor: 'var(--white)', borderRadius: 'var(--radius-md)',
                         boxShadow: 'var(--shadow-card)', padding: '16px 20px',
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        borderLeft: `3px solid ${m.headcount > 0 ? 'var(--status-purple)' : 'var(--gold)'}`,
+                        borderLeft: `3px solid ${m.headcount > 0 ? 'var(--primary)' : 'var(--gold)'}`,
                       }}>
                         <div>
                           <div style={{ fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--dark)', fontWeight: 500 }}>{m.action}</div>
@@ -263,10 +263,10 @@ export default function StrategicPage() {
                   <div style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--mid)', lineHeight: 1.6, marginBottom: 20 }}>{s.desc}</div>
 
                   {[
-                    { label: 'Impact Score',   val: s.impact, color: 'var(--status-green)'  },
-                    { label: 'Implementation Speed', val: s.speed, color: 'var(--gold)'     },
-                    { label: 'Cost Efficiency', val: s.cost,  color: 'var(--status-purple)' },
-                    { label: 'Risk Level',      val: s.risk,  color: s.risk > 60 ? 'var(--status-red)' : 'var(--status-orange)' },
+                    { label: 'Impact Score',        val: s.impact, color: 'var(--primary)'    },
+                    { label: 'Implementation Speed', val: s.speed, color: 'var(--gold)'      },
+                    { label: 'Cost Efficiency',      val: s.cost,  color: 'var(--primary-60)' },
+                    { label: 'Risk Level',           val: s.risk,  color: s.risk > 60 ? 'var(--status-red)' : 'var(--status-orange)' },
                   ].map(({ label, val, color }) => (
                     <div key={label} style={{ marginBottom: 12 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
