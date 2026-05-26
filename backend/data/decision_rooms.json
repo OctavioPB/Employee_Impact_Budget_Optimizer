@@ -1,0 +1,185 @@
+{
+  "0fe7cc3b": {
+    "session_id": "0fe7cc3b",
+    "name": "Budget Review",
+    "scenario": "A",
+    "size": "small",
+    "budget_pct": 85.0,
+    "resolution_mode": "owner",
+    "status": "Draft",
+    "created_at": "2026-05-26T22:22:51+00:00",
+    "participants": [
+      {
+        "user_id": "u_chen",
+        "display_name": "Director Chen",
+        "role": "Owner",
+        "last_action": "Voted yes on Bob Jones",
+        "joined_at": "2026-05-26T22:22:51+00:00"
+      },
+      {
+        "user_id": "u_rivera",
+        "display_name": "HR Partner Rivera",
+        "role": "Participant",
+        "last_action": "Voted yes on Bob Jones",
+        "joined_at": "2026-05-26T22:22:51+00:00"
+      },
+      {
+        "user_id": "u_hoffman",
+        "display_name": "Manager Hoffman",
+        "role": "Participant",
+        "last_action": "Set retain for Bob Jones",
+        "joined_at": "2026-05-26T22:22:51+00:00"
+      },
+      {
+        "user_id": "u_okonkwo",
+        "display_name": "Finance Lead Okonkwo",
+        "role": "Observer",
+        "last_action": "Joined",
+        "joined_at": "2026-05-26T22:22:51+00:00"
+      }
+    ],
+    "overrides": [
+      {
+        "id": "2d8fbd54",
+        "employee_id": "E001",
+        "employee_name": "Alice Smith",
+        "override_type": "retain",
+        "set_by": "Director Chen",
+        "rationale": "Critical nexus employee",
+        "timestamp": "2026-05-26T22:22:51+00:00"
+      },
+      {
+        "id": "3c0a4cd7",
+        "employee_id": "E002",
+        "employee_name": "Bob Jones",
+        "override_type": "retain",
+        "set_by": "Manager Hoffman",
+        "rationale": "[Vote passed] Critical skill holder",
+        "timestamp": "2026-05-26T22:22:51+00:00"
+      }
+    ],
+    "conflicts": [],
+    "comments": [],
+    "proposals": [
+      {
+        "id": "a75f9132",
+        "employee_id": "E002",
+        "employee_name": "Bob Jones",
+        "override_type": "retain",
+        "rationale": "Critical skill holder",
+        "proposed_by": "Manager Hoffman",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "objections": [],
+        "votes": {
+          "Director Chen": "yes",
+          "HR Partner Rivera": "yes",
+          "Manager Hoffman": "yes"
+        },
+        "vote_open": false,
+        "vote_result": "passed",
+        "applied": true
+      }
+    ],
+    "sign_offs": [],
+    "activity": [
+      {
+        "id": "f15f5a20",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "Director Chen",
+        "action": "created",
+        "subject": "Session \"Budget Review\""
+      },
+      {
+        "id": "ccd2c27e",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "HR Partner Rivera",
+        "action": "joined",
+        "subject": "as Participant"
+      },
+      {
+        "id": "f2c0edb9",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "Manager Hoffman",
+        "action": "joined",
+        "subject": "as Participant"
+      },
+      {
+        "id": "207f3f1a",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "Finance Lead Okonkwo",
+        "action": "joined",
+        "subject": "as Observer"
+      },
+      {
+        "id": "c216d9c7",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "Director Chen",
+        "action": "retain_override",
+        "subject": "Alice Smith"
+      },
+      {
+        "id": "d64281a0",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "HR Partner Rivera",
+        "action": "exclude_override",
+        "subject": "Alice Smith"
+      },
+      {
+        "id": "eae6fe01",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "Director Chen",
+        "action": "resolved_conflict",
+        "subject": "Alice Smith → retain"
+      },
+      {
+        "id": "5564c912",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "Manager Hoffman",
+        "action": "proposed",
+        "subject": "retain Bob Jones: Critical skill holder"
+      },
+      {
+        "id": "7724a29a",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "Director Chen",
+        "action": "opened_vote",
+        "subject": "on retain Bob Jones"
+      },
+      {
+        "id": "018f23a1",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "Director Chen",
+        "action": "voted",
+        "subject": "yes on Bob Jones"
+      },
+      {
+        "id": "48a59160",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "HR Partner Rivera",
+        "action": "voted",
+        "subject": "yes on Bob Jones"
+      },
+      {
+        "id": "541448d2",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "Manager Hoffman",
+        "action": "voted",
+        "subject": "yes on Bob Jones"
+      },
+      {
+        "id": "73c27ca9",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "System",
+        "action": "vote_closed",
+        "subject": "Bob Jones → passed (3Y/0N)"
+      },
+      {
+        "id": "1107078e",
+        "timestamp": "2026-05-26T22:22:51+00:00",
+        "actor": "Manager Hoffman",
+        "action": "retain_override",
+        "subject": "Bob Jones"
+      }
+    ]
+  }
+}
