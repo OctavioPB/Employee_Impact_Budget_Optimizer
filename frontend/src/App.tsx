@@ -13,7 +13,8 @@ import AdminPage       from './pages/AdminPage'
 import CompensationPage from './pages/CompensationPage'
 import KnowledgePage    from './pages/KnowledgePage'
 import MobilityPage     from './pages/MobilityPage'
-import FairnessPage     from './pages/FairnessPage'
+import FairnessPage      from './pages/FairnessPage'
+import DecisionRoomPage  from './pages/DecisionRoomPage'
 
 export type Page =
   | 'info'
@@ -29,6 +30,7 @@ export type Page =
   | 'knowledge'
   | 'mobility'
   | 'fairness'
+  | 'decision-room'
 
 export default function App() {
   const [page, setPage] = useState<Page>('info')
@@ -47,7 +49,8 @@ export default function App() {
       case 'compensation':  return <CompensationPage />
       case 'knowledge':     return <KnowledgePage />
       case 'mobility':      return <MobilityPage />
-      case 'fairness':      return <FairnessPage />
+      case 'fairness':       return <FairnessPage />
+      case 'decision-room':  return <DecisionRoomPage />
     }
   }
 

@@ -575,4 +575,178 @@ export const api = {
         `/api/fairness?scenario=${scenario}&size=${size}&demo=${demo}`,
       ),
   },
+
+  decisionRoom: {
+    list:   () =>
+      request<DecisionSession[]>('/api/decision-room/sessions'),
+    seed:   (scenario: string, size: string) =>
+      request<DecisionSession>('/api/decision-room/sessions/seed', {
+        method: 'POST', body: JSON.stringify({ scenario, size }),
+      }),
+    create: (body: CreateSessionBody) =>
+      request<DecisionSession>('/api/decision-room/sessions', {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+    get:    (id: string) =>
+      request<DecisionSession>(`/api/decision-room/sessions/${id}`),
+    join:   (id: string, body: { user_id: string; display_name: string; role: string }) =>
+      request<DecisionSession>(`/api/decision-room/sessions/${id}/join`, {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+    updateStatus: (id: string, new_status: string, updated_by: string) =>
+      request<DecisionSession>(`/api/decision-room/sessions/${id}/status`, {
+        method: 'PUT', body: JSON.stringify({ new_status, updated_by }),
+      }),
+    addOverride: (id: string, body: {
+      employee_id: string; employee_name: string;
+      override_type: string; set_by: string; rationale: string
+    }) =>
+      request<DecisionSession>(`/api/decision-room/sessions/${id}/overrides`, {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+    removeOverride: (id: string, employee_id: string, set_by: string) =>
+      request<DecisionSession>(`/api/decision-room/sessions/${id}/overrides/${employee_id}`, {
+        method: 'DELETE', body: JSON.stringify({ set_by }),
+      }),
+    resolveConflict: (id: string, employee_id: string, resolution: string, resolved_by: string) =>
+      request<DecisionSession>(`/api/decision-room/sessions/${id}/conflicts/${employee_id}/resolve`, {
+        method: 'POST', body: JSON.stringify({ resolution, resolved_by }),
+      }),
+    addComment: (id: string, body: {
+      employee_id: string; employee_name: string; author: string; body: string
+    }) =>
+      request<DecisionSession>(`/api/decision-room/sessions/${id}/comments`, {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+    addProposal: (id: string, body: {
+      employee_id: string; employee_name: string;
+      override_type: string; rationale: string; proposed_by: string
+    }) =>
+      request<DecisionSession>(`/api/decision-room/sessions/${id}/proposals`, {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+    addObjection: (id: string, proposal_id: string, objector: string, reason: string) =>
+      request<DecisionSession>(
+        `/api/decision-room/sessions/${id}/proposals/${proposal_id}/objection`, {
+        method: 'POST', body: JSON.stringify({ objector, reason }),
+      }),
+    openVote: (id: string, proposal_id: string, opened_by: string) =>
+      request<DecisionSession>(
+        `/api/decision-room/sessions/${id}/proposals/${proposal_id}/open-vote`, {
+        method: 'POST', body: JSON.stringify({ opened_by }),
+      }),
+    castVote: (id: string, proposal_id: string, voter: string, decision: string) =>
+      request<DecisionSession>(
+        `/api/decision-room/sessions/${id}/proposals/${proposal_id}/vote`, {
+        method: 'POST', body: JSON.stringify({ voter, decision }),
+      }),
+    signOff: (id: string, user_id: string, display_name: string, comment: string) =>
+      request<DecisionSession>(`/api/decision-room/sessions/${id}/sign-off`, {
+        method: 'POST', body: JSON.stringify({ user_id, display_name, comment }),
+      }),
+  },
+}
+
+// ── Decision Room types ───────────────────────────────────────────────────────
+
+export interface SessionParticipant {
+  user_id:      string
+  display_name: string
+  role:         'Owner' | 'Participant' | 'Observer'
+  last_action:  string
+  joined_at:    string
+}
+
+export interface SessionOverride {
+  id:            string
+  employee_id:   string
+  employee_name: string
+  override_type: 'retain' | 'exclude'
+  set_by:        string
+  rationale:     string
+  timestamp:     string
+}
+
+export interface SessionConflict {
+  employee_id:   string
+  employee_name: string
+  retain_by:     string
+  exclude_by:    string
+  resolved:      boolean
+  resolution:    string | null
+  resolved_by:   string | null
+  resolved_at:   string | null
+}
+
+export interface SessionComment {
+  id:            string
+  employee_id:   string
+  employee_name: string
+  author:        string
+  body:          string
+  timestamp:     string
+}
+
+export interface ProposalObjection {
+  objector:  string
+  reason:    string
+  timestamp: string
+}
+
+export interface SessionProposal {
+  id:            string
+  employee_id:   string
+  employee_name: string
+  override_type: 'retain' | 'exclude'
+  rationale:     string
+  proposed_by:   string
+  timestamp:     string
+  objections:    ProposalObjection[]
+  votes:         Record<string, 'yes' | 'no'>
+  vote_open:     boolean
+  vote_result:   'passed' | 'failed' | null
+  applied:       boolean
+}
+
+export interface ActivityEvent {
+  id:        string
+  timestamp: string
+  actor:     string
+  action:    string
+  subject:   string
+}
+
+export interface SessionSignOff {
+  user_id:      string
+  display_name: string
+  comment:      string
+  timestamp:    string
+}
+
+export interface DecisionSession {
+  session_id:      string
+  name:            string
+  scenario:        string
+  size:            string
+  status:          'Draft' | 'Active' | 'Under Review' | 'Finalized'
+  budget_pct:      number
+  resolution_mode: string
+  created_at:      string
+  participants:    SessionParticipant[]
+  overrides:       SessionOverride[]
+  conflicts:       SessionConflict[]
+  comments:        SessionComment[]
+  proposals:       SessionProposal[]
+  sign_offs:       SessionSignOff[]
+  activity:        ActivityEvent[]
+}
+
+export interface CreateSessionBody {
+  name:            string
+  owner_name:      string
+  owner_id:        string
+  scenario:        string
+  size:            string
+  budget_pct:      number
+  resolution_mode: string
 }

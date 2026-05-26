@@ -181,5 +181,305 @@
         "subject": "Bob Jones"
       }
     ]
+  },
+  "bc6bcc13": {
+    "session_id": "bc6bcc13",
+    "name": "Sprint 14 Demo",
+    "scenario": "A",
+    "size": "small",
+    "budget_pct": 85.0,
+    "resolution_mode": "vote",
+    "status": "Finalized",
+    "created_at": "2026-05-26T22:44:04+00:00",
+    "participants": [
+      {
+        "user_id": "u_chen",
+        "display_name": "Director Chen",
+        "role": "Owner",
+        "last_action": "Signed off",
+        "joined_at": "2026-05-26T22:44:04+00:00"
+      },
+      {
+        "user_id": "u_rivera",
+        "display_name": "HR Partner Rivera",
+        "role": "Participant",
+        "last_action": "Signed off",
+        "joined_at": "2026-05-26T22:44:04+00:00"
+      },
+      {
+        "user_id": "u_hoffman",
+        "display_name": "Manager Hoffman",
+        "role": "Participant",
+        "last_action": "Signed off",
+        "joined_at": "2026-05-26T22:44:04+00:00"
+      },
+      {
+        "user_id": "u_okonkwo",
+        "display_name": "Finance Lead Okonkwo",
+        "role": "Observer",
+        "last_action": "Joined",
+        "joined_at": "2026-05-26T22:44:04+00:00"
+      }
+    ],
+    "overrides": [
+      {
+        "id": "f06a63f5",
+        "employee_id": "E001",
+        "employee_name": "Alice Smith",
+        "override_type": "retain",
+        "set_by": "Director Chen",
+        "rationale": "Critical nexus",
+        "timestamp": "2026-05-26T22:44:04+00:00"
+      },
+      {
+        "id": "d5fccf5f",
+        "employee_id": "E002",
+        "employee_name": "Bob Jones",
+        "override_type": "retain",
+        "set_by": "Manager Hoffman",
+        "rationale": "Key skill holder",
+        "timestamp": "2026-05-26T22:44:04+00:00"
+      },
+      {
+        "id": "f90281eb",
+        "employee_id": "E003",
+        "employee_name": "Carol Lee",
+        "override_type": "retain",
+        "set_by": "Manager Hoffman",
+        "rationale": "[Vote passed] Critical project lead",
+        "timestamp": "2026-05-26T22:44:04+00:00"
+      }
+    ],
+    "conflicts": [
+      {
+        "employee_id": "E001",
+        "employee_name": "Alice Smith",
+        "retain_by": "Director Chen",
+        "exclude_by": "HR Partner Rivera",
+        "resolved": true,
+        "resolution": "retain",
+        "resolved_by": "Director Chen",
+        "resolved_at": "2026-05-26T22:44:04+00:00"
+      }
+    ],
+    "comments": [
+      {
+        "id": "c201a08e",
+        "employee_id": "E002",
+        "employee_name": "Bob Jones",
+        "author": "Director Chen",
+        "body": "Bob owns the migration process.",
+        "timestamp": "2026-05-26T22:44:04+00:00"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "17180a7e",
+        "employee_id": "E003",
+        "employee_name": "Carol Lee",
+        "override_type": "retain",
+        "rationale": "Critical project lead",
+        "proposed_by": "Manager Hoffman",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "objections": [
+          {
+            "objector": "HR Partner Rivera",
+            "reason": "Budget overrun risk",
+            "timestamp": "2026-05-26T22:44:04+00:00"
+          }
+        ],
+        "votes": {
+          "Director Chen": "yes",
+          "HR Partner Rivera": "yes",
+          "Manager Hoffman": "yes"
+        },
+        "vote_open": false,
+        "vote_result": "passed",
+        "applied": true
+      }
+    ],
+    "sign_offs": [
+      {
+        "user_id": "u_chen",
+        "display_name": "Director Chen",
+        "comment": "Approved after conflict resolution.",
+        "timestamp": "2026-05-26T22:44:04+00:00"
+      },
+      {
+        "user_id": "u_rivera",
+        "display_name": "HR Partner Rivera",
+        "comment": "Agreed with final outcome.",
+        "timestamp": "2026-05-26T22:44:04+00:00"
+      },
+      {
+        "user_id": "u_hoffman",
+        "display_name": "Manager Hoffman",
+        "comment": "Sign off confirmed.",
+        "timestamp": "2026-05-26T22:44:04+00:00"
+      }
+    ],
+    "activity": [
+      {
+        "id": "cba21cae",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Director Chen",
+        "action": "created",
+        "subject": "Session \"Sprint 14 Demo\""
+      },
+      {
+        "id": "db4293b7",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "HR Partner Rivera",
+        "action": "joined",
+        "subject": "as Participant"
+      },
+      {
+        "id": "15fcf9fc",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Manager Hoffman",
+        "action": "joined",
+        "subject": "as Participant"
+      },
+      {
+        "id": "a8083569",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Finance Lead Okonkwo",
+        "action": "joined",
+        "subject": "as Observer"
+      },
+      {
+        "id": "9739c48f",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Director Chen",
+        "action": "changed status",
+        "subject": "Draft → Active"
+      },
+      {
+        "id": "1dcac211",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Director Chen",
+        "action": "retain_override",
+        "subject": "Alice Smith"
+      },
+      {
+        "id": "f77f4e34",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "HR Partner Rivera",
+        "action": "exclude_override",
+        "subject": "Alice Smith"
+      },
+      {
+        "id": "a2c16ce6",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Manager Hoffman",
+        "action": "retain_override",
+        "subject": "Bob Jones"
+      },
+      {
+        "id": "c9d40f0c",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Director Chen",
+        "action": "commented_on",
+        "subject": "Bob Jones"
+      },
+      {
+        "id": "31167a00",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Manager Hoffman",
+        "action": "proposed",
+        "subject": "retain Carol Lee: Critical project lead"
+      },
+      {
+        "id": "1cbcd82f",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "HR Partner Rivera",
+        "action": "objected_to",
+        "subject": "proposal: retain Carol Lee"
+      },
+      {
+        "id": "fcb92d74",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Director Chen",
+        "action": "opened_vote",
+        "subject": "on retain Carol Lee"
+      },
+      {
+        "id": "593b9415",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Director Chen",
+        "action": "voted",
+        "subject": "yes on Carol Lee"
+      },
+      {
+        "id": "1a7bb2a2",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "HR Partner Rivera",
+        "action": "voted",
+        "subject": "yes on Carol Lee"
+      },
+      {
+        "id": "341118fc",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Manager Hoffman",
+        "action": "voted",
+        "subject": "yes on Carol Lee"
+      },
+      {
+        "id": "3bb8fc9e",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "System",
+        "action": "vote_closed",
+        "subject": "Carol Lee → passed (3Y/0N)"
+      },
+      {
+        "id": "e699ae23",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Manager Hoffman",
+        "action": "retain_override",
+        "subject": "Carol Lee"
+      },
+      {
+        "id": "72fe7104",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Director Chen",
+        "action": "resolved_conflict",
+        "subject": "Alice Smith → retain"
+      },
+      {
+        "id": "f874e093",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Director Chen",
+        "action": "changed status",
+        "subject": "Active → Under Review"
+      },
+      {
+        "id": "5ea9146c",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Director Chen",
+        "action": "signed_off",
+        "subject": ""
+      },
+      {
+        "id": "23827463",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "HR Partner Rivera",
+        "action": "signed_off",
+        "subject": ""
+      },
+      {
+        "id": "924538b1",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "Manager Hoffman",
+        "action": "signed_off",
+        "subject": ""
+      },
+      {
+        "id": "4ecb8aab",
+        "timestamp": "2026-05-26T22:44:04+00:00",
+        "actor": "System",
+        "action": "finalized",
+        "subject": "All required approvers signed off"
+      }
+    ]
   }
 }
