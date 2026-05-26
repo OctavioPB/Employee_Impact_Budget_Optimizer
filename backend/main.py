@@ -4,7 +4,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import dashboard, simulation, predictive, notifications, admin, forecast, compensation, knowledge, mobility
+from backend.routers import dashboard, simulation, predictive, notifications, admin, forecast, compensation, knowledge, mobility, fairness
 
 app = FastAPI(
     title="EIBO API",
@@ -38,6 +38,7 @@ app.include_router(forecast.router,      prefix="/api", tags=["forecast"])
 app.include_router(compensation.router,  prefix="/api", tags=["compensation"])
 app.include_router(knowledge.router,     prefix="/api", tags=["knowledge"])
 app.include_router(mobility.router,      prefix="/api", tags=["mobility"])
+app.include_router(fairness.router,      prefix="/api", tags=["fairness"])
 
 
 @app.get("/api/health", tags=["system"])

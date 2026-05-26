@@ -405,6 +405,79 @@ export interface MobilityData {
   succession: SuccessionRow[]
 }
 
+export interface FairnessGroupStat {
+  group:                string
+  count:                number
+  selected:             number
+  selection_rate:       number
+  avg_score:            number
+  adverse_impact_ratio: number
+  is_reference:         boolean
+  eeoc_pass:            boolean
+}
+
+export interface EEOCRow {
+  dimension:   string
+  model:       string
+  score_col:   string
+  groups:      FairnessGroupStat[]
+  min_air:     number
+  eeoc_pass:   boolean
+  chi2_stat:   number
+  chi2_pval:   number
+  significant: boolean
+}
+
+export interface SimSelectionRow {
+  group:                string
+  count:                number
+  selected:             number
+  selection_rate:       number
+  adverse_impact_ratio: number
+  eeoc_pass:            boolean
+}
+
+export interface CounterfactualRow {
+  attribute:    string
+  model:        string
+  sample_size:  number
+  mean_delta:   number
+  std_delta:    number
+  ci_lower_95:  number
+  ci_upper_95:  number
+  is_fair:      boolean
+}
+
+export interface GroupProfile {
+  dimension:        string
+  group:            string
+  count:            number
+  avg_impact_score: number
+  avg_attrition:    number
+  median_salary:    number
+}
+
+export interface FairnessSummary {
+  total_employees:      number
+  eeoc_threshold:       number
+  dimensions_tested:    number
+  model_outputs_tested: number
+  eeoc_flags:           number
+  sim_flags:            number
+  overall_pass:         boolean
+  counterfactual_fair:  boolean
+}
+
+export interface FairnessData {
+  summary:            FairnessSummary
+  protected_groups:   Record<string, { group: string; count: number }[]>
+  group_profiles:     GroupProfile[]
+  eeoc_analysis:      EEOCRow[]
+  simulation_analysis: Record<string, SimSelectionRow[]>
+  counterfactual:     CounterfactualRow[]
+  note:               string
+}
+
 // ── Base request ─────────────────────────────────────────────────────────
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -493,6 +566,13 @@ export const api = {
     data: (scenario: string, size: string, demo = true) =>
       request<MobilityData>(
         `/api/mobility?scenario=${scenario}&size=${size}&demo=${demo}`,
+      ),
+  },
+
+  fairness: {
+    data: (scenario: string, size: string, demo = true) =>
+      request<FairnessData>(
+        `/api/fairness?scenario=${scenario}&size=${size}&demo=${demo}`,
       ),
   },
 }
