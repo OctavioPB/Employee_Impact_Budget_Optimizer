@@ -321,6 +321,90 @@ export interface KnowledgeData {
   }
 }
 
+export interface MobilitySummary {
+  total_employees:    number
+  stagnated_count:    number
+  avg_stagnation:     number
+  career_paths_count: number
+  succession_gaps:    number
+  leaders_mapped:     number
+}
+
+export interface CareerSuggestion {
+  role_title:      string
+  department:      string
+  seniority:       string
+  skill_overlap:   number
+  gap_skills:      string[]
+  training_cost:   number
+  timeline_months: number
+  target_salary:   number
+  salary_uplift:   number
+  roi:             number
+}
+
+export interface CareerPath {
+  employee_id:      string
+  full_name:        string
+  department:       string
+  seniority_level:  string
+  role_title:       string
+  annual_salary:    number
+  stagnation_score: number
+  current_skills:   string[]
+  suggestions:      CareerSuggestion[]
+}
+
+export interface StagnationDeptRow {
+  department: string
+  avg_score:  number
+  count:      number
+}
+
+export interface StagnationHeatCell {
+  department:      string
+  seniority_level: string
+  avg_score:       number
+  count:           number
+}
+
+export interface StagnationEmployee {
+  employee_id:      string
+  full_name:        string
+  department:       string
+  seniority_level:  string
+  role_title:       string
+  tenure_days:      number
+  stagnation_score: number
+  annual_salary:    number
+}
+
+export interface SuccessionRow {
+  employee_id:      string
+  leader_name:      string
+  role_title:       string
+  department:       string
+  seniority_level:  string
+  depth_1:          string[]
+  depth_2:          string[]
+  depth_3:          string[]
+  depth_1_count:    number
+  depth_2_count:    number
+  depth_3_count:    number
+  succession_gap:   boolean
+}
+
+export interface MobilityData {
+  summary:       MobilitySummary
+  career_paths:  CareerPath[]
+  stagnation: {
+    dept_summary:        StagnationDeptRow[]
+    dept_seniority_heat: StagnationHeatCell[]
+    high_risk:           StagnationEmployee[]
+  }
+  succession: SuccessionRow[]
+}
+
 // ── Base request ─────────────────────────────────────────────────────────
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -402,6 +486,13 @@ export const api = {
     data: (scenario: string, size: string, demo = true) =>
       request<KnowledgeData>(
         `/api/knowledge?scenario=${scenario}&size=${size}&demo=${demo}`,
+      ),
+  },
+
+  mobility: {
+    data: (scenario: string, size: string, demo = true) =>
+      request<MobilityData>(
+        `/api/mobility?scenario=${scenario}&size=${size}&demo=${demo}`,
       ),
   },
 }
