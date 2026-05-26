@@ -15,6 +15,7 @@ const pages: { id: Page; label: string }[] = [
   { id: 'predictive',    label: 'Predictive'    },
   { id: 'forecast',      label: 'Forecast'      },
   { id: 'compensation',  label: 'Compensation'  },
+  { id: 'knowledge',     label: 'Knowledge'     },
   { id: 'strategic',     label: 'Strategic'     },
   { id: 'notifications', label: 'Alerts'        },
   { id: 'admin',         label: 'Admin'         },

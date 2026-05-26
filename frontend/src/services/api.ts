@@ -239,6 +239,88 @@ export interface CompensationData {
   retention_roi: RetentionRoiRow[]
 }
 
+export interface KnowledgeSummary {
+  total_domains:       number
+  skh_domains:         number
+  uncovered_domains:   number
+  skh_employees:       number
+  avg_knowledge_loss:  number
+  high_risk_employees: number
+}
+
+export interface KnowledgeEmployee {
+  employee_id:          string
+  full_name:            string
+  department:           string
+  seniority_level:      string
+  role_title:           string
+  knowledge_loss_score: number
+  domain_count:         number
+  skh_domains:          string[]
+  is_skh:               boolean
+}
+
+export interface KnowledgeDomain {
+  domain_id:          string
+  name:               string
+  criticality:        number
+  holder_count:       number
+  is_skh:             boolean
+  is_uncovered:       boolean
+  primary_holder:     string
+  backup_holder:      string
+  backup_proficiency: number
+  coverage_ratio:     number
+}
+
+export interface TransferRow {
+  domain_id:             string
+  domain_name:           string
+  criticality:           number
+  is_skh:                boolean
+  current_holder:        string
+  current_holder_dept:   string
+  current_proficiency:   number
+  successor:             string
+  successor_proficiency: number
+  proficiency_gap:       number
+  transfer_months:       number
+  transfer_cost:         number
+  urgency_score:         number
+}
+
+export interface HeatmapEmployee {
+  employee_id:          string
+  full_name:            string
+  department:           string
+  knowledge_loss_score: number
+}
+
+export interface HeatmapDomain {
+  domain_id:   string
+  name:        string
+  criticality: number
+}
+
+export interface HeatmapCell {
+  employee_id: string
+  domain_id:   string
+  proficiency: number
+  is_skh:      boolean
+}
+
+export interface KnowledgeData {
+  summary:          KnowledgeSummary
+  employees:        KnowledgeEmployee[]
+  domains:          KnowledgeDomain[]
+  transfer_roadmap: TransferRow[]
+  heatmap: {
+    employees: HeatmapEmployee[]
+    domains:   HeatmapDomain[]
+    cells:     HeatmapCell[]
+  }
+}
+
 // ── Base request ─────────────────────────────────────────────────────────
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -313,6 +395,13 @@ export const api = {
     data: (scenario: string, size: string, demo = true) =>
       request<CompensationData>(
         `/api/compensation?scenario=${scenario}&size=${size}&demo=${demo}`,
+      ),
+  },
+
+  knowledge: {
+    data: (scenario: string, size: string, demo = true) =>
+      request<KnowledgeData>(
+        `/api/knowledge?scenario=${scenario}&size=${size}&demo=${demo}`,
       ),
   },
 }
