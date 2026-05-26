@@ -10,6 +10,7 @@ import PredictivePage  from './pages/PredictivePage'
 import StrategicPage   from './pages/StrategicPage'
 import NotificationsPage from './pages/NotificationsPage'
 import AdminPage       from './pages/AdminPage'
+import CompensationPage from './pages/CompensationPage'
 
 export type Page =
   | 'info'
@@ -21,6 +22,7 @@ export type Page =
   | 'strategic'
   | 'notifications'
   | 'admin'
+  | 'compensation'
 
 export default function App() {
   const [page, setPage] = useState<Page>('info')
@@ -36,6 +38,7 @@ export default function App() {
       case 'strategic':     return <StrategicPage />
       case 'notifications': return <NotificationsPage />
       case 'admin':         return <AdminPage />
+      case 'compensation':  return <CompensationPage />
     }
   }
 

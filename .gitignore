@@ -20,3 +20,4 @@ backups/
 logs/
 planning/
 .streamlit/secrets.toml
+demo.ps1

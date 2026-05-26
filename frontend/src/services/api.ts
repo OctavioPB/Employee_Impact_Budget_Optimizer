@@ -182,6 +182,63 @@ export interface ResetResult {
   cleared_entries: number
 }
 
+export interface CompensationSummary {
+  total_employees:     number
+  median_comp_ratio:   number
+  pct_below_market:    number
+  pct_at_market:       number
+  pct_above_market:    number
+  avg_equity_gap_pct:  number
+  high_roi_candidates: number
+}
+
+export interface CompensationEmployee {
+  employee_id:       string
+  full_name:         string
+  department:        string
+  seniority_level:   string
+  role_title:        string
+  annual_salary:     number
+  market_median:     number
+  comp_ratio:        number
+  market_tier:       'Below Market' | 'At Market' | 'Above Market'
+  demographic_group: 'Group A' | 'Group B'
+}
+
+export interface DeptEquityRow {
+  department:        string
+  headcount:         number
+  group_a_count:     number
+  group_b_count:     number
+  group_a_median:    number
+  group_b_median:    number
+  raw_gap_pct:       number
+  adjusted_gap_pct:  number
+  p_value:           number
+  significant:       boolean
+}
+
+export interface RetentionRoiRow {
+  employee_id:       string
+  full_name:         string
+  department:        string
+  seniority_level:   string
+  role_title:        string
+  annual_salary:     number
+  market_median:     number
+  comp_ratio:        number
+  correction_cost:   number
+  replacement_cost:  number
+  roi:               number
+}
+
+export interface CompensationData {
+  summary:       CompensationSummary
+  employees:     CompensationEmployee[]
+  dept_equity:   DeptEquityRow[]
+  retention_roi: RetentionRoiRow[]
+}
+
 // ── Base request ─────────────────────────────────────────────────────────
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -249,6 +306,13 @@ export const api = {
     monteCarlo: (scenario: string, size: string, demo = true) =>
       request<MonteCarloData>(
         `/api/forecast/montecarlo?scenario=${scenario}&size=${size}&demo=${demo}`,
+      ),
+  },
+
+  compensation: {
+    data: (scenario: string, size: string, demo = true) =>
+      request<CompensationData>(
+        `/api/compensation?scenario=${scenario}&size=${size}&demo=${demo}`,
       ),
   },
 }

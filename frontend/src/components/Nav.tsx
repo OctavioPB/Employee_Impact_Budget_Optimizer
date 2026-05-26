@@ -9,15 +9,16 @@ interface NavProps {
 }
 
 const pages: { id: Page; label: string }[] = [
-  { id: 'dashboard',     label: 'Dashboard'  },
-  { id: 'simulation',    label: 'Simulation' },
-  { id: 'drilldown',     label: 'Drill-Down' },
-  { id: 'predictive',    label: 'Predictive' },
-  { id: 'forecast',      label: 'Forecast'   },
-  { id: 'strategic',     label: 'Strategic'  },
-  { id: 'notifications', label: 'Alerts'     },
-  { id: 'admin',         label: 'Admin'      },
-  { id: 'info',          label: 'Overview'   },
+  { id: 'dashboard',     label: 'Dashboard'     },
+  { id: 'simulation',    label: 'Simulation'    },
+  { id: 'drilldown',     label: 'Drill-Down'    },
+  { id: 'predictive',    label: 'Predictive'    },
+  { id: 'forecast',      label: 'Forecast'      },
+  { id: 'compensation',  label: 'Compensation'  },
+  { id: 'strategic',     label: 'Strategic'     },
+  { id: 'notifications', label: 'Alerts'        },
+  { id: 'admin',         label: 'Admin'         },
+  { id: 'info',          label: 'Overview'      },
 ]
 
 const navStyle: React.CSSProperties = {
