@@ -645,6 +645,18 @@ export const api = {
         method: 'POST', body: JSON.stringify({ user_id, display_name, comment }),
       }),
   },
+
+  resilience: {
+    data: (scenario: string, size: string, demo = true) =>
+      request<ResilienceData>(
+        `/api/resilience?scenario=${scenario}&size=${size}&demo=${demo}`,
+      ),
+    runScenario: (scenario: string, size: string, scenario_type: string, params: Record<string, unknown>) =>
+      request<DisruptionResult>('/api/resilience/scenario', {
+        method: 'POST',
+        body:   JSON.stringify({ scenario, size, scenario_type, params }),
+      }),
+  },
 }
 
 // ── Decision Room types ───────────────────────────────────────────────────────
@@ -749,4 +761,119 @@ export interface CreateSessionBody {
   size:            string
   budget_pct:      number
   resolution_mode: string
+}
+
+// ── Resilience types ──────────────────────────────────────────────────────────
+
+export interface ResilienceSubScores {
+  skill_coverage:           number
+  leadership_depth:         number
+  knowledge_redundancy:     number
+  network_robustness:       number
+  attrition_concentration:  number
+  team_size_buffer:         number
+}
+
+export interface ResilienceScore {
+  overall:    number
+  sub_scores: ResilienceSubScores
+  weights:    ResilienceSubScores
+  grade:      string
+}
+
+export interface DeptResilience {
+  department:   string
+  overall:      number
+  headcount:    number
+  nexus_count:  number
+  at_risk_count:number
+  sub_scores:   ResilienceSubScores
+  grade:        string
+}
+
+export interface CascadeEmployee {
+  employee_id:    string
+  full_name:      string
+  department:     string
+  role_title:     string
+  impact_score:   number
+  attrition_risk: number
+  is_nexus:       boolean
+  departure_round:number
+  trigger_reason: string
+}
+
+export interface CascadeRound {
+  round:     number
+  count:     number
+  employees: CascadeEmployee[]
+}
+
+export interface CascadeAmplifier {
+  employee_id:         string
+  full_name:           string
+  department:          string
+  is_nexus:            boolean
+  impact_score:        number
+  secondary_triggered: number
+}
+
+export interface DisruptionResult {
+  scenario_type:       string
+  scenario_label:      string
+  params:              Record<string, string | number | boolean>
+  primary_count:       number
+  total_departed:      number
+  cascade_multiplier:  number
+  financial_impact:    number
+  orphaned_skills:     string[]
+  teams_below_minimum: string[]
+  resilience_before:   number
+  resilience_after:    number
+  resilience_delta:    number
+  cascade_rounds:      CascadeRound[]
+  primary_employees:   CascadeEmployee[]
+  cascade_amplifiers:  CascadeAmplifier[]
+}
+
+export interface DisruptionPreset {
+  label:  string
+  type:   string
+  params: Record<string, string | number | boolean>
+}
+
+export interface ResilienceTrendPoint {
+  month: string
+  score: number
+}
+
+export interface ResilienceIntervention {
+  dimension:        string
+  dimension_label:  string
+  description:      string
+  current_score:    number
+  cost:             number
+  score_improvement:number
+  priority:         'critical' | 'high' | 'medium' | 'low'
+  timeline_months:  number
+  roi:              number
+}
+
+export interface ResilienceSummary {
+  total_employees:         number
+  overall_resilience:      number
+  grade:                   string
+  nexus_count:             number
+  at_risk_teams:           number
+  top_cascade_amplifier:   string
+  intervention_count:      number
+}
+
+export interface ResilienceData {
+  summary:            ResilienceSummary
+  org_resilience:     ResilienceScore
+  dept_resilience:    DeptResilience[]
+  interventions:      ResilienceIntervention[]
+  disruption_presets: DisruptionPreset[]
+  trend:              ResilienceTrendPoint[]
 }

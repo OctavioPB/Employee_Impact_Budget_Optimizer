@@ -19,6 +19,7 @@ const pages: { id: Page; label: string }[] = [
   { id: 'mobility',      label: 'Mobility'      },
   { id: 'fairness',       label: 'Fairness'      },
   { id: 'decision-room',  label: 'Decision Room' },
+  { id: 'resilience',     label: 'Resilience'    },
   { id: 'strategic',      label: 'Strategic'     },
   { id: 'notifications', label: 'Alerts'        },
   { id: 'admin',         label: 'Admin'         },
