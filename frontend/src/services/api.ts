@@ -657,6 +657,23 @@ export const api = {
         body:   JSON.stringify({ scenario, size, scenario_type, params }),
       }),
   },
+
+  ld: {
+    data: (scenario: string, size: string, demo = true) =>
+      request<LDData>(
+        `/api/ld?scenario=${scenario}&size=${size}&demo=${demo}`,
+      ),
+    optimize: (body: { scenario: string; size: string; budget: number; max_per_employee: number; close_gaps: boolean }) =>
+      request<LDOptimizationResult>('/api/ld/optimize', {
+        method: 'POST',
+        body:   JSON.stringify(body),
+      }),
+    pareto: (body: { scenario: string; size: string; total_budget: number }) =>
+      request<ParetoPoint[]>('/api/ld/pareto', {
+        method: 'POST',
+        body:   JSON.stringify(body),
+      }),
+  },
 }
 
 // ── Decision Room types ───────────────────────────────────────────────────────
@@ -876,4 +893,129 @@ export interface ResilienceData {
   interventions:      ResilienceIntervention[]
   disruption_presets: DisruptionPreset[]
   trend:              ResilienceTrendPoint[]
+}
+
+// ── L&D types ─────────────────────────────────────────────────────────────────
+
+export interface TrainingProgram {
+  id:               string
+  name:             string
+  track:            string
+  target_skill:     string
+  cost:             number
+  duration_weeks:   number
+  proficiency_gain: number
+  prerequisites:    string[]
+  capacity:         number
+}
+
+export interface TrainingAllocation {
+  employee_id:          string
+  full_name:            string
+  department:           string
+  role_title:           string
+  seniority_level:      string
+  impact_score:         number
+  attrition_risk:       number
+  learning_velocity:    number
+  program_id:           string
+  program_name:         string
+  track:                string
+  cost:                 number
+  duration_weeks:       number
+  impact_delta:         number
+  attrition_reduction:  number
+  roi:                  number
+}
+
+export interface LDOptimizationResult {
+  budget:                       number
+  budget_used:                  number
+  total_allocations:            number
+  unique_employees:             number
+  expected_impact_gain:         number
+  expected_attrition_reduction: number
+  gap_closures:                 number
+  allocations:                  TrainingAllocation[]
+  status:                       string
+}
+
+export interface ParetoPoint {
+  ld_pct:            number
+  retention_pct:     number
+  ld_budget:         number
+  retention_budget:  number
+  retention_impact:  number
+  ld_impact_gain:    number
+  combined_score:    number
+}
+
+export interface SkillGapRow {
+  department:           string
+  skill:                string
+  current_holders:      number
+  required_holders:     number
+  gap_severity:         'critical' | 'high' | 'medium' | 'low'
+  recommended_programs: string[]
+  internal_closeable:   boolean
+  estimated_cost:       number
+  affected_employees:   number
+}
+
+export interface ROIRecord {
+  id:                string
+  program_name:      string
+  track:             string
+  completion_month:  string
+  participants:      number
+  total_cost:        number
+  predicted_roi:     number
+  actual_roi:        number
+  avg_impact_delta:  number
+  status:            'above_forecast' | 'on_target' | 'below_forecast'
+}
+
+export interface TrainingProgramEffectiveness {
+  program_id:          string
+  program_name:        string
+  track:               string
+  cost:                number
+  duration_weeks:      number
+  impact_delta:        number
+  attrition_reduction: number
+  proficiency_gain:    number
+  roi:                 number
+  eligible:            boolean
+}
+
+export interface EmployeePreview {
+  employee_id:      string
+  full_name:        string
+  department:       string
+  role_title:       string
+  seniority_level:  string
+  impact_score:     number
+  attrition_risk:   number
+  learning_velocity:number
+  programs:         TrainingProgramEffectiveness[]
+}
+
+export interface LDSummary {
+  total_employees:        number
+  catalog_size:           number
+  skill_gaps:             number
+  critical_gaps:          number
+  avg_learning_velocity:  number
+  default_budget:         number
+  expected_impact_gain:   number
+}
+
+export interface LDData {
+  summary:              LDSummary
+  catalog:              TrainingProgram[]
+  default_optimization: LDOptimizationResult
+  skill_gaps:           SkillGapRow[]
+  roi_history:          ROIRecord[]
+  pareto_frontier:      ParetoPoint[]
+  employee_previews:    EmployeePreview[]
 }

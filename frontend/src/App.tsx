@@ -16,6 +16,7 @@ import MobilityPage     from './pages/MobilityPage'
 import FairnessPage      from './pages/FairnessPage'
 import DecisionRoomPage  from './pages/DecisionRoomPage'
 import ResiliencePage    from './pages/ResiliencePage'
+import LDPage            from './pages/LDPage'
 
 export type Page =
   | 'info'
@@ -33,6 +34,7 @@ export type Page =
   | 'fairness'
   | 'decision-room'
   | 'resilience'
+  | 'ld'
 
 export default function App() {
   const [page, setPage] = useState<Page>('info')
@@ -54,6 +56,7 @@ export default function App() {
       case 'fairness':       return <FairnessPage />
       case 'decision-room':  return <DecisionRoomPage />
       case 'resilience':     return <ResiliencePage />
+      case 'ld':             return <LDPage />
     }
   }
 
