@@ -710,6 +710,32 @@ export const api = {
         method: 'POST', body: JSON.stringify(body),
       }),
   },
+
+  apiKeys: {
+    list:    ()                         => request<ApiKeyRecord[]>('/api/v1/api-keys'),
+    scopes:  ()                         => request<string[]>('/api/v1/api-keys/scopes'),
+    sandbox: ()                         => request<{ key: string; scope: string; label: string }>('/api/v1/api-keys/sandbox'),
+    create:  (body: ApiKeyCreateRequest) => request<ApiKeyCreateResult>('/api/v1/api-keys', {
+      method: 'POST', body: JSON.stringify(body),
+    }),
+    revoke:  (keyId: string)            => request<{ status: string; key_id: string }>(`/api/v1/api-keys/${keyId}`, { method: 'DELETE' }),
+    verify:  (key: string)              => request<{ valid: boolean; scope: string; label: string }>('/api/v1/api-keys/verify', {
+      method: 'POST', body: JSON.stringify({ key }),
+    }),
+  },
+
+  webhooks: {
+    list:       ()                               => request<WebhookRecord[]>('/api/v1/webhooks'),
+    eventTypes: ()                               => request<string[]>('/api/v1/webhooks/event-types'),
+    create:     (body: WebhookCreateRequest)     => request<WebhookRecord & { secret: string }>('/api/v1/webhooks', {
+      method: 'POST', body: JSON.stringify(body),
+    }),
+    remove:     (id: string)                     => request<{ status: string }>(`/api/v1/webhooks/${id}`, { method: 'DELETE' }),
+    setActive:  (id: string, active: boolean)    => request<{ status: string; active: boolean }>(`/api/v1/webhooks/${id}`, {
+      method: 'PATCH', body: JSON.stringify({ active }),
+    }),
+    test:       (id: string)                     => request<WebhookDeliveryLog>(`/api/v1/webhooks/${id}/test`, { method: 'POST' }),
+  },
 }
 
 // ── Decision Room types ───────────────────────────────────────────────────────
@@ -1217,4 +1243,55 @@ export interface NarrativePageData {
   top_impact_employees:   NarrativeEmployee[]
   priority_employees:     NarrativeEmployee[]
   org_stats:              NarrativeOrgStats
+}
+
+// ── Sprint 19: API Keys & Webhooks types ──────────────────────────────────────
+
+export interface ApiKeyRecord {
+  key_id:     string
+  key_prefix: string
+  label:      string
+  scope:      string
+  created_at: number
+  last_used:  number
+  rate_limit: number
+}
+
+export interface ApiKeyCreateRequest {
+  label:      string
+  scope:      string
+  rate_limit: number
+}
+
+export interface ApiKeyCreateResult extends ApiKeyRecord {
+  key:     string
+  warning: string
+}
+
+export interface WebhookDeliveryLog {
+  event:       string
+  attempt:     number
+  ts:          number
+  status:      string
+  http_status?: number
+  error?:      string
+}
+
+export interface WebhookRecord {
+  webhook_id:       string
+  url:              string
+  events:           string[]
+  label:            string
+  active:           boolean
+  created_at:       number
+  secret_hint:      string
+  total_deliveries: number
+  last_delivery:    WebhookDeliveryLog | null
+}
+
+export interface WebhookCreateRequest {
+  url:    string
+  events: string[]
+  label:  string
+  secret: string
 }

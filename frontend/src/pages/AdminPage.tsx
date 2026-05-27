@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { api, GenerateResult } from '../services/api'
+import { useState, useEffect, useRef } from 'react'
+import { api, GenerateResult, ApiKeyRecord, ApiKeyCreateResult, WebhookRecord } from '../services/api'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ const ROLE_COLORS: Record<string, string> = {
   Admin:     'var(--status-red)',
 }
 
-type AdminTab = 'health' | 'users' | 'rbac' | 'audit' | 'demo'
+type AdminTab = 'health' | 'users' | 'rbac' | 'audit' | 'demo' | 'api-keys' | 'webhooks'
 
 function StatusDot({ ok }: { ok: boolean }) {
   return (
@@ -76,6 +76,30 @@ export default function AdminPage() {
   const [users,   setUsers]   = useState<RbacUser[]>(DEMO_USERS)
   const [editRole, setEditRole] = useState<Record<string, string>>({})
 
+  // ── API Keys state ──────────────────────────────────────────────────────────
+  const [keys,          setKeys]          = useState<ApiKeyRecord[]>([])
+  const [keyScopes,     setKeyScopes]     = useState<string[]>([])
+  const [newKeyLabel,   setNewKeyLabel]   = useState('')
+  const [newKeyScope,   setNewKeyScope]   = useState('analyst')
+  const [newKeyLimit,   setNewKeyLimit]   = useState(100)
+  const [keyLoading,    setKeyLoading]    = useState(false)
+  const [keyError,      setKeyError]      = useState<string | null>(null)
+  const [createdKey,    setCreatedKey]    = useState<ApiKeyCreateResult | null>(null)
+  const [keyCopied,     setKeyCopied]     = useState(false)
+  const [sandboxKey,    setSandboxKey]    = useState('')
+
+  // ── Webhooks state ──────────────────────────────────────────────────────────
+  const [webhooks,      setWebhooks]      = useState<WebhookRecord[]>([])
+  const [eventTypes,    setEventTypes]    = useState<string[]>([])
+  const [whUrl,         setWhUrl]         = useState('')
+  const [whLabel,       setWhLabel]       = useState('')
+  const [whEvents,      setWhEvents]      = useState<string[]>([])
+  const [whLoading,     setWhLoading]     = useState(false)
+  const [whError,       setWhError]       = useState<string | null>(null)
+  const [whCreated,     setWhCreated]     = useState<(WebhookRecord & { secret?: string }) | null>(null)
+  const [whTestResults, setWhTestResults] = useState<Record<string, string>>({})
+  const sandboxShownRef = useRef(false)
+
   // Demo admin state
   const [demoScenario, setDemoScenario]   = useState('A')
   const [demoSize,     setDemoSize]       = useState('small')
@@ -94,6 +118,20 @@ export default function AdminPage() {
       .then(r => setHealthy(r.status === 'ok'))
       .catch(() => setHealthy(false))
   }, [])
+
+  useEffect(() => {
+    if (tab === 'api-keys') {
+      api.apiKeys.list().then(setKeys).catch(() => {})
+      api.apiKeys.scopes().then(setKeyScopes).catch(() => {})
+      if (!sandboxShownRef.current) {
+        api.apiKeys.sandbox().then(r => { setSandboxKey(r.key); sandboxShownRef.current = true }).catch(() => {})
+      }
+    }
+    if (tab === 'webhooks') {
+      api.webhooks.list().then(setWebhooks).catch(() => {})
+      api.webhooks.eventTypes().then(setEventTypes).catch(() => {})
+    }
+  }, [tab])
 
   const tabBtn = (id: AdminTab, label: string) => {
     const active = tab === id
@@ -131,11 +169,13 @@ export default function AdminPage() {
             Admin Console
           </h1>
           <div style={{ display: 'flex', gap: 4, borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
-            {tabBtn('health', 'System Health')}
-            {tabBtn('users',  'Users')}
-            {tabBtn('rbac',   'Permissions')}
-            {tabBtn('audit',  'Audit Log')}
-            {tabBtn('demo',   'Demo Admin')}
+            {tabBtn('health',    'System Health')}
+            {tabBtn('users',     'Users')}
+            {tabBtn('rbac',      'Permissions')}
+            {tabBtn('audit',     'Audit Log')}
+            {tabBtn('demo',      'Demo Admin')}
+            {tabBtn('api-keys',  'API Keys')}
+            {tabBtn('webhooks',  'Webhooks')}
           </div>
         </div>
       </div>
@@ -568,6 +608,265 @@ export default function AdminPage() {
                 )}
               </div>
 
+            </div>
+          </>
+        )}
+
+        {/* ── API Keys ────────────────────────────────────────────────── */}
+        {tab === 'api-keys' && (
+          <>
+            {/* Sandbox key info */}
+            {sandboxKey && (
+              <div style={{ backgroundColor: 'rgba(39,185,124,0.06)', border: '1px solid rgba(39,185,124,0.2)', borderRadius: 'var(--radius-md)', padding: '14px 20px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: 'var(--fb)', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase' as const, color: 'var(--status-green)', fontWeight: 700, marginBottom: 4 }}>Sandbox Key (safe to share — returns demo data only)</div>
+                  <code style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--dark)', letterSpacing: '0.5px' }}>{sandboxKey}</code>
+                </div>
+                <button onClick={() => { navigator.clipboard.writeText(sandboxKey) }} style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase' as const, padding: '6px 14px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--status-green)', backgroundColor: 'transparent', color: 'var(--status-green)', cursor: 'pointer' }}>Copy</button>
+              </div>
+            )}
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 24, alignItems: 'start' }}>
+              {/* Key list */}
+              <div>
+                <div style={{ fontFamily: 'var(--fd)', fontSize: 20, fontWeight: 600, color: 'var(--primary)', marginBottom: 16 }}>Active API Keys</div>
+                {keys.length === 0 ? (
+                  <div style={{ backgroundColor: 'var(--white)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-card)', padding: '28px', textAlign: 'center' as const, color: 'var(--mid)', fontFamily: 'var(--fb)', fontSize: 13 }}>No custom keys yet. Create one to get started.</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {keys.map(k => (
+                      <div key={k.key_id} style={{ backgroundColor: 'var(--white)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-card)', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                            <span style={{ fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 600, color: 'var(--dark)' }}>{k.label}</span>
+                            <span style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px', textTransform: 'uppercase' as const, padding: '2px 8px', borderRadius: 'var(--radius-pill)', backgroundColor: 'var(--primary-10)', color: 'var(--primary)' }}>{k.scope}</span>
+                          </div>
+                          <div style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--mid)' }}>{k.key_prefix}…</div>
+                          <div style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'var(--mid)', marginTop: 3 }}>
+                            {k.rate_limit} req/min · Last used: {k.last_used ? new Date(k.last_used * 1000).toLocaleDateString() : 'Never'}
+                          </div>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            await api.apiKeys.revoke(k.key_id).catch(() => {})
+                            api.apiKeys.list().then(setKeys).catch(() => {})
+                          }}
+                          style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px', textTransform: 'uppercase' as const, padding: '6px 14px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--status-red)', backgroundColor: 'transparent', color: 'var(--status-red)', cursor: 'pointer' }}
+                        >Revoke</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Create key form */}
+              <div style={{ backgroundColor: 'var(--white)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-card)', padding: 24 }}>
+                <div style={{ fontFamily: 'var(--fd)', fontSize: 17, fontWeight: 600, color: 'var(--primary)', marginBottom: 20 }}>Create New Key</div>
+
+                {['Label', 'Scope', 'Rate Limit (req/min)'].map(lbl => (
+                  <div key={lbl} style={{ marginBottom: 16 }}>
+                    <div style={{ fontFamily: 'var(--fb)', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase' as const, color: 'var(--mid)', marginBottom: 6 }}>{lbl}</div>
+                    {lbl === 'Label' && (
+                      <input value={newKeyLabel} onChange={e => setNewKeyLabel(e.target.value)} placeholder="e.g. HRIS Portal Read" style={{ width: '100%', boxSizing: 'border-box' as const, fontFamily: 'var(--fb)', fontSize: 12, padding: '8px 12px', border: '1px solid var(--primary-10)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--light)', color: 'var(--dark)', outline: 'none' }} />
+                    )}
+                    {lbl === 'Scope' && (
+                      <select value={newKeyScope} onChange={e => setNewKeyScope(e.target.value)} style={{ width: '100%', fontFamily: 'var(--fb)', fontSize: 12, padding: '8px 12px', border: '1px solid var(--primary-10)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--light)', color: 'var(--dark)', outline: 'none' }}>
+                        {(keyScopes.length ? keyScopes : ['viewer','analyst','manager','director','executive','demo']).map(s => <option key={s}>{s}</option>)}
+                      </select>
+                    )}
+                    {lbl === 'Rate Limit (req/min)' && (
+                      <input type="number" value={newKeyLimit} onChange={e => setNewKeyLimit(Number(e.target.value))} min={10} max={10000} style={{ width: '100%', boxSizing: 'border-box' as const, fontFamily: 'var(--fb)', fontSize: 12, padding: '8px 12px', border: '1px solid var(--primary-10)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--light)', color: 'var(--dark)', outline: 'none' }} />
+                    )}
+                  </div>
+                ))}
+
+                {keyError && <div style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--status-red)', marginBottom: 12 }}>{keyError}</div>}
+
+                <button
+                  disabled={keyLoading || !newKeyLabel.trim()}
+                  onClick={async () => {
+                    setKeyLoading(true); setKeyError(null); setCreatedKey(null); setKeyCopied(false)
+                    try {
+                      const result = await api.apiKeys.create({ label: newKeyLabel.trim(), scope: newKeyScope, rate_limit: newKeyLimit })
+                      setCreatedKey(result)
+                      setNewKeyLabel('')
+                      api.apiKeys.list().then(setKeys).catch(() => {})
+                    } catch (e) { setKeyError(e instanceof Error ? e.message : 'Failed') }
+                    finally { setKeyLoading(false) }
+                  }}
+                  style={{ width: '100%', fontFamily: 'var(--fb)', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase' as const, fontWeight: 700, padding: '11px 0', border: 'none', borderRadius: 'var(--radius-sm)', backgroundColor: keyLoading || !newKeyLabel.trim() ? 'var(--mid)' : 'var(--gold)', color: '#fff', cursor: keyLoading || !newKeyLabel.trim() ? 'not-allowed' : 'pointer' }}
+                >{keyLoading ? 'Creating…' : 'Generate Key'}</button>
+
+                {createdKey && (
+                  <div style={{ marginTop: 16, backgroundColor: 'rgba(39,185,124,0.06)', border: '1px solid rgba(39,185,124,0.25)', borderRadius: 'var(--radius-sm)', padding: '14px' }}>
+                    <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase' as const, color: 'var(--status-green)', fontWeight: 700, marginBottom: 8 }}>Key Created — Copy Now</div>
+                    <code style={{ display: 'block', fontFamily: 'monospace', fontSize: 10, color: 'var(--dark)', wordBreak: 'break-all' as const, marginBottom: 10 }}>{createdKey.key}</code>
+                    <button onClick={() => { navigator.clipboard.writeText(createdKey.key); setKeyCopied(true) }} style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px', textTransform: 'uppercase' as const, padding: '5px 12px', border: '1px solid var(--status-green)', borderRadius: 'var(--radius-sm)', backgroundColor: 'transparent', color: keyCopied ? 'var(--status-green)' : 'var(--mid)', cursor: 'pointer' }}>
+                      {keyCopied ? 'Copied!' : 'Copy to clipboard'}
+                    </button>
+                    <div style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'var(--status-red)', marginTop: 8 }}>{createdKey.warning}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Widget embed codes */}
+            <div style={{ marginTop: 32 }}>
+              <div style={{ fontFamily: 'var(--fd)', fontSize: 20, fontWeight: 600, color: 'var(--primary)', marginBottom: 16 }}>Embeddable Widgets</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+                {[
+                  { name: 'Impact Score Badge',       file: 'eibo-impact-badge.js',      tag: 'eibo-impact-badge',      desc: 'Employee impact score with top SHAP driver — for HRIS profile pages.' },
+                  { name: 'Department Health Sparkline', file: 'eibo-dept-sparkline.js',  tag: 'eibo-dept-sparkline',    desc: 'Mini OHI trend chart for a department — for manager portals.' },
+                  { name: 'Attrition Risk Alert',     file: 'eibo-attrition-alert.js',   tag: 'eibo-attrition-alert',   desc: 'Count of high/critical risk employees — for executive dashboards.' },
+                  { name: 'Budget Forecast Chip',     file: 'eibo-budget-chip.js',       tag: 'eibo-budget-chip',       desc: 'Current month vs budget with 6-month forecast arrow — for finance portals.' },
+                ].map(w => (
+                  <div key={w.name} style={{ backgroundColor: 'var(--white)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-card)', padding: '18px 20px' }}>
+                    <div style={{ fontFamily: 'var(--fd)', fontSize: 14, fontWeight: 600, color: 'var(--primary)', marginBottom: 4 }}>{w.name}</div>
+                    <div style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--mid)', marginBottom: 12, lineHeight: 1.5 }}>{w.desc}</div>
+                    <pre style={{ backgroundColor: 'var(--light)', borderRadius: 'var(--radius-sm)', padding: '10px 12px', fontSize: 10, color: 'var(--dark)', overflowX: 'auto' as const, margin: 0, whiteSpace: 'pre-wrap' as const, wordBreak: 'break-all' as const }}>
+{`<script src="/widgets/${w.file}"></script>
+<${w.tag}
+  api-key="${sandboxKey || 'eibo_demo_sandbox…'}"
+  base-url="http://localhost:8000"
+  scenario="A" size="small">
+</${w.tag}>`}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ── Webhooks ─────────────────────────────────────────────────── */}
+        {tab === 'webhooks' && (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 24, alignItems: 'start' }}>
+              {/* Webhook list */}
+              <div>
+                <div style={{ fontFamily: 'var(--fd)', fontSize: 20, fontWeight: 600, color: 'var(--primary)', marginBottom: 16 }}>Registered Webhooks</div>
+                {webhooks.length === 0 ? (
+                  <div style={{ backgroundColor: 'var(--white)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-card)', padding: '28px', textAlign: 'center' as const, color: 'var(--mid)', fontFamily: 'var(--fb)', fontSize: 13 }}>No webhooks registered yet.</div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {webhooks.map(wh => (
+                      <div key={wh.webhook_id} style={{ backgroundColor: 'var(--white)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-card)', padding: '16px 20px', borderLeft: `3px solid ${wh.active ? 'var(--status-green)' : 'var(--mid)'}` }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                          <div>
+                            <div style={{ fontFamily: 'var(--fb)', fontSize: 13, fontWeight: 600, color: 'var(--dark)', marginBottom: 2 }}>{wh.label}</div>
+                            <div style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--mid)' }}>{wh.url}</div>
+                          </div>
+                          <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginLeft: 16 }}>
+                            <button
+                              onClick={async () => {
+                                setWhTestResults(prev => ({ ...prev, [wh.webhook_id]: 'Sending…' }))
+                                try {
+                                  const r = await api.webhooks.test(wh.webhook_id)
+                                  setWhTestResults(prev => ({ ...prev, [wh.webhook_id]: r.status }))
+                                } catch { setWhTestResults(prev => ({ ...prev, [wh.webhook_id]: 'Error' })) }
+                              }}
+                              style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px', textTransform: 'uppercase' as const, padding: '5px 10px', border: '1px solid var(--primary)', borderRadius: 'var(--radius-sm)', backgroundColor: 'transparent', color: 'var(--primary)', cursor: 'pointer' }}
+                            >Test</button>
+                            <button
+                              onClick={async () => {
+                                await api.webhooks.setActive(wh.webhook_id, !wh.active).catch(() => {})
+                                api.webhooks.list().then(setWebhooks).catch(() => {})
+                              }}
+                              style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px', textTransform: 'uppercase' as const, padding: '5px 10px', border: `1px solid ${wh.active ? 'var(--status-orange)' : 'var(--status-green)'}`, borderRadius: 'var(--radius-sm)', backgroundColor: 'transparent', color: wh.active ? 'var(--status-orange)' : 'var(--status-green)', cursor: 'pointer' }}
+                            >{wh.active ? 'Pause' : 'Resume'}</button>
+                            <button
+                              onClick={async () => {
+                                await api.webhooks.remove(wh.webhook_id).catch(() => {})
+                                api.webhooks.list().then(setWebhooks).catch(() => {})
+                              }}
+                              style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px', textTransform: 'uppercase' as const, padding: '5px 10px', border: '1px solid var(--status-red)', borderRadius: 'var(--radius-sm)', backgroundColor: 'transparent', color: 'var(--status-red)', cursor: 'pointer' }}
+                            >Delete</button>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 6 }}>
+                          {wh.events.map(ev => (
+                            <span key={ev} style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1px', textTransform: 'uppercase' as const, padding: '2px 8px', borderRadius: 'var(--radius-pill)', backgroundColor: 'var(--primary-10)', color: 'var(--primary)' }}>{ev}</span>
+                          ))}
+                        </div>
+                        <div style={{ display: 'flex', gap: 16, fontFamily: 'var(--fb)', fontSize: 10, color: 'var(--mid)' }}>
+                          <span>Secret: <code style={{ fontFamily: 'monospace' }}>{wh.secret_hint}</code></span>
+                          <span>{wh.total_deliveries} deliveries</span>
+                          {wh.last_delivery && <span>Last: <span style={{ color: wh.last_delivery.status === 'delivered' ? 'var(--status-green)' : 'var(--status-red)' }}>{wh.last_delivery.status}</span></span>}
+                          {whTestResults[wh.webhook_id] && <span>Test: <span style={{ color: whTestResults[wh.webhook_id] === 'delivered' ? 'var(--status-green)' : 'var(--status-orange)' }}>{whTestResults[wh.webhook_id]}</span></span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Register form */}
+              <div style={{ backgroundColor: 'var(--white)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-card)', padding: 24 }}>
+                <div style={{ fontFamily: 'var(--fd)', fontSize: 17, fontWeight: 600, color: 'var(--primary)', marginBottom: 20 }}>Register Webhook</div>
+
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontFamily: 'var(--fb)', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase' as const, color: 'var(--mid)', marginBottom: 6 }}>Endpoint URL</div>
+                  <input value={whUrl} onChange={e => setWhUrl(e.target.value)} placeholder="https://portal.internal/eibo/hook" style={{ width: '100%', boxSizing: 'border-box' as const, fontFamily: 'var(--fb)', fontSize: 12, padding: '8px 12px', border: '1px solid var(--primary-10)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--light)', color: 'var(--dark)', outline: 'none' }} />
+                </div>
+
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontFamily: 'var(--fb)', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase' as const, color: 'var(--mid)', marginBottom: 6 }}>Label</div>
+                  <input value={whLabel} onChange={e => setWhLabel(e.target.value)} placeholder="e.g. HRIS Portal Listener" style={{ width: '100%', boxSizing: 'border-box' as const, fontFamily: 'var(--fb)', fontSize: 12, padding: '8px 12px', border: '1px solid var(--primary-10)', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--light)', color: 'var(--dark)', outline: 'none' }} />
+                </div>
+
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontFamily: 'var(--fb)', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase' as const, color: 'var(--mid)', marginBottom: 8 }}>Events</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {(eventTypes.length ? eventTypes : ['attrition.risk.threshold_crossed','impact.score.updated','simulation.completed','ohi.alert','notification.created']).map(ev => (
+                      <label key={ev} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                        <input type="checkbox" checked={whEvents.includes(ev)} onChange={e => setWhEvents(prev => e.target.checked ? [...prev, ev] : prev.filter(x => x !== ev))} style={{ accentColor: 'var(--gold)' }} />
+                        <span style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--dark)' }}>{ev}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {whError && <div style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'var(--status-red)', marginBottom: 12 }}>{whError}</div>}
+
+                <button
+                  disabled={whLoading || !whUrl.trim() || !whLabel.trim() || whEvents.length === 0}
+                  onClick={async () => {
+                    setWhLoading(true); setWhError(null); setWhCreated(null)
+                    try {
+                      const result = await api.webhooks.create({ url: whUrl.trim(), label: whLabel.trim(), events: whEvents, secret: '' })
+                      setWhCreated(result)
+                      setWhUrl(''); setWhLabel(''); setWhEvents([])
+                      api.webhooks.list().then(setWebhooks).catch(() => {})
+                    } catch (e) { setWhError(e instanceof Error ? e.message : 'Failed') }
+                    finally { setWhLoading(false) }
+                  }}
+                  style={{ width: '100%', fontFamily: 'var(--fb)', fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase' as const, fontWeight: 700, padding: '11px 0', border: 'none', borderRadius: 'var(--radius-sm)', backgroundColor: whLoading || !whUrl.trim() || !whLabel.trim() || whEvents.length === 0 ? 'var(--mid)' : 'var(--gold)', color: '#fff', cursor: 'pointer' }}
+                >{whLoading ? 'Registering…' : 'Register Webhook'}</button>
+
+                {whCreated && (
+                  <div style={{ marginTop: 16, backgroundColor: 'rgba(39,185,124,0.06)', border: '1px solid rgba(39,185,124,0.25)', borderRadius: 'var(--radius-sm)', padding: '14px' }}>
+                    <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '2px', textTransform: 'uppercase' as const, color: 'var(--status-green)', fontWeight: 700, marginBottom: 6 }}>Registered — Save Signing Secret</div>
+                    <div style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'var(--mid)', marginBottom: 4 }}>Verify webhook authenticity with <code style={{ fontFamily: 'monospace' }}>X-EIBO-Signature</code> header (HMAC-SHA256).</div>
+                    <code style={{ display: 'block', fontFamily: 'monospace', fontSize: 10, color: 'var(--dark)', wordBreak: 'break-all' as const }}>{whCreated.secret}</code>
+                  </div>
+                )}
+
+                <div style={{ marginTop: 24, borderTop: '1px solid var(--primary-10)', paddingTop: 16 }}>
+                  <div style={{ fontFamily: 'var(--fd)', fontSize: 13, fontWeight: 600, color: 'var(--primary)', marginBottom: 8 }}>Event Reference</div>
+                  {[
+                    { ev: 'attrition.risk.threshold_crossed', desc: 'Employee crosses a configurable attrition risk level' },
+                    { ev: 'impact.score.updated',             desc: 'Scores refreshed after a data pipeline run' },
+                    { ev: 'simulation.completed',             desc: 'Budget simulation finished with summary payload' },
+                    { ev: 'ohi.alert',                        desc: 'OHI drops below configured floor (90-day window)' },
+                    { ev: 'notification.created',             desc: 'Any new platform alert or notification' },
+                  ].map(({ ev, desc }) => (
+                    <div key={ev} style={{ padding: '7px 0', borderBottom: '1px solid var(--primary-10)' }}>
+                      <code style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--primary)' }}>{ev}</code>
+                      <div style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'var(--mid)', marginTop: 2 }}>{desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </>
         )}
