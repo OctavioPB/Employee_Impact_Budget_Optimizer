@@ -147,6 +147,18 @@ function BusinessView() {
           <PainCard
             title="Workforce decisions lack documented justification"
             body="In regulated industries and in organizations subject to employment law, a decision that results in someone not being retained carries legal and compliance exposure unless it has a data-supported, role-appropriate, documented rationale. Most current processes cannot provide this at the individual level." />
+          <PainCard
+            title="Institutional knowledge has no inventory"
+            body="When a senior engineer or domain specialist leaves, the organization often discovers only afterward which processes, client relationships, system behaviors, and undocumented decisions lived exclusively in that person's head. Knowledge transfer is treated as an offboarding task rather than a continuous risk management practice." />
+          <PainCard
+            title="Pay equity gaps are discovered in litigation, not analysis"
+            body="Compensation disparities by gender, age bracket, or tenure cohort that are not explained by role, seniority, or performance are a structural and legal risk. Most organizations have no mechanism to surface these gaps systematically before they become complaints or regulatory inquiries." />
+          <PainCard
+            title="Disengagement accumulates in the background, invisible until departure"
+            body="Behavioral signals — declining calendar density, reduced cross-team interaction, increasing after-hours work — change gradually weeks or months before formal disengagement or resignation. Without continuous signal monitoring, these patterns become visible only in retrospect." />
+          <PainCard
+            title="Workforce decisions are made in silos, then announced"
+            body="Budget decisions that affect multiple teams are frequently made in sequence by separate stakeholders with no shared view of assumptions, constraints, or conflicts. The deliberation happens informally, the rationale is not captured, and the outcome cannot be reconstructed or defended after the fact." />
         </div>
 
         <div style={divider} />
@@ -154,7 +166,7 @@ function BusinessView() {
         {/* ── Capability deep-dive ── */}
         <Eyebrow>Platform Capabilities</Eyebrow>
         <h2 style={{ fontFamily: 'var(--fd)', fontSize: 22, fontWeight: 300, color: 'var(--dark)', marginBottom: 8 }}>
-          Seven capabilities, each addressing a specific failure mode.
+          Seventeen capabilities, each addressing a specific failure mode.
         </h2>
         <p style={{ fontFamily: 'var(--fb)', fontSize: 14, color: '#475569', maxWidth: 680, lineHeight: 1.8, marginBottom: 36 }}>
           The platform does not replace workforce judgment. It structures the information on which that judgment depends — making implicit assumptions explicit, quantifying risks that are currently described qualitatively, and creating a documented record of how decisions were reached.
@@ -206,6 +218,88 @@ function BusinessView() {
             pain="Org redesign proposals are developed in presentation software without a systematic view of actual skill coverage, replacement costs by role, or the cost difference between internal development and external hire."
             what="The Future State Designer allows modeling of proposed org structures — team consolidations, new roles, reporting line changes, department transfers — with immediate recalculation of total cost impact and headcount movement. Skills Gap Analysis inventories current skill coverage across the workforce against a defined future-state requirement set and quantifies the gap by role and seniority. Build vs. Buy analysis computes the cost differential between upskilling an existing employee and making an equivalent external hire for each identified gap, factoring in ramp time and market salary premium."
             matters="Strategic planning decisions that do not incorporate actual skill inventory, replacement cost, and coverage gap data are made on assumptions that may not hold. This module connects the design decision to the cost and talent reality before the decision is finalized — not after the hiring plan has been approved and the gaps become apparent. The output is not a recommendation; it is a cost and coverage model that leadership can use to stress-test the assumptions in a proposed redesign." />
+
+          <CapabilityCard
+            num={7}
+            title="Compensation Intelligence & Pay Equity"
+            pain="Salary decisions are made relative to internal precedent and budget availability, not relative to market. Structural pay gaps — those not explained by role, seniority, or performance — go unmeasured until they become retention problems or compliance events."
+            what="Every employee is benchmarked against a market median derived from their role, seniority band, and department. Comp-ratio (actual salary ÷ market median) places each person on a Below Market / At Market / Above Market spectrum. An OLS regression then models salary as a function of role and seniority; the residuals identify pay gaps that cannot be explained by these legitimate factors. For below-market employees, the retention ROI calculation compares the cost of a salary correction against the estimated replacement cost if the employee departs."
+            matters="Pay equity analysis surfaces structurally unexplained gaps before they escalate. The retention ROI figure gives finance a defensible basis for a targeted compensation adjustment: the cost of correction is bounded, the cost of turnover is estimated, and the comparison is visible in the same interface as the gap itself. The analysis uses synthetic proxy groups — no real demographic data is used or inferred."
+            limit="Market median figures are based on synthetic salary tables keyed by role and seniority. In production, these should be replaced with actual market survey data (Radford, Mercer, Levels.fyi) for the relevant geography and industry." />
+
+          <CapabilityCard
+            num={8}
+            title="Knowledge Graph & Institutional Memory"
+            pain="There is no inventory of which employees hold which critical knowledge, and no mechanism to identify single points of failure before a departure makes them visible."
+            what="Twenty-three knowledge domains are mapped across the workforce — ranging from legacy system architecture, production deploy runbooks, and incident response playbooks to strategic client relationships, HIPAA integration logic, and regulatory process ownership. Each domain carries a criticality weight (0–1). Every employee is assigned domains probabilistically based on their role and department. The Single-Knowledge-Holder (SKH) flag marks any domain where only one employee holds ownership. A knowledge loss score per employee sums the criticality-weighted domains that would be lost on their departure. A transfer roadmap ranks successor candidates by skill proximity, urgency, estimated transfer hours, and cost."
+            matters="The knowledge graph converts an invisible organizational risk into a measurable and addressable one. An SKH designation for a domain like 'Production Deploy Runbooks' in a department with no documented succession plan is a concrete, actionable finding — not a qualitative observation. The transfer roadmap gives managers a specific starting point for knowledge distribution conversations before the risk becomes a vacancy."
+            limit="Knowledge domain assignments are inferred from role and department affinity. They reflect likely ownership, not confirmed ownership. Calibration against actual employee self-assessments or manager attestation will improve signal quality." />
+
+          <CapabilityCard
+            num={9}
+            title="Internal Talent Mobility"
+            pain="Internal career development is managed through annual review cycles and informal conversations. The organization has no systematic view of which employees are stagnating, which roles they could grow into, and what the gap-closing cost would be."
+            what="Career path suggestions are generated by computing skill-proximity between each employee's current profile and every role in the catalog. The top three lateral and upward moves are surfaced with an estimated skill gap, a development cost (at $4,000 per skill), and a projected salary change. Career stagnation detection flags employees who combine long tenure, a flat KPI trajectory over recent quarters, and below-peer-percentile compensation — a combination that correlates with elevated departure probability. Succession depth maps each leadership role against the pool of employees who are ready now, ready in six months, or ready in twelve months."
+            matters="Mobility analysis shifts the retention conversation from reactive to structural. An employee flagged for stagnation is not simply a flight risk — they are someone whose current role may no longer represent appropriate scope for their tenure and performance. Knowing that a Director-level role has zero ready-now successors and one ready-in-12-months candidate is the kind of information that should drive a development investment conversation before the role becomes vacant." />
+
+          <CapabilityCard
+            num={10}
+            title="Algorithmic Fairness & Bias Audit"
+            pain="Model outputs that influence workforce decisions may systematically disadvantage groups defined by gender, age, or other protected characteristics, without anyone in the decision process being aware that this is happening."
+            what="The fairness audit applies the EEOC 4/5ths (80%) adverse impact rule across three model outputs: impact score, attrition risk prediction, and simulated retention selection. For each (protected dimension, model output) combination, a chi-square test assesses statistical significance of group differences. A counterfactual fairness test flips each protected attribute on a sample of employees, recomputes the relevant scores, and reports the delta and 95% confidence interval. A simulation disparity analysis checks whether retaining the top-40% by impact score systematically under-selects any group."
+            matters="Bias audit results do not block decisions — they inform them. A model output that fails the 4/5ths rule in a statistically significant direction is a finding that requires human review before that output is used to influence a decision. The audit surface is part of the platform, not a separate compliance process that happens after the fact. All demographic groups in the demo environment are synthetic proxies — no real demographic data is used or inferred."
+            limit="Fairness analysis depends on the quality and coverage of the underlying impact score and attrition model. If the input models contain systematic errors for certain role or department clusters, those errors will propagate into the fairness output. Fixing model quality is a prerequisite for meaningful fairness interpretation." />
+
+          <CapabilityCard
+            num={11}
+            title="Collaborative Decision Room"
+            pain="Workforce decisions that affect multiple teams are made through a sequence of disconnected conversations, informal agreements, and presentation decks. The deliberation is not captured, conflicts between stakeholders are not formally resolved, and the final decision cannot be reconstructed or defended."
+            what="A Decision Room is a structured session with a defined lifecycle: Draft → Active → Under Review → Finalized. Participants hold one of three roles — Owner, Participant, or Observer — each with scoped capabilities. When two participants mark the same employee differently (retain vs. exclude), the system detects the conflict and offers three resolution modes: last-write wins, owner decides, or a majority vote among Participants. Comment threads, proposals, and objections are attached to specific employees and preserved in a timestamped activity feed. Digital sign-off by all required participants triggers immutable finalization. The session record — every participant action, every comment, every conflict and its resolution — is retained permanently."
+            matters="The Decision Room converts an informal multi-stakeholder process into a documented, auditable one. The activity log is not a byproduct — it is the primary output. A finalized session record contains everything needed to explain why a set of decisions was reached: who was in the room, what conflicts arose, how they were resolved, and who signed off." />
+
+          <CapabilityCard
+            num={12}
+            title="Workforce Resilience Stress Testing"
+            pain="An organization's ability to absorb the departure of key employees is assessed qualitatively and retrospectively. There is no mechanism to measure structural fragility before it is tested by an actual disruption."
+            what="A six-dimension Resilience Score (0–100) is computed from skill coverage breadth, leadership succession depth, knowledge redundancy across SKH domains, collaboration network robustness, concentration of attrition risk, and team size buffer against minimum viable coverage. Five disruption scenario types can be applied: targeted departure of specific high-impact employees, a department-wide shock, competitive poaching of a role cluster, leadership vacuum from a simultaneous multi-leader departure, and a critical skill crisis. Each scenario runs a three-round cascade simulation that models which primary departures trigger secondary attrition through nexus pressure and leadership gap propagation. An intervention roadmap ranks responses by the ratio of resilience score improvement to estimated cost."
+            matters="Resilience scoring gives a concrete, repeatable answer to the question 'how fragile are we?' before disruption tests the organization. The cascade amplifier analysis — which single departure would trigger the most secondary departures — identifies the specific intervention points where investment has disproportionate structural value." />
+
+          <CapabilityCard
+            num={13}
+            title="Learning & Development Investment Optimizer"
+            pain="L&D budget is allocated to training programs based on availability, past participation, and manager discretion rather than a systematic view of which investments would produce the highest return across the workforce."
+            what="A catalog of fifteen training programs across five tracks (technical, leadership, compliance, communication, domain) defines each program's expected impact-score delta, attrition risk reduction, and proficiency gain. A per-employee learning velocity is inferred from seniority and role. An Integer Linear Programming model then assigns employees to programs — binary variables for each (employee, program) pair — to maximize total organizational return within the L&D budget ceiling. A Pareto frontier sweep shows the trade-off curve between retention investment and L&D investment as the split between them varies. Skill gap records flag any critical skill held by fewer than two employees, directly informing training prioritization."
+            matters="L&D investment optimization converts a discretionary spend into a defensible allocation with a quantified expected return. The ILP result shows not just who should receive which training but what the aggregate impact-score and attrition-risk improvement looks like at any given budget level — making the conversation between HR and Finance about L&D investment one that has numbers on both sides." />
+
+          <CapabilityCard
+            num={14}
+            title="Decision Narrative Engine"
+            pain="Model outputs — impact scores, attrition risks, simulation results — are numbers. The conversation that needs to happen between a manager and a team member, or between an HR leader and a finance partner, requires plain language that translates those numbers into context and rationale."
+            what="A local Ollama instance running mistral:7b-instruct generates plain-language explanations for four output types: an impact score explanation linking each SHAP dimension to the employee's specific profile, an attrition risk summary describing the top-contributing factors in plain terms, a three-paragraph simulation outcome narrative describing what the ILP result means for each affected team, and a manager retention conversation brief that frames a specific retention risk without exposing confidential model details. All prompts replace employee names and identifiers with anonymized role codes before reaching the LLM — zero PII is included in any prompt. A deterministic template-based fallback activates automatically when Ollama is unavailable, ensuring the endpoint always responds."
+            matters="The narrative engine does not add information to the model output. It translates the same information into a form that supports a specific human conversation. A manager who sees 'attrition_risk: 78, top_driver: comp_ratio' needs different framing to have a productive conversation than one who reads 'this employee's compensation sits 18% below the estimated market rate for their role and seniority — the primary driver of their current retention risk.'"
+            limit="LLM output should be reviewed before use in high-stakes conversations. The template fallback is deterministic and auditable; the Ollama output is not. In regulated environments, the deterministic fallback may be preferable to the LLM path." />
+
+          <CapabilityCard
+            num={15}
+            title="Organizational Health Index"
+            pain="There is no single indicator that summarizes the organization's structural health across financial, talent, knowledge, and equity dimensions simultaneously. Each function monitors its own metrics in isolation."
+            what="The Organizational Health Index (OHI) is a composite score (0–100) weighted across six sub-dimensions: financial health (20%), talent risk (20%), knowledge resilience (20%), leadership pipeline depth (15%), compensation equity (15%), and collaboration density (10%). A 24-month synthetic time series with annotated organizational events provides historical context. A 6-month forward forecast extends the trend. Department-level OHI breakdowns allow cross-department comparison on each sub-dimension. A decision impact preview shows how the OHI would shift under each of four budget retention scenarios (60%, 70%, 80%, 90%). Industry benchmark bands (P25/P50/P75) frame the score against a synthetic peer distribution."
+            matters="The OHI gives leadership a single defensible starting point for a board-level conversation about organizational condition. The sub-dimension breakdown prevents that single number from obscuring meaningful variation — an organization can have a high OHI overall while showing a deteriorating leadership pipeline score, which is a materially different situation than one with uniformly balanced sub-scores. The decision impact preview makes the cost of a budget cut visible not just in dollars but in organizational health terms." />
+
+          <CapabilityCard
+            num={16}
+            title="Workforce Intelligence API"
+            pain="Analytics that live only inside a platform interface cannot be embedded into the BI tools, dashboards, or workflows where decisions actually happen."
+            what="A versioned public REST API at /api/v1/ exposes a read-only subset of EIBO analytics — dashboard KPIs, per-employee impact scores, attrition summaries, OHI scores, and budget forecasts — under Bearer token authentication. API keys are scoped to six permission levels (viewer through executive). Raw keys are shown once at creation and never stored — only a SHA-256 hash is retained. Token-bucket rate limiting (100 req/min per key) operates in-process without requiring Redis. A webhook event system delivers HMAC-SHA256 signed payloads to registered endpoints on five event types: attrition threshold crossings, impact score updates, simulation completions, OHI alerts, and notification creation. Four embeddable Web Component widgets (no framework dependency, Shadow DOM isolation) allow any HTML page to display live EIBO data with a single script tag. A Python SDK (stdlib-only) and a JavaScript ESM SDK are included."
+            matters="The API layer makes EIBO data portable without making it insecure. Salary figures are withheld from keys scoped below manager tier. Webhook delivery logs are retained per endpoint. The sandbox key provides immediate access for integration testing without requiring a registration flow." />
+
+          <CapabilityCard
+            num={17}
+            title="Real-Time Engagement Signal Monitoring"
+            pain="Attrition risk models are built from HR system data that reflects formal decisions and recorded history. Behavioral disengagement — the pattern that typically precedes departure — is not captured in any structured system."
+            what="Six behavioral engagement signals are tracked per employee at daily resolution across a 90-day window: calendar meeting density, cross-team interaction breadth, communication response latency, PTO utilization rate, after-hours work ratio, and collaboration network delta (7-day change in interaction breadth). An IsolationForest anomaly detector (contamination=0.10) identifies employees whose signal pattern is statistically unusual relative to the population. A CUSUM control chart (k=0.5, h=3.0) detects directional threshold crossings on each signal independently. Anomaly scores are used to adjust the base attrition risk estimate — an employee flagged as anomalous has their risk increased by up to 30 percentage points. A department heatmap visualizes z-scores across all signal-department combinations. The early warning feed ranks the top 15 employees by adjusted attrition risk. Full 90-day signal timelines are available for individual review."
+            matters="Engagement signals extend the predictive window for attrition from the quarterly model refresh cycle to a continuous, daily-resolution view. An employee whose base attrition risk is moderate but who shows a CUSUM alert on after-hours ratio and a declining collaboration network delta may be exhibiting early disengagement that warrants a proactive conversation — weeks before that pattern would appear in a formal performance review or HRIS record."
+            limit="Signal generation in the demo environment uses synthetic behavioral data derived from attrition risk and org structure parameters. In production, these signals must be sourced from calendar system APIs, communication platform metadata, and identity provider activity logs. Signal quality varies substantially by the completeness of integration coverage." />
         </div>
 
         <div style={divider} />
@@ -389,8 +483,12 @@ function EngineeringView() {
                                 ▼
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  FastAPI  (backend/main.py — uvicorn, port 8000)                           │
-│  6 routers: dashboard · simulation · predictive · forecast                 │
-│             notifications · admin  — all prefixed /api                     │
+│  19 routers — internal /api/* and versioned public /api/v1/*               │
+│  Internal: dashboard · simulation · predictive · forecast · compensation   │
+│            knowledge · mobility · fairness · decision_room · resilience    │
+│            ld · narrative · ohi · pulse · notifications · admin            │
+│  Public v1 (Bearer auth): dashboard · impact · attrition · ohi · forecast  │
+│  Infra: api_keys · webhooks (HMAC-SHA256 signed delivery)                  │
 │  Auth middleware: JWT (PyJWT 2.x) + bcrypt + 6-tier RBAC                  │
 │  PostgreSQL 16: users · audit_logs · simulation_history · notifications    │
 └───────────────────────────────┬────────────────────────────────────────────┘
@@ -398,65 +496,57 @@ function EngineeringView() {
                                 ▼
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  React 18  (frontend/src/ — Vite 5, port 5173)                             │
-│  Zustand: demoStore · themeStore — no Redux                                │
+│  19 pages — Zustand: demoStore · themeStore — no Redux                     │
 │  Pure SVG charts — hand-coded, no chart library dependency                 │
 │  CSS: inline React.CSSProperties + design token vars — no Tailwind         │
-└────────────────────────────────────────────────────────────────────────────┘`
+└────────────────────────────────────────────────────────────────────────────┘
+                                │
+                    ┌───────────┴───────────┐
+                    ▼                       ▼
+┌──────────────────────────┐   ┌────────────────────────────────────────────┐
+│  Ollama (local, port 11434)│   │  External integrators (via /api/v1/)       │
+│  mistral:7b-instruct       │   │  Python SDK · JS SDK · 4 Web Components    │
+│  Zero PII in any prompt    │   │  Webhook fan-out to registered endpoints   │
+│  Deterministic fallback    │   │  Token-bucket rate limiting (in-process)   │
+│  when Ollama unavailable   │   │  HMAC-SHA256 payload signing               │
+└──────────────────────────┘   └────────────────────────────────────────────┘`
         }</div>
 
-        <div style={lbl}>Repository layout</div>
+        <div style={lbl}>Repository layout (abridged)</div>
         <div style={mono}>{
 `employee-impact-budget-optimizer/
 ├── backend/
-│   ├── main.py                        # FastAPI app, CORS, router registration
-│   ├── connectors/                    # WorkdayConnector, BambooHRConnector, etc.
-│   ├── data/
-│   │   ├── pipeline/
-│   │   │   ├── ingestion.py           # Bronze layer write
-│   │   │   ├── transformation.py      # Silver layer transform
-│   │   │   └── aggregation.py         # Gold layer + DuckDB load
-│   │   └── generators/
-│   │       └── synthetic_org.py       # Synthetic workforce generation (demo)
-│   ├── models/
-│   │   ├── org.py                     # Employee, Team, Org dataclasses
-│   │   ├── impact_scorer.py           # 4-feature weighted sum
-│   │   ├── attrition_model.py         # XGBoost + SMOTE + Platt + SHAP
-│   │   ├── budget_optimizer.py        # PuLP ILP model
-│   │   ├── graph_analyser.py          # NetworkX: centrality + Louvain
-│   │   ├── forecasting.py             # Prophet wrapper + linear fallback
-│   │   └── monte_carlo.py             # 2,000-simulation stress tester
+│   ├── main.py                        # FastAPI app, CORS, 19 router registrations
 │   ├── routers/
-│   │   ├── dashboard.py               # GET /api/dashboard
-│   │   ├── simulation.py              # GET/POST /api/simulation
-│   │   ├── predictive.py              # GET /api/predictive
-│   │   ├── forecast.py                # GET /api/forecast/{budget,montecarlo}
-│   │   ├── notifications.py           # GET/POST/PATCH /api/notifications
-│   │   └── admin.py                   # GET/POST /api/admin
-│   ├── services/
-│   │   └── data_service.py            # Builds response payloads from Org
-│   └── workflows/
-│       └── engine.py                  # Lightweight DAG scheduler (stdlib only)
-└── frontend/
-    └── src/
-        ├── App.tsx                    # Page routing + Page type union
-        ├── components/
-        │   ├── Nav.tsx
-        │   └── Eyebrow.tsx
-        ├── pages/
-        │   ├── DashboardPage.tsx
-        │   ├── SimulationPage.tsx
-        │   ├── DrillDownPage.tsx
-        │   ├── PredictivePage.tsx
-        │   ├── ForecastPage.tsx
-        │   ├── StrategicPage.tsx
-        │   ├── NotificationsPage.tsx
-        │   ├── AdminPage.tsx
-        │   └── InfoPage.tsx
-        ├── services/api.ts            # Typed fetch wrappers for all endpoints
-        ├── stores/
-        │   ├── demoStore.ts           # Zustand: scenario, size, demo flag
-        │   └── themeStore.ts          # Zustand: dark/light theme
-        └── hooks/useTheme.ts`
+│   │   ├── dashboard.py  simulation.py  predictive.py  forecast.py
+│   │   ├── compensation.py  knowledge.py  mobility.py  fairness.py
+│   │   ├── decision_room.py  resilience.py  ld.py  narrative.py
+│   │   ├── ohi.py  pulse.py  notifications.py  admin.py
+│   │   ├── api_keys.py  webhooks.py    # Infra — API key + webhook mgmt
+│   │   └── v1.py                      # Public versioned API (/api/v1/*)
+│   └── services/
+│       ├── data_service.py            # DemoGenerator wrapper (lru_cache)
+│       ├── compensation_service.py    # OLS pay equity, comp-ratio, ROI
+│       ├── knowledge_service.py       # SKH detection, 23 domains, transfer roadmap
+│       ├── mobility_service.py        # Career paths, stagnation, succession depth
+│       ├── fairness_service.py        # EEOC 4/5ths, chi-square, counterfactual
+│       ├── decision_room_service.py   # Session lifecycle, conflict resolution
+│       ├── resilience_service.py      # 6-dim score, cascade simulation
+│       ├── ld_service.py              # ILP training allocation, Pareto sweep
+│       ├── narrative_service.py       # Ollama wrapper + deterministic fallback
+│       ├── ohi_service.py             # 6-dimension OHI, 24-month series, benchmarks
+│       ├── pulse_service.py           # IsolationForest + CUSUM + 6-signal series
+│       ├── api_key_service.py         # SHA-256 hashing, token-bucket rate limiting
+│       └── webhook_service.py         # HMAC-SHA256 signing, async fan-out delivery
+├── sdk/
+│   ├── python/eibo_client.py          # stdlib-only typed client
+│   └── js/eibo-client.js              # ESM module, camelCase mapping
+└── frontend/src/
+    ├── App.tsx                        # Page union type + routing switch
+    ├── pages/                         # 19 pages (InfoPage through PulsePage)
+    ├── components/Nav.tsx             # Sticky nav — all 19 pages addressable
+    ├── services/api.ts                # Typed fetch wrappers for all endpoints
+    └── stores/demoStore.ts            # Zustand: scenario, size, demo flag`
         }</div>
 
         <div style={divider} />
@@ -482,8 +572,12 @@ function EngineeringView() {
             { layer: 'ML',             pkg: 'XGBoost 2.0 + scikit-learn',    why: 'GBDT for attrition classification. imbalanced-learn SMOTE for minority class oversampling.' },
             { layer: 'Explainability', pkg: 'SHAP 0.45',                     why: 'TreeExplainer for XGBoost; O(TLD) complexity. Required on every prediction — not optional per design.' },
             { layer: 'Forecasting',    pkg: 'Prophet 1.1',                   why: 'Handles annual + quarterly seasonality without manual feature engineering. NumPy polyfit fallback.' },
-            { layer: 'Simulation',     pkg: 'NumPy 1.26',                    why: 'Vectorised Monte Carlo draws (np.random.binomial) across 2,000 paths × N employees.' },
+            { layer: 'Simulation',     pkg: 'NumPy 1.26',                    why: 'Vectorised Monte Carlo draws (np.random.binomial) across 2,000 paths × N employees. Pulse signal array (90 × N × 6) also fully vectorised.' },
             { layer: 'Graph',          pkg: 'NetworkX 3.3',                  why: 'Betweenness centrality via Brandes algorithm O(VE). python-louvain for community detection.' },
+            { layer: 'Anomaly',        pkg: 'scikit-learn IsolationForest',  why: 'Pulse monitoring: contamination=0.10, decision_function inverted to [0,1] anomaly score. No PyOD dependency.' },
+            { layer: 'Statistics',     pkg: 'SciPy 1.12',                    why: 'OLS regression for pay equity residuals (stats.linregress). Chi-square for EEOC disparate-impact significance testing.' },
+            { layer: 'Local LLM',      pkg: 'Ollama (mistral:7b-instruct)',   why: 'Decision narrative generation — zero PII in prompts. 30s hard timeout; deterministic template fallback if unavailable. No cloud API.' },
+            { layer: 'HTTP client',    pkg: 'httpx 0.27',                    why: 'Async webhook fan-out delivery. Replaces requests for async contexts without adding aiohttp.' },
             { layer: 'Auth',           pkg: 'PyJWT 2.8 + bcrypt',            why: 'Stateless JWT with RS256 signing; bcrypt cost factor 12 for stored credentials.' },
             { layer: 'Containers',     pkg: 'Docker Compose 2.27',           why: 'Three-service topology: postgres / backend / frontend. No Kubernetes needed for single-node.' },
           ].map(({ layer, pkg, why }) => (
@@ -500,7 +594,7 @@ function EngineeringView() {
         {/* ── 3. Algorithms ── */}
         <Eyebrow>Algorithms</Eyebrow>
         <h2 style={{ fontFamily: 'var(--fd)', fontSize: 22, fontWeight: 300, color: 'var(--dark)', marginBottom: 32 }}>
-          Six computation stages — exact formulas and implementation parameters
+          Twelve computation stages — formulas and implementation parameters
         </h2>
 
         {/* 3a: Impact Score */}
@@ -686,15 +780,190 @@ Implementation: fully vectorised via NumPy
           </p>
         </div>
 
+        {/* 7: Pay Equity OLS */}
+        <div style={algCard}>
+          <div style={algTitle}>7 — Pay Equity Regression  (backend/services/compensation_service.py)</div>
+          <div style={lbl}>OLS model and residual interpretation</div>
+          <div style={mono}>{
+`salary_i = β₀ + β₁·seniority_rank_i + β₂·dept_dummy_i + ε_i
+
+  seniority_rank:   junior=0, mid=1, senior=2, lead=3, director=4, exec=5
+  dept_dummy:       one-hot encoded department (k-1 dummies, reference = Engineering)
+  ε_i (residual):   unexplained salary variation after controlling for seniority + dept
+
+comp_ratio_i = salary_i / market_median(dept_i, seniority_i)
+  Below Market  if comp_ratio_i < 0.85
+  At Market     if 0.85 ≤ comp_ratio_i ≤ 1.15
+  Above Market  if comp_ratio_i > 1.15
+
+retention_roi_i = replacement_cost_i − correction_cost_i
+  replacement_cost_i  = salary_i × 0.50 + fixed_recruit_cost
+  correction_cost_i   = max(0, market_median_i − salary_i)
+
+Implementation: scipy.stats.linregress on (seniority_rank, salary) per department
+Residual ε_i > 0 → paid above expectation for cohort
+Residual ε_i < 0 → paid below expectation for cohort (structural gap candidate)`
+          }</div>
+        </div>
+
+        {/* 8: IsolationForest + CUSUM */}
+        <div style={algCard}>
+          <div style={algTitle}>8 — Engagement Anomaly Detection  (backend/services/pulse_service.py)</div>
+          <div style={lbl}>IsolationForest + CUSUM control chart</div>
+          <div style={mono}>{
+`Signal array shape: (90 days, N employees, 6 signals)
+  s₀  calendar_density_7d        meetings/week
+  s₁  cross_team_interaction_7d  unique cross-dept contacts/week
+  s₂  response_latency_trend     normalised latency score ∈ [0, 2.5]
+  s₃  pto_utilization_rate       fraction of entitled PTO taken ∈ [0, 1]
+  s₄  after_hours_ratio          fraction of activity outside 08:00–18:00 ∈ [0, 0.9]
+  s₅  collaboration_network_delta 7-day change in unique contacts ∈ [−1.8, 0.3]
+
+IsolationForest  (sklearn.ensemble.IsolationForest)
+  Input:    last_day_values — shape (N, 6), last observation per employee per signal
+  params:   n_estimators=100, contamination=0.10, random_state=42
+  Output:   decision_function(X) → raw scores → inverted to anomaly_score ∈ [0, 1]
+            score = (raw − raw.min()) / (raw.max() − raw.min())
+
+CUSUM control chart  (vectorised NumPy)
+  params:  k = 0.5  (allowance — half the expected shift magnitude)
+           h = 3.0  (decision threshold — triggers alert after sustained drift)
+  Upper CUSUM:  S⁺_t = max(0, S⁺_{t-1} + z_t − k)   alert if S⁺_t > h
+  Lower CUSUM:  S⁻_t = max(0, S⁻_{t-1} − z_t − k)   alert if S⁻_t > h
+  z_t:  z-score of signal value relative to baseline mean (days 0–69)
+  Alert direction per signal: s₀,s₁,s₅ → low; s₂,s₄ → high; s₃ → both
+
+Adjusted attrition risk:
+  adjusted_risk_i = clamp(base_risk_i + anomaly_score_i × 0.30, 0, 1)`
+          }</div>
+        </div>
+
+        {/* 9: EEOC Fairness */}
+        <div style={algCard}>
+          <div style={algTitle}>9 — Algorithmic Fairness Audit  (backend/services/fairness_service.py)</div>
+          <div style={lbl}>EEOC 4/5ths rule and chi-square significance test</div>
+          <div style={mono}>{
+`EEOC 4/5ths (80%) adverse impact rule:
+  For each (protected group g, model output m):
+    selection_rate_g  = P(outcome_i > threshold | group_i = g)
+    reference_rate    = max selection rate across all groups
+    impact_ratio_g    = selection_rate_g / reference_rate
+    adverse_impact    = impact_ratio_g < 0.80
+
+Chi-square significance test  (scipy.stats.chi2_contingency):
+  Contingency table:  rows = [above threshold, below threshold]
+                      cols = [group g, all other groups]
+  α = 0.05; p < α → statistically significant disparity
+
+Counterfactual fairness test:
+  For each protected attribute a and a sample of 200 employees:
+    flip attribute a on employee i → recompute model score
+    Δscore_i = score(flipped) − score(original)
+    Report: mean(Δscore), 95% CI via bootstrap (n=1000)
+    Flag if |mean(Δscore)| > 2.0 points
+
+Model outputs audited:  impact_score · attrition_risk · simulated_retention_selection
+Protected dimensions:   gender · age_bracket · ethnicity_proxy
+All groups are synthetic proxies — no real demographic data used or inferred`
+          }</div>
+        </div>
+
+        {/* 10: L&D ILP */}
+        <div style={algCard}>
+          <div style={algTitle}>10 — L&D Budget ILP  (backend/services/ld_service.py)</div>
+          <div style={lbl}>PuLP formulation — employee × program binary assignment</div>
+          <div style={mono}>{
+`Variables:  y_{i,t} ∈ {0, 1}  — 1 if employee i is assigned to program t
+
+Maximise:   Σ_{i,t}  y_{i,t} · [w_impact · Δimpact_{i,t}
+                                + w_attrition · Δattrition_{i,t}
+                                + w_proficiency · Δproficiency_{i,t}]
+            w_impact=0.50, w_attrition=0.30, w_proficiency=0.20
+
+Subject to:
+  [Budget]    Σ_{i,t}  y_{i,t} · cost_t  ≤  ld_budget
+  [Capacity]  ∀ t:  Σ_i  y_{i,t}  ≤  capacity_t
+  [One prog]  ∀ i:  Σ_t  y_{i,t}  ≤  1
+
+Δimpact_{i,t}     = program_impact_delta_t × learning_velocity_i
+learning_velocity_i inferred from:  junior→0.6, mid→0.8, senior→1.0, lead→0.9, exec→0.7
+Δattrition_{i,t}  = program_attrition_reduction_t × (attrition_risk_i / 100)
+
+Pareto sweep:  total_budget varied; ld_budget ∈ [0, total_budget] in 20 steps
+               reports (retention_score, ld_return) frontier
+Capped at top 150 employees by attrition risk to keep solve time < 3s`
+          }</div>
+        </div>
+
+        {/* 11: Knowledge SKH */}
+        <div style={algCard}>
+          <div style={algTitle}>11 — Knowledge Loss Score  (backend/services/knowledge_service.py)</div>
+          <div style={lbl}>Weighted domain criticality and single-holder detection</div>
+          <div style={mono}>{
+`23 knowledge domains, each with criticality c_d ∈ [0, 1]
+  Examples:  legacy_system_arch=0.95, hipaa_integration=0.90,
+             production_runbooks=0.88, client_relationships=0.85
+
+Domain assignment probability for employee i:
+  P(domain d | employee i) = base_prob + affinity_bonus
+  base_prob  = 0.12 (all employees)
+  affinity_bonus = 0.35 if department_i ∈ domain_d.affinity_departments
+
+knowledge_loss_score_i = Σ_d  c_d × owns(i, d) × (1 − has_backup_d)
+  has_backup_d = 1 if count(owners of d) > 1 else 0
+  Employees with knowledge_loss_score > 0.5 flagged as high-knowledge-loss risk
+
+Single-Knowledge-Holder (SKH):
+  skh_flag_d = (count_owners_d == 1)
+
+Transfer roadmap for employee i (top 5 successors per domain):
+  successor_score_j = skill_overlap(j, domain_d) + (1 − attrition_risk_j)
+  estimated_transfer_hours = criticality_d × 40  (configurable)
+  estimated_transfer_cost  = estimated_transfer_hours × $150/hr`
+          }</div>
+        </div>
+
+        {/* 12: OHI */}
+        <div style={algCard}>
+          <div style={algTitle}>12 — Organizational Health Index  (backend/services/ohi_service.py)</div>
+          <div style={lbl}>Six-dimension weighted composite with forecast</div>
+          <div style={mono}>{
+`OHI = Σ_d  weight_d × sub_score_d   ∈ [0, 100]
+
+Sub-dimension computation:
+  financial_health (20%):
+    = clamp(100 × (1 − budget_variance) × compensation_leverage, 0, 100)
+  talent_risk (20%):
+    = 100 − (attrition_concentration × critical_role_exposure)
+  knowledge_resilience (20%):
+    = 100 × (1 − fraction_skh_domains) × transfer_progress
+  leadership_pipeline (15%):
+    = 100 × ready_now_count / required_leaders
+  compensation_equity (15%):
+    = 100 × (1 − mean_absolute_equity_gap)
+  collaboration_density (10%):
+    = 100 × mean_betweenness_norm_all_employees
+
+24-month time series:  base OHI evolved with AR(1) noise + annotated events
+6-month forecast:      numpy.polyfit(degree=1) on last 12 months → extrapolated
+Industry benchmarks:   P25/P50/P75 generated from rng.normal(base_ohi, σ_peer)
+
+Decision impact preview:
+  For budget retention at [60%, 70%, 80%, 90%] of total payroll:
+    recalculate talent_risk and knowledge_resilience sub-scores
+    report ΔOHI relative to baseline`
+          }</div>
+        </div>
+
         <div style={divider} />
 
         {/* ── 4. API Endpoints ── */}
         <Eyebrow>API Endpoints</Eyebrow>
         <h2 style={{ fontFamily: 'var(--fd)', fontSize: 22, fontWeight: 300, color: 'var(--dark)', marginBottom: 8 }}>
-          All routes — method, path, minimum RBAC role, response shape
+          All routes — method, path, minimum role, response shape
         </h2>
         <p style={{ fontFamily: 'var(--fb)', fontSize: 13, color: '#475569', maxWidth: 700, lineHeight: 1.8, marginBottom: 24 }}>
-          All endpoints prefixed <code style={inlineCode}>/api</code>. Query params <code style={inlineCode}>scenario</code>, <code style={inlineCode}>size</code>, <code style={inlineCode}>demo</code> accepted on all GET routes and forwarded to the data service layer.
+          Internal API prefixed <code style={inlineCode}>/api</code> — JWT + RBAC. Public API at <code style={inlineCode}>/api/v1/</code> — Bearer token (scoped API key). All GET routes accept <code style={inlineCode}>scenario</code>, <code style={inlineCode}>size</code>, <code style={inlineCode}>demo</code> query params.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           {[
@@ -705,12 +974,31 @@ Implementation: fully vectorised via NumPy
             { method: 'GET',  path: '/api/predictive',                role: 'Analyst',  desc: 'Attrition risk score + SHAP top driver per employee; department filter applied by RBAC' },
             { method: 'GET',  path: '/api/forecast/budget',           role: 'Analyst',  desc: 'Prophet forecast: 24-month history + 12-month forward + 80/95% CI per dept or total' },
             { method: 'GET',  path: '/api/forecast/montecarlo',       role: 'Analyst',  desc: 'Monte Carlo fan chart: P10/P50/P90 × 12 months + per-month exceedance probabilities' },
+            { method: 'GET',  path: '/api/compensation',              role: 'Analyst',  desc: 'Comp-ratio per employee, OLS pay equity residuals, retention ROI, dept scorecards' },
+            { method: 'GET',  path: '/api/knowledge',                 role: 'Analyst',  desc: 'Knowledge domain map, SKH flags, knowledge_loss_score per employee, transfer roadmap' },
+            { method: 'GET',  path: '/api/mobility',                  role: 'Analyst',  desc: 'Career path suggestions, stagnation flags, succession depth per leadership role' },
+            { method: 'GET',  path: '/api/fairness',                  role: 'Director', desc: 'EEOC 4/5ths results, chi-square p-values, counterfactual deltas per (dimension, model)' },
+            { method: 'GET',  path: '/api/decision-room/sessions',    role: 'Manager',  desc: 'All sessions in scope with lifecycle state, participant list, and activity feed' },
+            { method: 'POST', path: '/api/decision-room/sessions',    role: 'Manager',  desc: 'Create session — body: {name, participants[], scenario} → session_id + Draft state' },
+            { method: 'GET',  path: '/api/resilience',                role: 'Director', desc: '6-dim resilience score, department breakdown, cascade simulation, intervention roadmap' },
+            { method: 'GET',  path: '/api/ld',                        role: 'Analyst',  desc: 'ILP training allocation, Pareto frontier, skill gap records, 12-cohort ROI history' },
+            { method: 'POST', path: '/api/narrative/impact',          role: 'Manager',  desc: 'Body: {employee_id} → LLM or template explanation of impact score SHAP breakdown' },
+            { method: 'POST', path: '/api/narrative/attrition',       role: 'Manager',  desc: 'Body: {employee_id} → plain-language attrition risk summary with top drivers' },
+            { method: 'POST', path: '/api/narrative/simulation',      role: 'Director', desc: 'Body: {simulation_id} → 3-paragraph outcome narrative for the full simulation result' },
+            { method: 'GET',  path: '/api/ohi',                       role: 'Executive',desc: 'OHI score, 6-sub-dimension breakdown, 24-month series, forecast, benchmark bands' },
+            { method: 'GET',  path: '/api/pulse',                     role: 'Analyst',  desc: 'Signal heatmap, early warning feed, 90-day timelines, team cohesion by department' },
             { method: 'GET',  path: '/api/notifications',             role: 'Viewer',   desc: 'Active alerts in scope: attrition spikes, budget overruns, threshold breaches' },
-            { method: 'POST', path: '/api/notifications/acknowledge', role: 'Analyst',  desc: 'Body: {notification_id} → marks alert acknowledged with user + timestamp' },
-            { method: 'GET',  path: '/api/admin/users',               role: 'Admin',    desc: 'User list with roles, department scope, and last-activity timestamps' },
-            { method: 'POST', path: '/api/admin/users',               role: 'Admin',    desc: 'Body: {email, role, department_scope[]} → create or update user account' },
             { method: 'GET',  path: '/api/admin/audit',               role: 'Admin',    desc: 'Queryable audit log: filter by user, event_type, date range, outcome' },
-            { method: 'POST', path: '/api/admin/demo',                role: 'Admin',    desc: 'Regenerate synthetic demo dataset — body: {size: small|medium|large}' },
+            { method: 'GET',  path: '/api/v1/health',                 role: 'None',     desc: 'Service health — no auth required' },
+            { method: 'GET',  path: '/api/v1/dashboard',              role: 'Bearer',   desc: 'KPI summary — salary gated by key scope (manager+ only)' },
+            { method: 'GET',  path: '/api/v1/impact',                 role: 'Bearer',   desc: 'Per-employee impact scores — salary withheld below manager scope' },
+            { method: 'GET',  path: '/api/v1/attrition-summary',      role: 'Bearer',   desc: 'Attrition risk distribution by tier and department' },
+            { method: 'GET',  path: '/api/v1/ohi',                    role: 'Bearer',   desc: 'OHI score and 6-dimension breakdown' },
+            { method: 'GET',  path: '/api/v1/forecast',               role: 'Bearer',   desc: '6-month budget forecast with P10/P50/P90 bands' },
+            { method: 'GET',  path: '/api/v1/api-keys/sandbox',       role: 'None',     desc: 'Returns the demo sandbox key — immediate integration testing, no registration' },
+            { method: 'POST', path: '/api/v1/api-keys',               role: 'Bearer',   desc: 'Create a scoped API key — raw key returned once, SHA-256 hash stored' },
+            { method: 'POST', path: '/api/v1/webhooks',               role: 'Bearer',   desc: 'Register a webhook endpoint for one or more event types — secret returned once' },
+            { method: 'POST', path: '/api/v1/webhooks/{id}/test',     role: 'Bearer',   desc: 'Send a test delivery to the endpoint; response includes status and latency' },
           ].map(({ method, path, role, desc }) => (
             <div key={path + method} style={{ display: 'grid', gridTemplateColumns: '58px 280px 1fr', gap: 16, padding: '11px 16px', background: 'var(--white)', borderRadius: 6, border: '1px solid var(--primary-10)', alignItems: 'start' }}>
               <span style={{ fontFamily: 'Courier New, monospace', fontSize: 10, fontWeight: 700, color: method === 'GET' ? '#1d4ed8' : '#6d28d9', backgroundColor: method === 'GET' ? '#eff6ff' : '#f5f3ff', padding: '2px 6px', borderRadius: 3, whiteSpace: 'nowrap', display: 'inline-block' }}>{method}</span>
@@ -789,11 +1077,15 @@ audit_logs  (PostgreSQL — not DuckDB — append-only, no UPDATE/DELETE permitt
           {[
             { metric: '< 100ms',   label: 'DuckDB full dashboard aggregation · 50K employees' },
             { metric: '< 2s',      label: 'ILP solve · 5K-variable binary programme · CBC' },
+            { metric: '< 3s',      label: 'L&D ILP · top 150 employees × 15 programs · CBC' },
             { metric: '< 500ms',   label: 'Impact scoring recalculation · full org · 50K employees' },
             { metric: '< 5s',      label: 'Graph centrality · Brandes O(VE) · 5,000-node graph' },
+            { metric: '< 3s',      label: 'Pulse signal generation · 90 days × N employees × 6 signals · NumPy vectorised' },
             { metric: '< 15%',     label: 'MAPE · Prophet 3-month forecast horizon · validation fold' },
             { metric: '< 30s',     label: 'Monte Carlo · 2,000 simulations · 500 employees' },
             { metric: 'AUC > 0.78',label: 'Attrition classifier · held-out test fold · XGBoost' },
+            { metric: '< 30s',     label: 'Narrative generation · Ollama mistral:7b with 30s hard timeout' },
+            { metric: '100 req/m', label: 'API v1 rate limit · token-bucket per key · in-process, no Redis' },
             { metric: '>= 85%',    label: 'Unit test coverage target (pytest + pytest-cov)' },
           ].map(({ metric, label }) => (
             <div key={metric} style={{ ...card }}>
@@ -943,9 +1235,9 @@ export default function InfoPage({ onLaunch }: InfoPageProps) {
             defines responsible decision-making.
           </p>
           <div style={{ display: 'flex', gap: 48, flexWrap: 'wrap', marginBottom: 40 }}>
-            <KpiStat value="3×"    label="Faster budget scenario analysis" />
-            <KpiStat value="< 2s"  label="Optimization for 5,000 employees" />
-            <KpiStat value="100%"  label="Human override on every suggestion" />
+            <KpiStat value="17"    label="Analytical capabilities across the workforce decision lifecycle" />
+            <KpiStat value="< 2s"  label="ILP optimization for 5,000 employees" />
+            <KpiStat value="100%"  label="Human override on every model suggestion" />
             <KpiStat value="$0"    label="Licensing cost — fully open source" />
           </div>
 
