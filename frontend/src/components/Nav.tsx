@@ -22,6 +22,7 @@ const pages: { id: Page; label: string }[] = [
   { id: 'resilience',     label: 'Resilience'    },
   { id: 'ld',             label: 'L&D'           },
   { id: 'narrative',      label: 'Narrative'     },
+  { id: 'ohi',            label: 'OHI'           },
   { id: 'strategic',      label: 'Strategic'     },
   { id: 'notifications', label: 'Alerts'        },
   { id: 'admin',         label: 'Admin'         },

@@ -18,6 +18,7 @@ import DecisionRoomPage  from './pages/DecisionRoomPage'
 import ResiliencePage    from './pages/ResiliencePage'
 import LDPage            from './pages/LDPage'
 import NarrativePage     from './pages/NarrativePage'
+import OHIPage           from './pages/OHIPage'
 
 export type Page =
   | 'info'
@@ -37,6 +38,7 @@ export type Page =
   | 'resilience'
   | 'ld'
   | 'narrative'
+  | 'ohi'
 
 export default function App() {
   const [page, setPage] = useState<Page>('info')
@@ -60,6 +62,7 @@ export default function App() {
       case 'resilience':     return <ResiliencePage />
       case 'ld':             return <LDPage />
       case 'narrative':      return <NarrativePage />
+      case 'ohi':            return <OHIPage />
     }
   }
 

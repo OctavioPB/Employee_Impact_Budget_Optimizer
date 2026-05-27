@@ -675,6 +675,17 @@ export const api = {
       }),
   },
 
+  ohi: {
+    data: (scenario: string, size: string, demo = true) =>
+      request<OHIData>(
+        `/api/ohi?scenario=${scenario}&size=${size}&demo=${demo}`,
+      ),
+    preview: (body: { scenario: string; size: string; retention_pct: number }) =>
+      request<OHIPreviewResult>('/api/ohi/preview', {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+  },
+
   narrative: {
     data: (scenario: string, size: string, demo = true) =>
       request<NarrativePageData>(
@@ -1043,6 +1054,94 @@ export interface LDData {
   roi_history:          ROIRecord[]
   pareto_frontier:      ParetoPoint[]
   employee_previews:    EmployeePreview[]
+}
+
+// ── OHI types ─────────────────────────────────────────────────────────────────
+
+export interface OHISubIndex {
+  score:      number
+  grade:      string
+  weight:     number
+  label:      string
+  components: Record<string, number>
+  labels:     Record<string, string>
+  detail:     string
+}
+
+export interface OHIDeptRow {
+  department:    string
+  score:         number
+  grade:         string
+  headcount:     number
+  nexus_count:   number
+  avg_impact:    number
+  avg_attrition: number
+  sub_scores:    Record<string, number>
+}
+
+export interface OHITrendPoint {
+  month:       string
+  score:       number
+  is_forecast: boolean
+  event:       string | null
+}
+
+export interface OHIBenchmarkBand {
+  p25:   number
+  p50:   number
+  p75:   number
+  label: string
+}
+
+export interface OHIBenchmark {
+  org_size:    string
+  comparators: number
+  source:      string
+  sub_indices: Record<string, OHIBenchmarkBand>
+}
+
+export interface OHIDecisionPoint {
+  retention_pct:      number
+  budget_savings_pct: number
+  ohi:                number
+  ohi_delta:          number
+  n_retained:         number
+}
+
+export interface OHIAlert {
+  type:     string
+  message:  string
+  severity: 'critical' | 'high' | 'medium'
+}
+
+export interface OHISummary {
+  overall:          number
+  grade:            string
+  trend_direction:  'improving' | 'stable' | 'declining'
+  trend_delta_90d:  number
+  n_employees:      number
+  nexus_count:      number
+  alert:            boolean
+}
+
+export interface OHIData {
+  summary:          OHISummary
+  sub_indices:      Record<string, OHISubIndex>
+  dept_ohi:         OHIDeptRow[]
+  trend:            OHITrendPoint[]
+  benchmark:        OHIBenchmark
+  decision_preview: OHIDecisionPoint[]
+  alert:            OHIAlert | null
+}
+
+export interface OHIPreviewResult {
+  retention_pct: number
+  n_retained:    number
+  n_total:       number
+  ohi:           number
+  ohi_delta:     number
+  grade:         string
+  sub_indices:   Record<string, number>
 }
 
 // ── Narrative types ───────────────────────────────────────────────────────────
