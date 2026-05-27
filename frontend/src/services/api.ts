@@ -674,6 +674,31 @@ export const api = {
         body:   JSON.stringify(body),
       }),
   },
+
+  narrative: {
+    data: (scenario: string, size: string, demo = true) =>
+      request<NarrativePageData>(
+        `/api/narrative?scenario=${scenario}&size=${size}&demo=${demo}`,
+      ),
+    status: () =>
+      request<OllamaStatus>('/api/narrative/status'),
+    impact: (body: NarrativeRequest) =>
+      request<NarrativeResult>('/api/narrative/impact', {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+    attrition: (body: NarrativeRequest) =>
+      request<NarrativeResult>('/api/narrative/attrition', {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+    simulation: (body: NarrativeRequest) =>
+      request<NarrativeResult>('/api/narrative/simulation', {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+    brief: (body: NarrativeRequest) =>
+      request<NarrativeResult>('/api/narrative/brief', {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+  },
 }
 
 // ── Decision Room types ───────────────────────────────────────────────────────
@@ -1018,4 +1043,79 @@ export interface LDData {
   roi_history:          ROIRecord[]
   pareto_frontier:      ParetoPoint[]
   employee_previews:    EmployeePreview[]
+}
+
+// ── Narrative types ───────────────────────────────────────────────────────────
+
+export interface OllamaStatus {
+  available:     boolean
+  model:         string
+  base_url:      string
+  loaded_models: string[]
+}
+
+export interface NarrativeDriver {
+  factor:       string
+  value:        string
+  contribution: number
+  direction:    'positive' | 'risk' | 'protective' | 'neutral'
+}
+
+export interface NarrativeSourceData {
+  anon_id?:         string
+  role?:            string
+  seniority?:       string
+  department?:      string
+  impact_score?:    number
+  attrition_risk?:  number
+  is_nexus?:        boolean
+  drivers?:         NarrativeDriver[]
+  budget_pct?:      number
+  n_retained?:      number
+  n_total?:         number
+  [key: string]:    unknown
+}
+
+export interface NarrativeResult {
+  narrative:      string
+  is_llm:         boolean
+  model:          string
+  source_data:    NarrativeSourceData
+  disclaimer:     string
+  cached:         boolean
+  generated_at:   string
+  generation_ms?: number
+}
+
+export interface NarrativeRequest {
+  scenario:    string
+  size:        string
+  employee_id: string
+  budget_pct:  number
+}
+
+export interface NarrativeEmployee {
+  employee_id:    string
+  full_name:      string
+  role_title:     string
+  department:     string
+  seniority_level:string
+  impact_score:   number
+  attrition_risk: number
+  is_nexus:       boolean
+}
+
+export interface NarrativeOrgStats {
+  n_employees:    number
+  total_payroll:  number
+  avg_impact:     number
+  nexus_count:    number
+  high_risk_count:number
+}
+
+export interface NarrativePageData {
+  ollama_status:          OllamaStatus
+  top_impact_employees:   NarrativeEmployee[]
+  priority_employees:     NarrativeEmployee[]
+  org_stats:              NarrativeOrgStats
 }

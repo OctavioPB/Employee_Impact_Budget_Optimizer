@@ -21,6 +21,7 @@ const pages: { id: Page; label: string }[] = [
   { id: 'decision-room',  label: 'Decision Room' },
   { id: 'resilience',     label: 'Resilience'    },
   { id: 'ld',             label: 'L&D'           },
+  { id: 'narrative',      label: 'Narrative'     },
   { id: 'strategic',      label: 'Strategic'     },
   { id: 'notifications', label: 'Alerts'        },
   { id: 'admin',         label: 'Admin'         },
