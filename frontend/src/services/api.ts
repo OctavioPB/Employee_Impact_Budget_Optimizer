@@ -724,6 +724,11 @@ export const api = {
     }),
   },
 
+  pulse: {
+    data: (scenario: string, size: string, demo = true) =>
+      request<PulseData>(`/api/pulse?scenario=${scenario}&size=${size}&demo=${demo}`),
+  },
+
   webhooks: {
     list:       ()                               => request<WebhookRecord[]>('/api/v1/webhooks'),
     eventTypes: ()                               => request<string[]>('/api/v1/webhooks/event-types'),
@@ -1294,4 +1299,78 @@ export interface WebhookCreateRequest {
   events: string[]
   label:  string
   secret: string
+}
+
+// ── Sprint 20: Pulse Monitoring types ─────────────────────────────────────────
+
+export interface PulseSignalDefinition {
+  name:            string
+  label:           string
+  unit:            string
+  alert_direction: string
+  healthy_range:   string
+  mu:              number
+  sigma:           number
+}
+
+export interface PulseSignalCell {
+  value:  number
+  zscore: number
+  alert:  boolean
+}
+
+export interface PulseHeatmapRow {
+  department: string
+  headcount:  number
+  signals:    Record<string, PulseSignalCell>
+}
+
+export interface PulseWarningEmployee {
+  employee_id:             string
+  anon_id:                 string
+  role_title:              string
+  department:              string
+  seniority_level:         string
+  is_nexus:                boolean
+  anomaly_score:           number
+  base_attrition_risk:     number
+  adjusted_attrition_risk: number
+  cusum_alerts:            string[]
+  signal_zscores:          Record<string, number>
+}
+
+export interface PulseTimeline {
+  employee_id: string
+  anon_id:     string
+  role_title:  string
+  department:  string
+  signals:     Record<string, number[]>
+}
+
+export interface PulseCohesionRow {
+  department:    string
+  headcount:     number
+  cohesion_score:number
+  trend:         number[]
+  delta_30d:     number
+}
+
+export interface PulseSummary {
+  headcount:         number
+  monitored:         number
+  anomaly_count:     number
+  cusum_alert_count: number
+  avg_anomaly_score: number
+  collection_date:   string
+}
+
+export interface PulseData {
+  enabled:            boolean
+  disclaimer:         string
+  summary:            PulseSummary
+  signal_definitions: PulseSignalDefinition[]
+  heatmap:            PulseHeatmapRow[]
+  early_warning:      PulseWarningEmployee[]
+  timelines:          PulseTimeline[]
+  team_cohesion:      PulseCohesionRow[]
 }
