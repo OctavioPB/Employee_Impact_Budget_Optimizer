@@ -1051,7 +1051,9 @@ All design and engineering documentation lives in `planning/`. Each file has a s
 
 ## License
 
-This project uses exclusively permissively-licensed open-source dependencies (MIT, Apache 2.0, BSD). See `requirements.txt` and `frontend/package.json` for the full dependency lists.
+This project is licensed under the **MIT License** — see the [`LICENSE`](LICENSE) file for the full text.
+
+All third-party dependencies are also permissively licensed (MIT, Apache 2.0, or BSD). See `requirements.txt` and `frontend/package.json` for the full dependency lists.
 
 ---
 
