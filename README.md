@@ -25,6 +25,7 @@ The machine suggests. People decide.
 - [Security & Privacy](#security--privacy)
 - [Testing](#testing)
 - [Key Commands](#key-commands)
+- [Documentation](#documentation)
 
 ---
 
@@ -418,7 +419,7 @@ eibo/
 │   │   │   ├── NotificationsPage.tsx
 │   │   │   └── AdminPage.tsx        # API keys, webhooks, widget embed codes
 │   │   ├── components/
-│   │   │   ├── Nav.tsx              # Sticky top nav bar
+│   │   │   ├── Nav.tsx              # Sticky top nav — 5 grouped hover-open dropdowns
 │   │   │   ├── Footer.tsx
 │   │   │   └── Eyebrow.tsx          # Gold rule + label component
 │   │   ├── hooks/
@@ -553,8 +554,18 @@ eibo/
 ├── ui/                              # Legacy Streamlit UI (kept for reference)
 │   └── main.py
 │
+├── planning/                        # Engineering and design documentation
+│   ├── CLAUDE.md                    # Development guide and core principles
+│   ├── PLAN.md                      # Sprint plan and backlog
+│   ├── BRAND.md                     # OPB visual identity guide
+│   ├── DECISIONS.md                 # Engineering decisions with tech stack deep-dive and business value
+│   ├── Business.md                  # Business justification — people analytics concepts for stakeholders
+│   ├── UI_Decisions.md              # Complete UI system reference: hero, nav, footer, charts
+│   └── UI_migration.md              # Guide for migrating a Streamlit app to this UI stack
+│
 ├── docker-compose.yml               # postgres + backend + frontend + pgadmin
 ├── docker-compose.prod.yml
+├── demo.ps1                         # Windows one-command demo launcher (PowerShell)
 ├── .env.example
 ├── requirements.txt                 # Python deps (includes fastapi, uvicorn)
 └── requirements-dev.txt
@@ -1011,6 +1022,30 @@ cd frontend && npm run build
 | 20 | Real-time engagement signals, IsolationForest, CUSUM, Pulse UI | Complete |
 
 **Codebase**: 130+ Python modules · React SPA (19 pages) · FastAPI REST layer (19 routers) · Python & JS SDKs · 4 embeddable widgets · 35,000+ lines · 734 tests
+
+---
+
+## Documentation
+
+All design and engineering documentation lives in `planning/`. Each file has a specific audience and purpose.
+
+| File | Audience | Purpose |
+|---|---|---|
+| [`planning/DECISIONS.md`](planning/DECISIONS.md) | Engineers, technical leads, students | Justifies every engineering decision — architecture, algorithms, libraries, API design, security, and deployment. Includes a tech stack deep-dive (every library explained: what it is, why it was chosen, what it costs to replace) and a business-value-by-capability section translating all 17 modules into organizational outcomes. |
+| [`planning/Business.md`](planning/Business.md) | CHROs, Finance Directors, HR Business Partners, Legal | Plain-language explanation of what EIBO is and is not, the organizational problems it addresses, 13 people analytics concepts explained (ONA, attrition, pay equity, adverse impact, ILP, Monte Carlo, SHAP, SKH, OHI, and more), and a section-by-section breakdown of all 17 capabilities in business terms. Closes with what the platform cannot do and the organizational conditions required to get value from it. |
+| [`planning/UI_Decisions.md`](planning/UI_Decisions.md) | Frontend engineers, designers | Complete reference for the OPB design system as implemented: design tokens, typography rules, colour hierarchy, and detailed code specifications for the navigation bar, hero section, footer, all chart types (diverging bar, donut, histogram, scatter/quadrant, radar, heatmap, sparkline), data tables, status badges, KPI cards, progress bars, and avatar components. Sufficient to replicate the visual system exactly from this document alone. |
+| [`planning/UI_migration.md`](planning/UI_migration.md) | Engineers migrating from Streamlit | Step-by-step guide for porting a Streamlit application to this React + TypeScript + Vite + Zustand stack. Covers the mental model shift, project scaffolding, API extraction (Python function → FastAPI router → api.ts), state migration (st.session_state → useState/Zustand), routing migration, and a widget-by-widget mapping of every Streamlit component to its React + OPB equivalent. Includes a full worked example and a migration checklist. |
+| [`planning/BRAND.md`](planning/BRAND.md) | Designers, UI engineers | Visual identity specification for the OPB brand system: colour palette, typography choices, spacing scale, and component usage rules. |
+| [`planning/CLAUDE.md`](planning/CLAUDE.md) | Contributors, AI assistants | Development guide: core principles (human-in-the-loop, privacy-first, explainability), non-negotiable language rules, sprint guidelines, and useful commands. Read this before writing any code or UI copy. |
+| [`planning/PLAN.md`](planning/PLAN.md) | Project leads | Sprint plan, feature backlog, and implementation notes across all 20 sprints. |
+
+### Quick reference: which document to read first
+
+- **Evaluating the platform for your organization** → `Business.md`
+- **Understanding why specific technical decisions were made** → `DECISIONS.md`
+- **Building a new page or component** → `UI_Decisions.md`
+- **Porting an existing Streamlit app to this stack** → `UI_migration.md`
+- **Contributing to the codebase** → `CLAUDE.md` then `DECISIONS.md`
 
 ---
 
