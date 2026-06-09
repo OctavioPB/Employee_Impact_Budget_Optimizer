@@ -269,10 +269,15 @@ class TestXGBoostMode:
         except ImportError:
             pytest.skip("XGBoost not installed")
 
-        # 100 employees × 25% positive rate = ~25 positives, reliably above the
-        # _MIN_LABELS_FOR_XGB=20 threshold which counts positive-label sum.
-        emp = _make_employees(100)
-        labels = self._make_labels(emp["employee_id"].tolist())
+        emp = _make_employees(50)
+        ids = emp["employee_id"].tolist()
+        # Build exactly 25 positives — _make_labels uses a random seed whose
+        # yield is << 20 with seed=99 on this population, so we construct the
+        # labels explicitly to be deterministically above _MIN_LABELS_FOR_XGB=20.
+        labels = pd.DataFrame({
+            "employee_id": ids,
+            "left": [1] * 25 + [0] * 25,
+        })
         result = compute_attrition_risk(emp, attrition_labels=labels)
         assert result.mode == "xgboost"
 
