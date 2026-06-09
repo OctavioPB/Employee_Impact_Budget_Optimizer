@@ -102,7 +102,6 @@ ignore = [
     "RUF002", # ambiguous unicode char in docstring — same
     "RUF003", # ambiguous unicode char in comment  — same
     "RUF012", # ClassVar annotation on mutable class attrs — too noisy for dataclasses
-    "UP007",  # X | Y union syntax — keep Optional[] for code shared with older callers
 ]
 
 [tool.ruff.lint.per-file-ignores]

@@ -2,7 +2,6 @@
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from forecasting.budget_forecaster import (
     BudgetForecaster,
@@ -12,10 +11,8 @@ from forecasting.budget_forecaster import (
 )
 from forecasting.monte_carlo import (
     MonteCarloResult,
-    MonteCarloSimulator,
     run_monte_carlo,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

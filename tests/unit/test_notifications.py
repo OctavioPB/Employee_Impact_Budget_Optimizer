@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
@@ -13,7 +12,6 @@ import pytest
 # ---------------------------------------------------------------------------
 # Notification engine tests
 # ---------------------------------------------------------------------------
-
 from notifications.engine import (
     DeliveryStatus,
     Notification,
@@ -23,7 +21,6 @@ from notifications.engine import (
     NotificationPriority,
     NotificationStore,
     NotificationType,
-    NotificationChannel,
     get_notification_engine,
 )
 
@@ -482,8 +479,6 @@ from workflows.engine import (
     FlowRun,
     FlowState,
     TaskResult,
-    TaskState,
-    WorkflowRegistry,
     _FlowWrapper,
     _TaskWrapper,
     flow,
@@ -651,7 +646,7 @@ class TestFlowDecorator:
         received = {}
 
         @flow(name="inject_test_flow")
-        def itf(_flow_run: Optional[FlowRun] = None):
+        def itf(_flow_run: FlowRun | None = None):
             received["run"] = _flow_run
 
         itf.run()

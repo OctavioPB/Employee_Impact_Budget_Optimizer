@@ -8,7 +8,6 @@ Usage:
 
 import argparse
 import logging
-import os
 import sys
 import time
 from pathlib import Path
@@ -97,10 +96,10 @@ def seed_organization(org: GeneratedOrg, engine: sa.Engine) -> None:
     # employee_skills — look up actual skill_ids from DB (canonical)
     with engine.connect() as conn:
         db_skills = pd.read_sql("SELECT skill_id, skill_name FROM skills", conn)
-    name_to_id = dict(zip(db_skills["skill_name"], db_skills["skill_id"]))
+    name_to_id = dict(zip(db_skills["skill_name"], db_skills["skill_id"], strict=False))
 
     # Remap skill_ids in employee_skills to canonical DB values
-    skill_id_map = dict(zip(org.skills["skill_id"], org.skills["skill_name"]))
+    skill_id_map = dict(zip(org.skills["skill_id"], org.skills["skill_name"], strict=False))
     emp_skills = org.employee_skills.copy()
     emp_skills["skill_id"] = emp_skills["skill_id"].map(
         lambda sid: name_to_id.get(skill_id_map.get(sid, ""), sid)
@@ -148,13 +147,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="EIBO Demo Database Seeder")
     parser.add_argument(
         "--scenario",
-        choices=ALL_SCENARIOS + ["all"],
+        choices=[*ALL_SCENARIOS, "all"],
         default="all",
         help="Scenario to seed (A, B, C, or all)",
     )
     parser.add_argument(
         "--size",
-        choices=ALL_SIZES + ["all"],
+        choices=[*ALL_SIZES, "all"],
         default="medium",
         help="Organization size to seed (small, medium, large, or all)",
     )

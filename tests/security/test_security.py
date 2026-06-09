@@ -9,21 +9,17 @@ Organised as OWASP-aligned checks covering:
 
 from __future__ import annotations
 
-import os
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # 1. RBAC access control — A01 Broken Access Control
 # ---------------------------------------------------------------------------
-
 from auth.rbac import (
     AccessControl,
     Permission,
     Role,
     User,
     get_demo_user,
-    DEMO_USERS,
 )
 
 
@@ -266,6 +262,7 @@ from utils.sanitization import (
     assert_no_sql_injection,
     assert_no_xss,
     is_safe_input,
+    sanitize_and_validate,
     sanitize_budget_value,
     sanitize_department_name,
     sanitize_employee_id,
@@ -274,7 +271,6 @@ from utils.sanitization import (
     sanitize_positive_int,
     sanitize_role_title,
     sanitize_string,
-    sanitize_and_validate,
 )
 
 
@@ -424,10 +420,10 @@ class TestInputSanitizerHelpers:
 # ---------------------------------------------------------------------------
 
 from utils.secrets_validator import (
-    SecretStatus,
     SecretsReport,
-    validate_secrets,
+    SecretStatus,
     _check_secret,
+    validate_secrets,
 )
 
 
@@ -607,8 +603,8 @@ import json
 import logging
 
 from utils.logging_config import (
-    JsonFormatter,
     DevFormatter,
+    JsonFormatter,
     configure_logging,
     get_logger,
 )

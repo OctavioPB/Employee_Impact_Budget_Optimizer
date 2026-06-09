@@ -7,27 +7,22 @@ so the suite runs offline with zero infrastructure.
 
 from __future__ import annotations
 
-import io
-import textwrap
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
 
+from data_pipeline.bronze_ingest import _add_uuid_column, _read_file
 
 # ---------------------------------------------------------------------------
 # 1. Data pipeline integration: validators + bronze helpers
 # ---------------------------------------------------------------------------
-
 from data_pipeline.validators import (
-    ValidationResult,
     validate_csv_columns,
     validate_employee_dataframe,
     validate_performance_dataframe,
     validate_team_dataframe,
 )
-from data_pipeline.bronze_ingest import _add_uuid_column, _read_file
 
 
 class TestDataPipelineIntegration:
@@ -160,8 +155,8 @@ class TestDataPipelineIntegration:
 from demo_data.generator import DemoGenerator
 from models.impact_scorer import ImpactScorer
 from models.network_analysis import build_graph, compute_centrality_metrics
-from optimization_engine.ilp_solver import solve
 from optimization_engine.constraints import ConstraintConfig
+from optimization_engine.ilp_solver import solve
 
 
 class TestModelPipelineIntegration:
@@ -299,9 +294,6 @@ from notifications.engine import (
     NotificationType,
 )
 from workflows.engine import FlowState, get_registry
-import workflows.data_pipeline_flow  # triggers registration
-import workflows.model_retraining_flow
-import workflows.report_generation_flow
 
 
 class TestNotificationWorkflowIntegration:
@@ -366,8 +358,8 @@ class TestNotificationWorkflowIntegration:
 # 4. RBAC + Audit logger integration
 # ---------------------------------------------------------------------------
 
-from auth.rbac import AccessControl, Permission, Role, User, get_demo_user
-from audit.logger import AuditLogger, EventCategory, EventSeverity, get_audit_logger
+from audit.logger import AuditLogger, EventCategory, EventSeverity
+from auth.rbac import AccessControl, Permission, Role, get_demo_user
 
 
 class TestRbacAuditIntegration:

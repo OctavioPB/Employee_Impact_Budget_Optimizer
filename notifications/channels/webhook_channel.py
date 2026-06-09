@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Optional
 
 import httpx
 
@@ -37,7 +36,7 @@ class WebhookChannel:
     def __init__(
         self,
         url:     str,
-        headers: Optional[dict[str, str]] = None,
+        headers: dict[str, str] | None = None,
         timeout: float = 10.0,
         format:  str   = "generic",
     ) -> None:

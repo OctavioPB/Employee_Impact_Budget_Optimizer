@@ -1,19 +1,16 @@
 """Unit tests for the demo data generator (Sprint 1 DoD requirement)."""
 
-import pytest
 import pandas as pd
+import pytest
 
 from demo_data.generator import DemoGenerator
 from demo_data.scenarios import (
     ALL_SCENARIOS,
-    ALL_SIZES,
     SKILL_TAXONOMY,
-    load_scenario,
-    get_headcount,
-    get_base_budget,
     ScenarioConfig,
+    get_headcount,
+    load_scenario,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

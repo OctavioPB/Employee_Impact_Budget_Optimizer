@@ -7,7 +7,7 @@ Field mappings are specified at runtime via ConnectorSchema.
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -45,9 +45,9 @@ class GenericAPIConnector(BaseConnector):
         base_url:            str,
         employees_endpoint:  str = "/employees",
         auth_type:           str = "none",
-        auth_config:         Optional[dict[str, str]] = None,
-        list_key:            Optional[str] = None,
-        extra_headers:       Optional[dict[str, str]] = None,
+        auth_config:         dict[str, str] | None = None,
+        list_key:            str | None = None,
+        extra_headers:       dict[str, str] | None = None,
         timeout:             float = 15.0,
     ) -> None:
         super().__init__(schema)
@@ -88,7 +88,7 @@ class GenericAPIConnector(BaseConnector):
             logger.error("Fetch failed: %s", exc)
             return []
 
-    def _get(self, path: str, params: Optional[dict] = None) -> httpx.Response:
+    def _get(self, path: str, params: dict | None = None) -> httpx.Response:
         url  = self._base_url + path
         auth = self._build_auth()
         return httpx.get(
@@ -124,7 +124,7 @@ class ConnectorRegistry:
     def register(self, connector: BaseConnector) -> None:
         self._connectors[connector.name] = connector
 
-    def get(self, name: str) -> Optional[BaseConnector]:
+    def get(self, name: str) -> BaseConnector | None:
         return self._connectors.get(name)
 
     def all(self) -> list[BaseConnector]:
@@ -134,7 +134,7 @@ class ConnectorRegistry:
         return [c.status_dict() for c in self._connectors.values()]
 
 
-_registry: Optional[ConnectorRegistry] = None
+_registry: ConnectorRegistry | None = None
 
 
 def get_connector_registry() -> ConnectorRegistry:

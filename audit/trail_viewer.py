@@ -7,7 +7,6 @@ for use in the admin UI.
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Optional
 
 import pandas as pd
 
@@ -20,7 +19,7 @@ from audit.logger import AuditEvent, AuditLogger, EventCategory, EventSeverity, 
 class TrailViewer:
     """Provides structured views over the audit log for the admin panel."""
 
-    def __init__(self, audit: Optional[AuditLogger] = None) -> None:
+    def __init__(self, audit: AuditLogger | None = None) -> None:
         self._audit = audit or get_audit_logger()
 
     # ------------------------------------------------------------------
@@ -29,12 +28,12 @@ class TrailViewer:
 
     def events_df(
         self,
-        category:   Optional[EventCategory] = None,
-        user_email: Optional[str] = None,
-        action:     Optional[str] = None,
-        outcome:    Optional[str] = None,
-        severity:   Optional[EventSeverity] = None,
-        hours_back: Optional[int] = None,
+        category:   EventCategory | None = None,
+        user_email: str | None = None,
+        action:     str | None = None,
+        outcome:    str | None = None,
+        severity:   EventSeverity | None = None,
+        hours_back: int | None = None,
         limit:      int = 500,
     ) -> pd.DataFrame:
         """Return filtered audit events as a DataFrame."""
@@ -128,7 +127,7 @@ class TrailViewer:
     def stats(self) -> dict:
         return self._audit.stats()
 
-    def export_csv(self, hours_back: Optional[int] = None) -> str:
+    def export_csv(self, hours_back: int | None = None) -> str:
         df = self.events_df(hours_back=hours_back, limit=10_000)
         return df.to_csv(index=False)
 

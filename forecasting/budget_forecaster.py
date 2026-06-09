@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -86,7 +85,7 @@ class BudgetForecaster:
     def forecast(
         self,
         employee_df: pd.DataFrame,
-        performance_df: Optional[pd.DataFrame] = None,
+        performance_df: pd.DataFrame | None = None,
         dept_col: str = "department",
         cost_col: str = "total_cost",
     ) -> BudgetForecastResult:
@@ -315,7 +314,7 @@ class BudgetForecaster:
 
 def forecast_budget(
     employee_df: pd.DataFrame,
-    performance_df: Optional[pd.DataFrame] = None,
+    performance_df: pd.DataFrame | None = None,
     dept_col: str = "department",
     cost_col: str = "total_cost",
     history_months: int = 24,

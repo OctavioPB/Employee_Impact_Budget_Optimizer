@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
 import pandas as pd
 
@@ -127,9 +126,9 @@ class TransitionPlanner:
     def plan(
         self,
         future_analysis: FutureStateAnalysis,
-        skills_analysis: Optional[SkillsGapAnalysis],
+        skills_analysis: SkillsGapAnalysis | None,
         current_employees_df: pd.DataFrame,
-        nexus_ids: Optional[set[str]] = None,
+        nexus_ids: set[str] | None = None,
     ) -> TransitionPlan:
         """Generate the transition plan.
 
@@ -186,7 +185,7 @@ class TransitionPlanner:
     def _phase1_foundation(
         self,
         fa: FutureStateAnalysis,
-        sa: Optional[SkillsGapAnalysis],
+        sa: SkillsGapAnalysis | None,
         nexus_ids: set[str],
         n_exits: int,
     ) -> TransitionPhase:
@@ -288,7 +287,7 @@ class TransitionPlanner:
     def _phase2_execution(
         self,
         fa: FutureStateAnalysis,
-        sa: Optional[SkillsGapAnalysis],
+        sa: SkillsGapAnalysis | None,
         n_hires: int,
         n_trains: int,
     ) -> TransitionPhase:
@@ -382,7 +381,7 @@ class TransitionPlanner:
     def _phase3_stabilisation(
         self,
         fa: FutureStateAnalysis,
-        sa: Optional[SkillsGapAnalysis],
+        sa: SkillsGapAnalysis | None,
     ) -> TransitionPhase:
         """Phase 3 (months 9–24): Stabilisation — optimise and embed."""
         actions: list[TransitionAction] = []
@@ -470,7 +469,7 @@ class TransitionPlanner:
     def _assess_risks(
         self,
         fa: FutureStateAnalysis,
-        sa: Optional[SkillsGapAnalysis],
+        sa: SkillsGapAnalysis | None,
         nexus_ids: set[str],
         n_exits: int,
         n_hires: int,
@@ -616,9 +615,9 @@ class TransitionPlanner:
 
 def plan_transition(
     future_analysis: FutureStateAnalysis,
-    skills_analysis: Optional[SkillsGapAnalysis] = None,
-    current_employees_df: Optional[pd.DataFrame] = None,
-    nexus_ids: Optional[set[str]] = None,
+    skills_analysis: SkillsGapAnalysis | None = None,
+    current_employees_df: pd.DataFrame | None = None,
+    nexus_ids: set[str] | None = None,
 ) -> TransitionPlan:
     """Generate a workforce transition plan. Convenience wrapper."""
     if current_employees_df is None:

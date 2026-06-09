@@ -6,7 +6,6 @@ import pytest
 
 from models.impact_scorer import ImpactScorer, ScoringResult, compute_impact_scores
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------

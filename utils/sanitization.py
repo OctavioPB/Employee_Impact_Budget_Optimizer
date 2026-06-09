@@ -10,7 +10,6 @@ from __future__ import annotations
 import html
 import re
 import unicodedata
-from typing import Optional
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -100,7 +99,7 @@ def sanitize_free_text(text: str) -> str:
 # Identifier validators
 # ---------------------------------------------------------------------------
 
-def sanitize_employee_id(value: str) -> Optional[str]:
+def sanitize_employee_id(value: str) -> str | None:
     """Return sanitized employee ID or None if the format is invalid.
 
     Accepts UUID format or a loose alphanumeric ID (1–64 chars).
@@ -111,7 +110,7 @@ def sanitize_employee_id(value: str) -> Optional[str]:
     return None
 
 
-def sanitize_department_filter(dept: str) -> Optional[str]:
+def sanitize_department_filter(dept: str) -> str | None:
     """Return a safe department name suitable for use in query filters, or None."""
     cleaned = sanitize_department_name(dept)
     if not cleaned or len(cleaned) < 2:

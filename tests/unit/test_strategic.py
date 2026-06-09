@@ -13,29 +13,28 @@ from strategic_planner.future_state import (
     FutureStateAnalyzer,
     FutureStateDesign,
     ProposedRole,
-    build_demo_design,
     analyze_future_state,
+    build_demo_design,
 )
 from strategic_planner.skills_gap import (
     SkillRequirement,
-    SkillsGapAnalyzer,
     SkillsGapAnalysis,
+    SkillsGapAnalyzer,
     analyze_skills_gap,
     build_demo_requirements,
 )
-from strategic_planner.transition_planner import (
-    TransitionPlanner,
-    TransitionPlan,
-    plan_transition,
-)
 from strategic_planner.strategy_comparator import (
-    WorkforceStrategy,
-    StrategyComparator,
-    ComparisonResult,
     PRESET_STRATEGIES,
+    ComparisonResult,
+    StrategyComparator,
+    WorkforceStrategy,
     compare_strategies,
 )
-
+from strategic_planner.transition_planner import (
+    TransitionPlan,
+    TransitionPlanner,
+    plan_transition,
+)
 
 # ===========================================================================
 # Shared fixtures

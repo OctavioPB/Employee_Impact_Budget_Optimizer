@@ -6,8 +6,8 @@ overrides, infeasibility, diagnose_infeasibility, OptimizationResult properties,
 and the _prepare/_empty_result/_infeasible_result helpers indirectly.
 """
 
-import pytest
 import pandas as pd
+import pytest
 
 from optimization_engine.constraints import ConstraintConfig
 from optimization_engine.ilp_solver import (
@@ -15,7 +15,6 @@ from optimization_engine.ilp_solver import (
     diagnose_infeasibility,
     solve,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures — canonical small datasets
@@ -469,7 +468,7 @@ class TestForceRetain:
 
     def test_force_retain_all_employees_exceeds_tight_budget(self, five_employees):
         emp, scores = five_employees
-        current_spend = 240_000 + 4 * 120_000  # E1=240k, E2-E5=120k each
+        240_000 + 4 * 120_000  # E1=240k, E2-E5=120k each
         result = solve(emp, budget_target=10_000, impact_scores=scores,
                        critical_skill_holders={}, constraint_config=_no_constraints(),
                        force_retain={"E1", "E2", "E3", "E4", "E5"})

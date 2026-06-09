@@ -10,11 +10,8 @@ Run with:
 from __future__ import annotations
 
 import time
-from typing import Generator
 
-import pandas as pd
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -156,8 +153,8 @@ class TestILPSolverPerformance:
     _THRESHOLD_SOLVE_S = 10.0  # 10s for small org
 
     def test_solve_70pct_budget_speed(self, small_org, small_scores):
-        from optimization_engine.ilp_solver import solve
         from optimization_engine.constraints import ConstraintConfig
+        from optimization_engine.ilp_solver import solve
         current_spend = (
             small_org.employees["annual_salary"] + small_org.employees["annual_benefits"]
         ).sum()
@@ -174,8 +171,8 @@ class TestILPSolverPerformance:
             f"ILP solve took {elapsed:.2f}s (threshold {self._THRESHOLD_SOLVE_S}s)"
 
     def test_solve_returns_valid_result(self, small_org, small_scores):
-        from optimization_engine.ilp_solver import solve
         from optimization_engine.constraints import ConstraintConfig
+        from optimization_engine.ilp_solver import solve
         current_spend = (
             small_org.employees["annual_salary"] + small_org.employees["annual_benefits"]
         ).sum()
@@ -193,8 +190,8 @@ class TestILPSolverPerformance:
         assert result.n_total == len(small_org.employees)
 
     def test_solve_100pct_budget_is_fast(self, small_org, small_scores):
-        from optimization_engine.ilp_solver import solve
         from optimization_engine.constraints import ConstraintConfig
+        from optimization_engine.ilp_solver import solve
         full_spend = (
             small_org.employees["annual_salary"] + small_org.employees["annual_benefits"]
         ).sum()

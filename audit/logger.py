@@ -17,7 +17,6 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +88,7 @@ class AuditLogger:
     of the last `buffer_size` events for fast admin queries.
     """
 
-    _instance: Optional[AuditLogger] = None
+    _instance: AuditLogger | None = None
     _lock = threading.Lock()
 
     def __new__(cls, *args, **kwargs) -> AuditLogger:
@@ -126,7 +125,7 @@ class AuditLogger:
         severity:   EventSeverity = EventSeverity.INFO,
         outcome:    str = "success",
         session_id: str = "",
-        metadata:   Optional[dict] = None,
+        metadata:   dict | None = None,
     ) -> AuditEvent:
         """Write an audit event to disk and buffer."""
         with self._write_lock:
@@ -160,14 +159,14 @@ class AuditLogger:
 
     def query(
         self,
-        category:   Optional[EventCategory] = None,
-        user_id:    Optional[str] = None,
-        user_email: Optional[str] = None,
-        action:     Optional[str] = None,
-        outcome:    Optional[str] = None,
-        severity:   Optional[EventSeverity] = None,
-        since:      Optional[datetime] = None,
-        until:      Optional[datetime] = None,
+        category:   EventCategory | None = None,
+        user_id:    str | None = None,
+        user_email: str | None = None,
+        action:     str | None = None,
+        outcome:    str | None = None,
+        severity:   EventSeverity | None = None,
+        since:      datetime | None = None,
+        until:      datetime | None = None,
         limit:      int = 500,
     ) -> list[AuditEvent]:
         """Query the in-memory buffer. Disk fallback not needed for Streamlit demos."""
@@ -222,7 +221,7 @@ class AuditLogger:
 # Module-level singleton + convenience functions
 # ---------------------------------------------------------------------------
 
-_audit: Optional[AuditLogger] = None
+_audit: AuditLogger | None = None
 
 
 def get_audit_logger(log_dir: str | Path = "audit_logs") -> AuditLogger:
@@ -248,7 +247,7 @@ def log_access(
 
 def log_simulation(
     user_id: str, user_email: str, user_role: str,
-    resource: str, detail: str, metadata: Optional[dict] = None,
+    resource: str, detail: str, metadata: dict | None = None,
 ) -> AuditEvent:
     return get_audit_logger().log(
         category=EventCategory.SIMULATION, action="run_simulation",
@@ -260,7 +259,7 @@ def log_simulation(
 
 def log_override(
     user_id: str, user_email: str, user_role: str,
-    resource: str, detail: str, metadata: Optional[dict] = None,
+    resource: str, detail: str, metadata: dict | None = None,
 ) -> AuditEvent:
     return get_audit_logger().log(
         category=EventCategory.OVERRIDE, action="override_decision",

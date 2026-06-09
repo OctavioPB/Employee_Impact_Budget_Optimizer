@@ -7,7 +7,7 @@ All randomness is seeded for reproducibility.
 import logging
 import random
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Any
 
@@ -24,7 +24,6 @@ def _seeded_uuid(rng: np.random.Generator) -> str:
     return str(uuid.UUID(int=int_val & ((1 << 128) - 1)))
 
 from demo_data.scenarios import (
-    ScenarioConfig,
     SKILL_TAXONOMY,
     get_base_budget,
     get_headcount,
@@ -268,7 +267,6 @@ class DemoGenerator:
 
     def _generate_teams(self, org_id: str) -> pd.DataFrame:
         rows: list[dict[str, Any]] = []
-        budget_variance = self.scenario.total_budget_variance
 
         for dept_cfg in self.scenario.departments:
             dept = dept_cfg["name"]
@@ -458,7 +456,7 @@ class DemoGenerator:
         self, employees_df: pd.DataFrame, skills_df: pd.DataFrame
     ) -> pd.DataFrame:
         """Assign 2–6 skills per employee based on department affinity."""
-        skill_name_to_id = dict(zip(skills_df["skill_name"], skills_df["skill_id"]))
+        skill_name_to_id = dict(zip(skills_df["skill_name"], skills_df["skill_id"], strict=False))
         rows: list[dict[str, Any]] = []
 
         seniority_n_skills = {
@@ -506,10 +504,10 @@ class DemoGenerator:
         """Generate collaboration edges: reports_to, collaborates_with, mentors."""
         rows: list[dict[str, Any]] = []
         emp_ids = employees_df["employee_id"].tolist()
-        emp_depts = dict(zip(employees_df["employee_id"], employees_df["department"]))
-        emp_managers = dict(zip(employees_df["employee_id"], employees_df["manager_id"]))
-        emp_teams = dict(zip(employees_df["employee_id"], employees_df["team_id"]))
-        emp_seniority = dict(zip(employees_df["employee_id"], employees_df["seniority_level"]))
+        emp_depts = dict(zip(employees_df["employee_id"], employees_df["department"], strict=False))
+        emp_managers = dict(zip(employees_df["employee_id"], employees_df["manager_id"], strict=False))
+        emp_teams = dict(zip(employees_df["employee_id"], employees_df["team_id"], strict=False))
+        emp_seniority = dict(zip(employees_df["employee_id"], employees_df["seniority_level"], strict=False))
 
         nexus_ids = set(
             employees_df[employees_df.get("_is_nexus", False) == True]["employee_id"].tolist()

@@ -19,7 +19,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
 logger = logging.getLogger(__name__)
@@ -113,10 +113,10 @@ class task:
 
     def __init__(
         self,
-        name:        Optional[str] = None,
+        name:        str | None = None,
         retries:     int = 0,
         retry_delay: float = 1.0,
-        tags:        Optional[list[str]] = None,
+        tags:        list[str] | None = None,
     ) -> None:
         self._name        = name
         self._retries     = retries
@@ -182,9 +182,9 @@ class flow:
 
     def __init__(
         self,
-        name:        Optional[str] = None,
+        name:        str | None = None,
         description: str = "",
-        tags:        Optional[list[str]] = None,
+        tags:        list[str] | None = None,
     ) -> None:
         self._name        = name
         self._description = description
@@ -238,7 +238,7 @@ class _FlowWrapper:
         return run
 
     @property
-    def last_run(self) -> Optional[FlowRun]:
+    def last_run(self) -> FlowRun | None:
         return self._run_history[-1] if self._run_history else None
 
     @property
@@ -253,7 +253,7 @@ class _FlowWrapper:
 class WorkflowRegistry:
     """Central registry for all defined flows. Singleton per process."""
 
-    _instance: Optional[WorkflowRegistry] = None
+    _instance: WorkflowRegistry | None = None
     _lock = threading.Lock()
 
     def __new__(cls) -> WorkflowRegistry:
@@ -266,14 +266,14 @@ class WorkflowRegistry:
     def register(self, flow_wrapper: _FlowWrapper) -> None:
         self._flows[flow_wrapper.flow_name] = flow_wrapper
 
-    def get(self, name: str) -> Optional[_FlowWrapper]:
+    def get(self, name: str) -> _FlowWrapper | None:
         return self._flows.get(name)
 
     def all_flows(self) -> list[_FlowWrapper]:
         return list(self._flows.values())
 
     def run_flow(self, name: str, triggered_by: str = "manual",
-                 **kwargs) -> Optional[FlowRun]:
+                 **kwargs) -> FlowRun | None:
         f = self.get(name)
         if f is None:
             logger.error("Flow '%s' not registered", name)

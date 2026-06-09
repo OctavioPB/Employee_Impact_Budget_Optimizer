@@ -9,7 +9,6 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -106,7 +105,7 @@ class EarlyWarningEvaluator:
     All methods are independent; each returns zero or more Alert objects.
     """
 
-    def __init__(self, thresholds: Optional[EarlyWarningThresholds] = None) -> None:
+    def __init__(self, thresholds: EarlyWarningThresholds | None = None) -> None:
         self._t = thresholds or EarlyWarningThresholds()
 
     # ------------------------------------------------------------------
@@ -116,13 +115,13 @@ class EarlyWarningEvaluator:
     def evaluate(
         self,
         employee_df: pd.DataFrame,
-        attrition_scores: Optional[pd.DataFrame] = None,
-        team_fragility: Optional[dict[str, float]] = None,
-        nexus_ids: Optional[set[str]] = None,
-        impact_scores: Optional[pd.DataFrame] = None,
+        attrition_scores: pd.DataFrame | None = None,
+        team_fragility: dict[str, float] | None = None,
+        nexus_ids: set[str] | None = None,
+        impact_scores: pd.DataFrame | None = None,
         budget_consumed: float = 0.0,
         annual_budget: float = 0.0,
-        skill_holders: Optional[dict[str, list[str]]] = None,
+        skill_holders: dict[str, list[str]] | None = None,
         dept_col: str = "department",
         team_col: str = "team_id",
     ) -> EarlyWarningResult:
@@ -491,14 +490,14 @@ class EarlyWarningEvaluator:
 
 def evaluate_early_warnings(
     employee_df: pd.DataFrame,
-    attrition_scores: Optional[pd.DataFrame] = None,
-    team_fragility: Optional[dict[str, float]] = None,
-    nexus_ids: Optional[set[str]] = None,
-    impact_scores: Optional[pd.DataFrame] = None,
+    attrition_scores: pd.DataFrame | None = None,
+    team_fragility: dict[str, float] | None = None,
+    nexus_ids: set[str] | None = None,
+    impact_scores: pd.DataFrame | None = None,
     budget_consumed: float = 0.0,
     annual_budget: float = 0.0,
-    skill_holders: Optional[dict[str, list[str]]] = None,
-    thresholds: Optional[EarlyWarningThresholds] = None,
+    skill_holders: dict[str, list[str]] | None = None,
+    thresholds: EarlyWarningThresholds | None = None,
 ) -> EarlyWarningResult:
     """Evaluate early warning triggers. Convenience wrapper."""
     return EarlyWarningEvaluator(thresholds).evaluate(

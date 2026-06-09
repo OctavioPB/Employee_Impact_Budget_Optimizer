@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Optional
 
 from workflows.engine import FlowRun, TaskResult, flow, get_registry, task
 
@@ -82,7 +81,7 @@ def notify_retraining_complete(deploy_result: dict) -> dict:
 def model_retraining_flow(
     model_name: str = "impact_scorer",
     force_retrain: bool = False,
-    _flow_run: Optional[FlowRun] = None,
+    _flow_run: FlowRun | None = None,
 ) -> None:
     r1: TaskResult = assess_model_drift(model_name=model_name)
     if _flow_run:

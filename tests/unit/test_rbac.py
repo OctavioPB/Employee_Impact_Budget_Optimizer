@@ -8,14 +8,9 @@ from __future__ import annotations
 
 import pytest
 
-from auth.rbac import (
-    AccessControl,
-    DEMO_USERS,
-    Permission,
-    Role,
-    User,
-    get_demo_user,
-    _ROLE_PERMISSIONS,
+from audit.compliance_reports import (
+    ComplianceReport,
+    ComplianceReportGenerator,
 )
 from audit.logger import (
     AuditEvent,
@@ -23,19 +18,23 @@ from audit.logger import (
     EventCategory,
     EventSeverity,
     log_access,
+    log_admin,
     log_auth,
     log_export,
     log_override,
-    log_simulation,
     log_security,
-    log_admin,
+    log_simulation,
 )
 from audit.trail_viewer import TrailViewer
-from audit.compliance_reports import (
-    ComplianceReportGenerator,
-    ComplianceReport,
+from auth.rbac import (
+    _ROLE_PERMISSIONS,
+    DEMO_USERS,
+    AccessControl,
+    Permission,
+    Role,
+    User,
+    get_demo_user,
 )
-
 
 # ===========================================================================
 # 1. Role definitions
@@ -73,7 +72,7 @@ class TestRole:
 # ===========================================================================
 
 class TestUser:
-    def _make_user(self, role: Role, depts: list[str] = None) -> User:
+    def _make_user(self, role: Role, depts: list[str] | None = None) -> User:
         return User(
             user_id="U999", full_name="Test User",
             email="test@test.com", role=role,
@@ -144,7 +143,7 @@ class TestUser:
 # ===========================================================================
 
 class TestAccessControl:
-    def _ac(self, role: Role, depts: list[str] = None) -> AccessControl:
+    def _ac(self, role: Role, depts: list[str] | None = None) -> AccessControl:
         u = User("U1", "T", "t@t.com", role, departments=depts or [])
         return AccessControl(u)
 

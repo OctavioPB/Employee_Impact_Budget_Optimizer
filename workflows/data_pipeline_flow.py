@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Optional
 
 from workflows.engine import FlowRun, TaskResult, flow, get_registry, task
 
@@ -66,7 +65,7 @@ def validate_pipeline(gold_result: dict) -> dict:
     description="Bronze → Silver → Gold ingestion pipeline with validation",
     tags=["data", "pipeline", "scheduled"],
 )
-def data_pipeline_flow(source_path: str = "demo", _flow_run: Optional[FlowRun] = None) -> None:
+def data_pipeline_flow(source_path: str = "demo", _flow_run: FlowRun | None = None) -> None:
     r1: TaskResult = ingest_bronze(source_path=source_path)
     if _flow_run:
         _flow_run.task_results.append(r1)

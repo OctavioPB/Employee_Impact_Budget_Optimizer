@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Optional
 
 from workflows.engine import FlowRun, TaskResult, flow, get_registry, task
 
@@ -56,7 +55,7 @@ def format_report(content: dict) -> dict:
 
 
 @task(name="distribute_report")
-def distribute_report(format_result: dict, recipients: Optional[list[str]] = None) -> dict:
+def distribute_report(format_result: dict, recipients: list[str] | None = None) -> dict:
     """Distribute formatted report to specified recipients."""
     time.sleep(0.02)
     recipients = recipients or ["executive_team"]
@@ -75,8 +74,8 @@ def distribute_report(format_result: dict, recipients: Optional[list[str]] = Non
 )
 def report_generation_flow(
     report_type: str = "weekly_risk",
-    recipients:  Optional[list[str]] = None,
-    _flow_run:   Optional[FlowRun] = None,
+    recipients:  list[str] | None = None,
+    _flow_run:   FlowRun | None = None,
 ) -> None:
     r1: TaskResult = collect_report_data(report_type=report_type)
     if _flow_run:

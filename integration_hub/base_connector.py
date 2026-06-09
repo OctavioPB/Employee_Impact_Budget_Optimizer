@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -69,7 +69,7 @@ class FieldMapping:
     """Maps one external field to one EIBO field with optional transformation."""
     source_field:    str
     target_field:    str
-    transform:       Optional[str] = None   # "upper" | "lower" | "date_iso" | "salary_usd"
+    transform:       str | None = None   # "upper" | "lower" | "date_iso" | "salary_usd"
     default_value:   Any           = None
     required:        bool          = False
 
@@ -109,7 +109,7 @@ class ConnectorSchema:
         return out
 
     @staticmethod
-    def _transform(value: Any, transform: Optional[str]) -> Any:
+    def _transform(value: Any, transform: str | None) -> Any:
         if transform is None or value is None:
             return value
         if transform == "upper":
@@ -142,7 +142,7 @@ class BaseConnector(ABC):
     def __init__(self, schema: ConnectorSchema) -> None:
         self._schema  = schema
         self._status  = ConnectorStatus.CONFIGURED
-        self._last_sync: Optional[datetime] = None
+        self._last_sync: datetime | None = None
 
     @property
     def name(self) -> str:
@@ -157,7 +157,7 @@ class BaseConnector(ABC):
         return self._status
 
     @property
-    def last_sync_at(self) -> Optional[str]:
+    def last_sync_at(self) -> str | None:
         return self._last_sync.isoformat() if self._last_sync else None
 
     @abstractmethod

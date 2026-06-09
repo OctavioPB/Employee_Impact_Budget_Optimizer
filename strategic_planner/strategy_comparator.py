@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -184,7 +183,7 @@ class StrategyComparator:
 
     def __init__(
         self,
-        org_priorities: Optional[dict[str, float]] = None,
+        org_priorities: dict[str, float] | None = None,
     ) -> None:
         raw = org_priorities or self._DEFAULT_PRIORITIES
         total = sum(raw.values()) or 1.0
@@ -449,13 +448,13 @@ class StrategyComparator:
 # ---------------------------------------------------------------------------
 
 def compare_strategies(
-    strategies: Optional[list[WorkforceStrategy]] = None,
+    strategies: list[WorkforceStrategy] | None = None,
     current_annual_spend: float = 5_000_000,
     n_employees: int = 100,
     avg_impact_score: float = 60.0,
     n_nexus: int = 5,
     attrition_rate: float = 0.12,
-    org_priorities: Optional[dict[str, float]] = None,
+    org_priorities: dict[str, float] | None = None,
 ) -> ComparisonResult:
     """Run strategy comparison. Convenience wrapper using preset strategies."""
     strats = strategies or PRESET_STRATEGIES

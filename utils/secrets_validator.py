@@ -16,7 +16,6 @@ import os
 import re
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 
 
 class SecretStatus(str, Enum):
@@ -149,8 +148,8 @@ _DEMO_REQUIRED = ["SECRET_KEY"]  # minimum secrets even in demo mode
 
 
 def validate_secrets(
-    demo_mode: Optional[bool] = None,
-    definitions: Optional[list[dict]] = None,
+    demo_mode: bool | None = None,
+    definitions: list[dict] | None = None,
 ) -> SecretsReport:
     """Run all secret checks and return a SecretsReport.
 

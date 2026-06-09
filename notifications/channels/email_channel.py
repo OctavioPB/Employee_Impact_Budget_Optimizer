@@ -13,7 +13,6 @@ import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import Optional
 
 from notifications.engine import Notification, NotificationBundle, NotificationPriority
 
@@ -90,7 +89,7 @@ class EmailChannel:
         smtp_user:     str = "",
         smtp_password: str = "",
         email_from:    str = "noreply@eibo.local",
-        user_email_map: Optional[dict[str, str]] = None,
+        user_email_map: dict[str, str] | None = None,
     ) -> None:
         self._host      = smtp_host or os.getenv("SMTP_HOST", "")
         self._port      = smtp_port or int(os.getenv("SMTP_PORT", "587"))

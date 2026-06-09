@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -70,7 +69,7 @@ class MonteCarloSimulator:
         self,
         employee_df: pd.DataFrame,
         annual_budget: float,
-        attrition_result: Optional[pd.DataFrame] = None,
+        attrition_result: pd.DataFrame | None = None,
         cost_col: str = "total_cost",
         dept_col: str = "department",
         monthly_attrition_rate: float = 0.015,
@@ -232,7 +231,7 @@ except ImportError:
 def run_monte_carlo(
     employee_df: pd.DataFrame,
     annual_budget: float,
-    attrition_result: Optional[pd.DataFrame] = None,
+    attrition_result: pd.DataFrame | None = None,
     cost_col: str = "total_cost",
     n_simulations: int = _DEFAULT_N_SIMS,
     horizon_months: int = _DEFAULT_HORIZON,

@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Optional
 
 from integration_hub.base_connector import (
     BaseConnector,
@@ -69,7 +68,7 @@ class WorkdayConnector(BaseConnector):
         self._password      = password      or os.getenv("WORKDAY_PASSWORD", "")
         self._client_id     = client_id     or os.getenv("WORKDAY_CLIENT_ID", "")
         self._client_secret = client_secret or os.getenv("WORKDAY_CLIENT_SECRET", "")
-        self._token: Optional[str] = None
+        self._token: str | None = None
 
     def connect(self) -> bool:
         if not self._api_url:

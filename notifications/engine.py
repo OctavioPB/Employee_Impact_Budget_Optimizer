@@ -12,7 +12,6 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional
 from uuid import uuid4
 
 logger = logging.getLogger(__name__)
@@ -167,15 +166,15 @@ class NotificationStore:
             self._store[n.notification_id] = n
             self._order.append(n.notification_id)
 
-    def get(self, notification_id: str) -> Optional[Notification]:
+    def get(self, notification_id: str) -> Notification | None:
         return self._store.get(notification_id)
 
     def for_user(
         self,
         user_id:      str,
         unread_only:  bool = False,
-        ntype:        Optional[NotificationType] = None,
-        priority:     Optional[NotificationPriority] = None,
+        ntype:        NotificationType | None = None,
+        priority:     NotificationPriority | None = None,
         limit:        int = 100,
     ) -> list[Notification]:
         results = []
@@ -245,7 +244,7 @@ class NotificationBundler:
         self._pending: dict[str, list[Notification]] = defaultdict(list)
         self._last_flush: datetime = datetime.utcnow()
 
-    def add(self, notification: Notification) -> Optional[NotificationBundle]:
+    def add(self, notification: Notification) -> NotificationBundle | None:
         """Add a notification. Returns a bundle if the window has elapsed."""
         key = notification.bundle_key or notification.notification_type.value
         self._pending[key].append(notification)
@@ -290,7 +289,7 @@ class NotificationEngine:
 
     def __init__(
         self,
-        store:          Optional[NotificationStore] = None,
+        store:          NotificationStore | None = None,
         bundle_window_m: int = 15,
     ) -> None:
         self._store    = store or NotificationStore()
@@ -331,9 +330,9 @@ class NotificationEngine:
         title:          str,
         body:           str,
         source:         str,
-        target_user_ids: Optional[list[str]] = None,
+        target_user_ids: list[str] | None = None,
         channel:        NotificationChannel = NotificationChannel.IN_APP,
-        metadata:       Optional[dict] = None,
+        metadata:       dict | None = None,
         bundle_key:     str = "",
     ) -> Notification:
         """Create and dispatch a notification."""
@@ -362,7 +361,7 @@ class NotificationEngine:
 
     def send_risk_alert(
         self, title: str, body: str, priority: NotificationPriority,
-        source: str = "early_warning", target_user_ids: Optional[list[str]] = None,
+        source: str = "early_warning", target_user_ids: list[str] | None = None,
     ) -> Notification:
         return self.send(
             ntype=NotificationType.RISK_ALERT, priority=priority,
@@ -442,7 +441,7 @@ class NotificationEngine:
 # Module-level singleton
 # ---------------------------------------------------------------------------
 
-_engine: Optional[NotificationEngine] = None
+_engine: NotificationEngine | None = None
 
 
 def get_notification_engine() -> NotificationEngine:

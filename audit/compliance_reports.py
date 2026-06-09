@@ -7,7 +7,6 @@ decision impact reports suitable for regulatory audit submissions.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 import pandas as pd
 
@@ -49,7 +48,7 @@ class ComplianceReport:
 class ComplianceReportGenerator:
     """Generates compliance and audit reports from event data."""
 
-    def __init__(self, viewer: Optional[TrailViewer] = None) -> None:
+    def __init__(self, viewer: TrailViewer | None = None) -> None:
         self._viewer = viewer or TrailViewer()
 
     # ------------------------------------------------------------------

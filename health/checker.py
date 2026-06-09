@@ -13,7 +13,6 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -285,7 +284,7 @@ _DEFAULT_CHECKS: list[Callable[[], ComponentHealth]] = [
 class HealthChecker:
     """Run all registered component checks and return a HealthReport."""
 
-    def __init__(self, checks: Optional[list[Callable[[], ComponentHealth]]] = None) -> None:
+    def __init__(self, checks: list[Callable[[], ComponentHealth]] | None = None) -> None:
         self._checks = checks or _DEFAULT_CHECKS
 
     def run(self) -> HealthReport:
