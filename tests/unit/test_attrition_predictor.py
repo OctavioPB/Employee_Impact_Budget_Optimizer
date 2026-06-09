@@ -261,7 +261,7 @@ class TestXGBoostMode:
                      seed: int = 99) -> pd.DataFrame:
         rng = np.random.default_rng(seed)
         labels = (rng.random(len(employee_ids)) < positive_rate).astype(int)
-        return pd.DataFrame({"employee_id": employee_ids, "attrition": labels})
+        return pd.DataFrame({"employee_id": employee_ids, "left": labels})
 
     def test_xgboost_mode_activated_with_enough_labels(self):
         try:
