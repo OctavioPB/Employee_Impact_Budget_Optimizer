@@ -1,0 +1,59 @@
+name: Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["master", "main"]
+
+# Cancel in-flight runs for the same branch on new push
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-3.11-${{ hashFiles('requirements-dev.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-3.11-
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run unit tests
+        run: |
+          pytest tests/unit/ \
+            -m "not integration and not benchmark and not slow" \
+            --tb=short \
+            --cov-fail-under=40
+
+      - name: Upload coverage XML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          retention-days: 30
+
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-html
+          path: htmlcov/
+          retention-days: 7

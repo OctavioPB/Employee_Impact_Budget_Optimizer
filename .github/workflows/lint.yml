@@ -1,0 +1,47 @@
+name: Lint
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["master", "main"]
+
+# Cancel in-flight runs for the same branch on new push
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ruff:
+    name: ruff check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-ruff-${{ hashFiles('requirements-dev.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-ruff-
+
+      - name: Install ruff
+        run: pip install "ruff>=0.4.0"
+
+      # --output-format=github emits ::error file=…,line=…:: annotations
+      # visible inline on the PR diff and in the Actions summary.
+      - name: Lint
+        run: ruff check . --output-format=github
+
+      # Format check is commented out until `ruff format .` has been run once
+      # across the whole codebase.  Uncomment when ready:
+      #
+      # - name: Format
+      #   run: ruff format --check . --diff
