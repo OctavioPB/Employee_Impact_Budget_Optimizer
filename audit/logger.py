@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import threading
 from collections import deque
 from dataclasses import asdict, dataclass
@@ -90,10 +89,10 @@ class AuditLogger:
     of the last `buffer_size` events for fast admin queries.
     """
 
-    _instance: Optional["AuditLogger"] = None
+    _instance: Optional[AuditLogger] = None
     _lock = threading.Lock()
 
-    def __new__(cls, *args, **kwargs) -> "AuditLogger":
+    def __new__(cls, *args, **kwargs) -> AuditLogger:
         with cls._lock:
             if cls._instance is None:
                 cls._instance = super().__new__(cls)

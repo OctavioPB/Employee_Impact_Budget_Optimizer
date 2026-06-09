@@ -19,7 +19,7 @@ Constraints:
 
 import logging
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import pandas as pd
 import pulp
@@ -131,10 +131,10 @@ def solve(
         return _empty_result(budget_target)
 
     emp_ids = emp["employee_id"].tolist()
-    impact_dict: dict[str, float] = dict(zip(emp["employee_id"], emp["impact_score"]))
-    cost_dict: dict[str, float] = dict(zip(emp["employee_id"], emp["total_cost"]))
-    seniority_dict: dict[str, str] = dict(zip(emp["employee_id"], emp["seniority_level"]))
-    team_dict: dict[str, str] = dict(zip(emp["employee_id"], emp["team_id"]))
+    impact_dict: dict[str, float] = dict(zip(emp["employee_id"], emp["impact_score"], strict=False))
+    cost_dict: dict[str, float] = dict(zip(emp["employee_id"], emp["total_cost"], strict=False))
+    seniority_dict: dict[str, str] = dict(zip(emp["employee_id"], emp["seniority_level"], strict=False))
+    team_dict: dict[str, str] = dict(zip(emp["employee_id"], emp["team_id"], strict=False))
 
     teams_to_emp: dict[str, list[str]] = {}
     for eid in emp_ids:
@@ -337,9 +337,9 @@ def diagnose_infeasibility(
     if emp.empty:
         return ["No employees available to optimize."]
 
-    cost_dict = dict(zip(emp["employee_id"], emp["total_cost"]))
-    seniority_dict = dict(zip(emp["employee_id"], emp["seniority_level"]))
-    team_dict = dict(zip(emp["employee_id"], emp["team_id"]))
+    cost_dict = dict(zip(emp["employee_id"], emp["total_cost"], strict=False))
+    seniority_dict = dict(zip(emp["employee_id"], emp["seniority_level"], strict=False))
+    team_dict = dict(zip(emp["employee_id"], emp["team_id"], strict=False))
 
     # Check 1: force-retain cost exceeds budget
     fr_cost = sum(cost_dict.get(eid, 0.0) for eid in force_retain if eid in cost_dict)

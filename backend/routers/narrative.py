@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from backend.services.narrative_service import (
     build_narrative_data,
-    generate_impact_explanation,
-    generate_attrition_explanation,
-    generate_simulation_summary,
-    generate_manager_brief,
     check_ollama,
+    generate_attrition_explanation,
+    generate_impact_explanation,
+    generate_manager_brief,
+    generate_simulation_summary,
 )
 
 router = APIRouter()

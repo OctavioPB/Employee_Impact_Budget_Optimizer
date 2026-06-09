@@ -3,12 +3,10 @@ Sprint 19 — Webhook registration and delivery service.
 Webhooks are stored in-memory (demo). In production, persist to PostgreSQL.
 """
 
-import hashlib
 import hmac
 import json
 import secrets
 import time
-
 
 EVENT_TYPES = [
     "attrition.risk.threshold_crossed",
@@ -107,7 +105,7 @@ async def _deliver(wh: WebhookRegistration, event_type: str, payload: dict, atte
         log["status"] = "failed"
         log["error"]  = str(exc)
 
-    wh.delivery_log = (wh.delivery_log + [log])[-50:]
+    wh.delivery_log = ([*wh.delivery_log, log])[-50:]
     return log
 
 

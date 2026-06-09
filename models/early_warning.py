@@ -11,8 +11,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 

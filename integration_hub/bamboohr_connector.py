@@ -9,7 +9,10 @@ import logging
 import os
 
 from integration_hub.base_connector import (
-    BaseConnector, ConnectorSchema, ConnectorStatus, FieldMapping,
+    BaseConnector,
+    ConnectorSchema,
+    ConnectorStatus,
+    FieldMapping,
 )
 
 logger = logging.getLogger(__name__)

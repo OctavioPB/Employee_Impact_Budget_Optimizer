@@ -4,7 +4,12 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from backend.services.api_key_service import (
-    create_key, list_keys, revoke_key, authenticate, get_sandbox_key, _SCOPES,
+    _SCOPES,
+    authenticate,
+    create_key,
+    get_sandbox_key,
+    list_keys,
+    revoke_key,
 )
 
 router = APIRouter()

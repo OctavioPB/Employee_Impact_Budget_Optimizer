@@ -80,7 +80,7 @@ def _gini(values: np.ndarray) -> float:
     arr = np.sort(np.abs(values.astype(float)))
     n   = len(arr)
     idx = np.arange(1, n + 1)
-    return float((2 * (idx * arr).sum() / (n * arr.sum()) - (n + 1) / n)) if arr.sum() > 0 else 0.0
+    return float(2 * (idx * arr).sum() / (n * arr.sum()) - (n + 1) / n) if arr.sum() > 0 else 0.0
 
 
 # ── Resilience sub-scores ─────────────────────────────────────────────────────
@@ -367,7 +367,7 @@ def run_disruption_scenario(
     return {
         "scenario_type":      scenario_type,
         "scenario_label":     _SCENARIO_LABELS[scenario_type],
-        "params":             {k: str(v) if not isinstance(v, (int, float, bool)) else v for k, v in params.items()},
+        "params":             {k: str(v) if not isinstance(v, int | float | bool) else v for k, v in params.items()},
         "primary_count":      len(primary_ids),
         "total_departed":     total_departed,
         "cascade_multiplier": cascade_multiplier,

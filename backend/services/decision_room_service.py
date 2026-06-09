@@ -16,7 +16,7 @@ disconnect and reconnect).
 
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # ── Persistence ───────────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ _DEMO_PARTICIPANTS = [
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 def _uid() -> str:

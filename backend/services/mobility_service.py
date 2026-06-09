@@ -7,9 +7,8 @@ Computes:
 """
 
 import sys
-import math
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
@@ -18,8 +17,8 @@ if str(_REPO_ROOT) not in sys.path:
 import numpy as np
 import pandas as pd
 
-from demo_data.generator import _ROLE_BY_DEPT_SENIORITY, _DEPT_SKILLS, _ROLE_SALARY
 from backend.services.data_service import get_org
+from demo_data.generator import _DEPT_SKILLS, _ROLE_BY_DEPT_SENIORITY, _ROLE_SALARY
 
 # ── Seniority ordering ─────────────────────────────────────────────────────
 _SEN_RANK = {"junior": 0, "mid": 1, "senior": 2, "lead": 3, "director": 4, "exec": 5}
@@ -75,7 +74,7 @@ def build_mobility_data(scenario: str, size: str) -> dict:
 
     # ── Lookups ────────────────────────────────────────────────────────────
     skill_id_to_name: dict[str, str] = dict(
-        zip(skills_df["skill_id"].astype(str), skills_df["skill_name"])
+        zip(skills_df["skill_id"].astype(str), skills_df["skill_name"], strict=False)
     )
 
     # employee_id → set of skill names
@@ -87,9 +86,7 @@ def build_mobility_data(scenario: str, size: str) -> dict:
             emp_skill_map.setdefault(eid, set()).add(sn)
 
     # employee_id → list of kpi records
-    perf_by_emp: dict[str, pd.DataFrame] = {
-        eid: grp for eid, grp in perf_df.groupby("employee_id")
-    }
+    perf_by_emp: dict[str, pd.DataFrame] = dict(perf_df.groupby("employee_id"))
 
     # ── Salary percentile within (dept, seniority) cohort ─────────────────
     emp_df["sal_pct_in_cohort"] = emp_df.groupby(["department", "seniority_level"])[

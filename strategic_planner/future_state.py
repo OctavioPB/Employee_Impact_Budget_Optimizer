@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -280,7 +279,7 @@ class FutureStateAnalyzer:
         skill_name_map = {}
         if "skill_id" in skills_df.columns and "skill_name" in skills_df.columns:
             skill_name_map = dict(zip(skills_df["skill_id"].astype(str),
-                                      skills_df["skill_name"].str.lower()))
+                                      skills_df["skill_name"].str.lower(), strict=False))
 
         result: dict[str, set[str]] = {}
         for _, row in employee_skills_df.iterrows():
@@ -312,7 +311,7 @@ class FutureStateAnalyzer:
             str(e["employee_id"]): str(e.get("seniority_level", "mid")).lower()
             for e in emp_list
         }
-        salary_map = {
+        {
             str(e["employee_id"]): float(e.get("annual_salary", 0))
             for e in emp_list
         }
@@ -320,7 +319,7 @@ class FutureStateAnalyzer:
         assigned: set[str] = set()
         candidates: list[InternalCandidate] = []
 
-        for team_name, roles in design.proposed_teams.items():
+        for _team_name, roles in design.proposed_teams.items():
             for role in roles:
                 required = {s.lower() for s in role.required_skills}
                 for _ in range(role.count):

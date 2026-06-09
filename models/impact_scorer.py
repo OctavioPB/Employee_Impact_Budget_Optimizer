@@ -220,7 +220,7 @@ class ImpactScorer:
         ).to_dict()
 
         for emp_id, group in merged.groupby("employee_id"):
-            critical = group[group["is_critical"] == True]
+            critical = group[group["is_critical"]]
             if not critical.empty:
                 skill_crit = float(
                     (critical["proficiency"] * critical["market_scarcity"]).mean()
@@ -367,7 +367,7 @@ class ImpactScorer:
         cv_acc = float(cv_scores.mean())
 
         feature_importance = dict(
-            zip(self._feature_cols, self._model.feature_importances_.round(4))
+            zip(self._feature_cols, self._model.feature_importances_.round(4), strict=False)
         )
 
         # Produce impact scores from RF retention probability → scaled to [0, 100]

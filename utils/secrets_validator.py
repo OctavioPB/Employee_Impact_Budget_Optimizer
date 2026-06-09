@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import os
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
@@ -132,17 +132,17 @@ def _check_secret(
 
 _SECRET_DEFINITIONS = [
     # Database
-    dict(name="POSTGRES_USER",     required=True, min_length=1, check_placeholder=True),
-    dict(name="POSTGRES_PASSWORD", required=True, min_length=8, check_placeholder=True),
-    dict(name="POSTGRES_HOST",     required=True, min_length=1, check_placeholder=False),
-    dict(name="POSTGRES_DB",       required=True, min_length=1, check_placeholder=False),
+    {"name": "POSTGRES_USER",     "required": True, "min_length": 1, "check_placeholder": True},
+    {"name": "POSTGRES_PASSWORD", "required": True, "min_length": 8, "check_placeholder": True},
+    {"name": "POSTGRES_HOST",     "required": True, "min_length": 1, "check_placeholder": False},
+    {"name": "POSTGRES_DB",       "required": True, "min_length": 1, "check_placeholder": False},
     # Application security
-    dict(name="SECRET_KEY",        required=True, min_length=_MIN_SECRET_LENGTH,
-         check_placeholder=True),
+    {"name": "SECRET_KEY",        "required": True, "min_length": _MIN_SECRET_LENGTH,
+         "check_placeholder": True},
     # Email (optional in demo)
-    dict(name="SMTP_HOST",         required=False, min_length=1, check_placeholder=False),
-    dict(name="SMTP_USER",         required=False, min_length=1, check_placeholder=True),
-    dict(name="SMTP_PASSWORD",     required=False, min_length=1, check_placeholder=True),
+    {"name": "SMTP_HOST",         "required": False, "min_length": 1, "check_placeholder": False},
+    {"name": "SMTP_USER",         "required": False, "min_length": 1, "check_placeholder": True},
+    {"name": "SMTP_PASSWORD",     "required": False, "min_length": 1, "check_placeholder": True},
 ]
 
 _DEMO_REQUIRED = ["SECRET_KEY"]  # minimum secrets even in demo mode

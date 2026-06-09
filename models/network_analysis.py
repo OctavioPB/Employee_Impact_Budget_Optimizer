@@ -171,7 +171,7 @@ def compute_team_fragility(
     Single-person teams always return 1.0.
     """
     centrality_map = dict(
-        zip(centrality_df["employee_id"], centrality_df["betweenness_centrality"])
+        zip(centrality_df["employee_id"], centrality_df["betweenness_centrality"], strict=False)
     )
 
     fragility: dict[str, float] = {}

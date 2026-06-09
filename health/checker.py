@@ -10,9 +10,10 @@ import importlib
 import logging
 import os
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable, Optional
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -181,10 +182,10 @@ def check_notification_engine() -> ComponentHealth:
 def check_workflow_registry() -> ComponentHealth:
     """Verify the workflow registry has flows registered."""
     try:
-        from workflows.engine import get_registry
-        import workflows.data_pipeline_flow  # noqa: F401 — triggers registration
-        import workflows.model_retraining_flow  # noqa: F401
+        import workflows.data_pipeline_flow
+        import workflows.model_retraining_flow
         import workflows.report_generation_flow  # noqa: F401
+        from workflows.engine import get_registry
         reg = get_registry()
         n_flows = len(reg.all_flows())
         if n_flows == 0:
@@ -250,7 +251,7 @@ def check_environment_variables() -> ComponentHealth:
 def check_rbac() -> ComponentHealth:
     """Verify RBAC module loads and demo users are accessible."""
     try:
-        from auth.rbac import DEMO_USERS, Role
+        from auth.rbac import DEMO_USERS
         if not DEMO_USERS:
             return ComponentHealth(name="rbac", status=HealthStatus.DEGRADED,
                                    message="No demo users configured")

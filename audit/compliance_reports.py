@@ -11,9 +11,8 @@ from typing import Optional
 
 import pandas as pd
 
-from audit.logger import EventCategory, get_audit_logger
+from audit.logger import EventCategory
 from audit.trail_viewer import TrailViewer
-
 
 # ---------------------------------------------------------------------------
 # Report dataclasses
@@ -161,7 +160,7 @@ class ComplianceReportGenerator:
         """Who accessed what data in the past N days."""
         hours = days_back * 24
         activity = self._viewer.activity_by_user(hours_back=hours)
-        volume   = self._viewer.event_volume_by_hour(hours_back=hours)
+        self._viewer.event_volume_by_hour(hours_back=hours)
         security = self._viewer.security_events(hours_back=hours)
 
         # Privilege summary by role

@@ -8,7 +8,6 @@ solution where no further cost reduction is possible without losing impact.
 import logging
 from dataclasses import dataclass
 
-import numpy as np
 import pandas as pd
 
 from optimization_engine.constraints import ConstraintConfig

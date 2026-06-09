@@ -12,6 +12,7 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 import dataclasses
+
 import numpy as np
 
 from demo_data.generator import DemoGenerator, GeneratedOrg
@@ -102,7 +103,7 @@ def build_dashboard_data(scenario: str, size: str) -> dict:
     emp_df["top_skill"] = [pick_skill(d) for d in emp_df["department"]]
 
     # Merge team name
-    team_name_map = dict(zip(team_df["team_id"], team_df["team_name"]))
+    team_name_map = dict(zip(team_df["team_id"], team_df["team_name"], strict=False))
     emp_df["team_name"] = emp_df["team_id"].map(team_name_map).fillna("Unassigned")
 
     # ── Department summary ─────────────────────────────────────────────────
@@ -182,8 +183,8 @@ def run_simulation(
     total_budget = dashboard["total_budget"] * (budget_pct / 100.0)
 
     # Exclude set
-    exclude_set = set(e.upper() for e in exclude)
-    retain_set  = set(r.upper() for r in force_retain)
+    exclude_set = {e.upper() for e in exclude}
+    retain_set  = {r.upper() for r in force_retain}
 
     candidates = [e for e in employees if e["employee_id"] not in exclude_set]
 
@@ -416,6 +417,7 @@ def build_forecast_data(scenario: str, size: str) -> dict:
 def build_montecarlo_data(scenario: str, size: str) -> dict:
     """Run Monte Carlo budget stress test (2 000 simulations)."""
     import pandas as pd
+
     from forecasting.monte_carlo import run_monte_carlo
 
     org = get_org(scenario.upper(), size.lower())

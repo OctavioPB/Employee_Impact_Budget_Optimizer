@@ -11,7 +11,6 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from enum import IntEnum
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +37,7 @@ class Role(IntEnum):
         return _ROLE_DESCRIPTIONS[self]
 
     @classmethod
-    def from_string(cls, s: str) -> "Role":
+    def from_string(cls, s: str) -> Role:
         try:
             return cls[s.upper()]
         except KeyError:

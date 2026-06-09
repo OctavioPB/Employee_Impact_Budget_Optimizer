@@ -1,8 +1,12 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
-from backend.services.resilience_service import build_resilience_data, run_disruption_scenario, _add_scores
 from backend.services.data_service import get_org
+from backend.services.resilience_service import (
+    _add_scores,
+    build_resilience_data,
+    run_disruption_scenario,
+)
 
 router = APIRouter()
 

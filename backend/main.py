@@ -1,10 +1,31 @@
 """FastAPI backend for EIBO — wraps Python analytics modules as REST endpoints."""
 
 import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import dashboard, simulation, predictive, notifications, admin, forecast, compensation, knowledge, mobility, fairness, decision_room, resilience, ld, narrative, ohi, api_keys, webhooks, v1, pulse
+from backend.routers import (
+    admin,
+    api_keys,
+    compensation,
+    dashboard,
+    decision_room,
+    fairness,
+    forecast,
+    knowledge,
+    ld,
+    mobility,
+    narrative,
+    notifications,
+    ohi,
+    predictive,
+    pulse,
+    resilience,
+    simulation,
+    v1,
+    webhooks,
+)
 
 app = FastAPI(
     title="EIBO API",

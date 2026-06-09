@@ -1,6 +1,6 @@
 """Constraint configuration and validation for the ILP workforce optimization model."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass

@@ -18,7 +18,7 @@ Risk categories (per PLAN.md §5.1):
 """
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
@@ -476,7 +476,7 @@ class AttritionPredictor:
 
         feature_importance = dict(zip(
             feature_cols,
-            np.abs(shap_drivers).mean(axis=0).round(4).tolist(),
+            np.abs(shap_drivers).mean(axis=0).round(4).tolist(), strict=False,
         ))
 
         scores_df = pd.DataFrame({

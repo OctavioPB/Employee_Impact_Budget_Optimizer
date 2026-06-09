@@ -14,8 +14,8 @@ if str(_REPO_ROOT) not in sys.path:
 import numpy as np
 from scipy import stats
 
-from demo_data.generator import _ROLE_SALARY
 from backend.services.data_service import get_org
+from demo_data.generator import _ROLE_SALARY
 
 _SENIORITY_ORDER = {"junior": 0, "mid": 1, "senior": 2, "lead": 3, "director": 4, "exec": 5}
 

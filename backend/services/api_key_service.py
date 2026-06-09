@@ -4,10 +4,8 @@ Keys are stored in-memory (demo). In production, persist to PostgreSQL.
 """
 
 import hashlib
-import hmac
 import secrets
 import time
-
 
 _SCOPES = ["viewer", "analyst", "manager", "director", "executive", "demo"]
 

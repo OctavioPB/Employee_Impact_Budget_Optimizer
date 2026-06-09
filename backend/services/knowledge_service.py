@@ -17,7 +17,6 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 import numpy as np
-import pandas as pd
 
 from backend.services.data_service import get_org
 

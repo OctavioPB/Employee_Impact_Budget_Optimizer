@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from backend.services.ohi_service import build_ohi_data, _compute_ohi, _add_scores
 from backend.services.data_service import get_org
+from backend.services.ohi_service import _add_scores, _compute_ohi, build_ohi_data
 
 router = APIRouter()
 

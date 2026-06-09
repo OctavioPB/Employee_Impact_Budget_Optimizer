@@ -6,7 +6,7 @@ All data endpoints require Authorization: Bearer <api-key>.
 from typing import Annotated
 
 import numpy as np
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, Header, HTTPException
 
 from backend.services.api_key_service import ApiKey, authenticate, key_allows_salary
 from backend.services.data_service import get_org

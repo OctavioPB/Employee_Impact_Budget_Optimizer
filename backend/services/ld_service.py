@@ -21,8 +21,15 @@ if str(_REPO_ROOT) not in sys.path:
 import numpy as np
 import pandas as pd
 from pulp import (  # type: ignore[import-untyped]
-    LpProblem, LpMaximize, LpVariable, lpSum, LpBinary,
-    PULP_CBC_CMD, value as lp_value,
+    PULP_CBC_CMD,
+    LpBinary,
+    LpMaximize,
+    LpProblem,
+    LpVariable,
+    lpSum,
+)
+from pulp import (
+    value as lp_value,
 )
 
 from backend.services.data_service import get_org
@@ -357,7 +364,7 @@ def compute_pareto_frontier(df: pd.DataFrame, total_budget: float, n_points: int
     # Max retention impact achievable (all budget to retention)
     retained_cost = 0.0
     retained_impact = 0.0
-    for cost, impact in zip(emp_costs, emp_impacts):
+    for cost, impact in zip(emp_costs, emp_impacts, strict=False):
         if retained_cost + cost <= total_budget:
             retained_cost   += cost
             retained_impact += impact
@@ -373,7 +380,7 @@ def compute_pareto_frontier(df: pd.DataFrame, total_budget: float, n_points: int
         # Retention: greedy
         r_cost = 0.0
         r_imp  = 0.0
-        for cost, impact in zip(emp_costs, emp_impacts):
+        for cost, impact in zip(emp_costs, emp_impacts, strict=False):
             if r_cost + cost <= ret_bud:
                 r_cost += cost
                 r_imp  += impact

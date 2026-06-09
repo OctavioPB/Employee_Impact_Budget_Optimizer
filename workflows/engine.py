@@ -12,13 +12,14 @@ from __future__ import annotations
 
 import functools
 import logging
+import threading
 import time
 import traceback
-import threading
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 from uuid import uuid4
 
 logger = logging.getLogger(__name__)
@@ -107,7 +108,7 @@ class FlowRun:
 # Decorators
 # ---------------------------------------------------------------------------
 
-class task:  # noqa: N801 — intentionally lowercase to match Prefect API
+class task:
     """Decorator that wraps a function as a workflow task with retry logic."""
 
     def __init__(
@@ -122,7 +123,7 @@ class task:  # noqa: N801 — intentionally lowercase to match Prefect API
         self._retry_delay = retry_delay
         self._tags        = tags or []
 
-    def __call__(self, fn: Callable) -> "_TaskWrapper":
+    def __call__(self, fn: Callable) -> _TaskWrapper:
         return _TaskWrapper(fn, self._name or fn.__name__,
                              self._retries, self._retry_delay, self._tags)
 
@@ -146,7 +147,6 @@ class _TaskWrapper:
         while attempt <= max_attempts:
             started = time.perf_counter()
             started_at = datetime.utcnow().isoformat() + "Z"
-            state = TaskState.RUNNING if attempt == 1 else TaskState.RETRYING
             try:
                 result = self._fn(*args, **kwargs)
                 duration = time.perf_counter() - started
@@ -177,7 +177,7 @@ class _TaskWrapper:
         return TaskResult(task_name=self.task_name, state=TaskState.FAILED)  # pragma: no cover
 
 
-class flow:  # noqa: N801
+class flow:
     """Decorator that wraps a function as a named workflow flow."""
 
     def __init__(
@@ -190,7 +190,7 @@ class flow:  # noqa: N801
         self._description = description
         self._tags        = tags or []
 
-    def __call__(self, fn: Callable) -> "_FlowWrapper":
+    def __call__(self, fn: Callable) -> _FlowWrapper:
         return _FlowWrapper(fn, self._name or fn.__name__,
                              self._description, self._tags)
 
@@ -253,10 +253,10 @@ class _FlowWrapper:
 class WorkflowRegistry:
     """Central registry for all defined flows. Singleton per process."""
 
-    _instance: Optional["WorkflowRegistry"] = None
+    _instance: Optional[WorkflowRegistry] = None
     _lock = threading.Lock()
 
-    def __new__(cls) -> "WorkflowRegistry":
+    def __new__(cls) -> WorkflowRegistry:
         with cls._lock:
             if cls._instance is None:
                 cls._instance = super().__new__(cls)

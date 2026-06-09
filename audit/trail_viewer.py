@@ -13,7 +13,6 @@ import pandas as pd
 
 from audit.logger import AuditEvent, AuditLogger, EventCategory, EventSeverity, get_audit_logger
 
-
 # ---------------------------------------------------------------------------
 # TrailViewer
 # ---------------------------------------------------------------------------

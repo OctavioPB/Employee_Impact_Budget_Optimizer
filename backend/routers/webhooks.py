@@ -4,8 +4,13 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from backend.services.webhook_service import (
-    EVENT_TYPES, WebhookRegistration,
-    register_webhook, list_webhooks, delete_webhook, set_active, test_webhook,
+    EVENT_TYPES,
+    WebhookRegistration,
+    delete_webhook,
+    list_webhooks,
+    register_webhook,
+    set_active,
+    test_webhook,
 )
 
 router = APIRouter()

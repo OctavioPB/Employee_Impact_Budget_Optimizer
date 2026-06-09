@@ -6,14 +6,15 @@ Field mappings are specified at runtime via ConnectorSchema.
 
 from __future__ import annotations
 
-import json
 import logging
 from typing import Any, Optional
 
 import httpx
 
 from integration_hub.base_connector import (
-    BaseConnector, ConnectorSchema, ConnectorStatus,
+    BaseConnector,
+    ConnectorSchema,
+    ConnectorStatus,
 )
 
 logger = logging.getLogger(__name__)
@@ -139,8 +140,8 @@ _registry: Optional[ConnectorRegistry] = None
 def get_connector_registry() -> ConnectorRegistry:
     global _registry
     if _registry is None:
-        from integration_hub.workday_connector import WorkdayConnector
         from integration_hub.bamboohr_connector import BambooHRConnector
+        from integration_hub.workday_connector import WorkdayConnector
         _registry = ConnectorRegistry()
         _registry.register(WorkdayConnector())
         _registry.register(BambooHRConnector())

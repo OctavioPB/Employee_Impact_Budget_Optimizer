@@ -5,7 +5,6 @@ import logging
 import os
 import uuid
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 import sqlalchemy as sa

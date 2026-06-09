@@ -8,9 +8,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
-import numpy as np
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -371,7 +369,7 @@ class SkillsGapAnalyzer:
             return {}, {}
         name_map = dict(zip(
             skills_df["skill_id"].astype(str),
-            skills_df["skill_name"].str.lower() if "skill_name" in skills_df.columns else skills_df["skill_id"],
+            skills_df["skill_name"].str.lower() if "skill_name" in skills_df.columns else skills_df["skill_id"], strict=False,
         ))
         id_map = {v: k for k, v in name_map.items()}
         return name_map, id_map

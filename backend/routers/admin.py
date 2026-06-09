@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from backend.services.data_service import get_org, reset_cache, generate_org_with_params
+from backend.services.data_service import generate_org_with_params, reset_cache
 
 router = APIRouter()
 

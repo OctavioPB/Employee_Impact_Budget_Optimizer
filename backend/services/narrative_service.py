@@ -10,13 +10,13 @@ Implements:
   - Zero PII to LLM: names replaced with [role]-[anonymized_id] in all prompts
 """
 
+import hashlib
+import json
 import os
 import sys
-import json
 import time
-import hashlib
-import urllib.request
 import urllib.error
+import urllib.request
 from datetime import date, datetime
 from pathlib import Path
 
@@ -153,7 +153,7 @@ def _impact_drivers(row: pd.Series, df: pd.DataFrame) -> list[dict]:
 
 def _attrition_drivers(row: pd.Series, df: pd.DataFrame) -> list[dict]:
     sal_rank  = df["annual_salary"].rank(pct=True)[row.name]
-    at_risk   = float(row["attrition_risk"])
+    float(row["attrition_risk"])
     nexus_flag = bool(row.get("_is_nexus", False))
     sen        = str(row.get("seniority_level", "mid")).lower()
 
@@ -315,7 +315,7 @@ def _attrition_template(source: dict) -> str:
 
 def _simulation_template(source: dict) -> str:
     budget_pct     = source["budget_pct"]
-    retained_pct   = source["retained_pct"]
+    source["retained_pct"]
     impact_pct     = source["impact_preserved_pct"]
     n_retained     = source["n_retained"]
     n_total        = source["n_total"]
@@ -370,7 +370,7 @@ def _manager_brief_template(source: dict) -> str:
     risk    = source["attrition_risk"]
     impact  = source["impact_score"]
     drivers = source.get("drivers", [])
-    anon    = source.get("anon_id", "employee")
+    source.get("anon_id", "employee")
 
     label = _risk_label(risk)
     risk_drivers = [d for d in drivers if d["direction"] == "risk"]

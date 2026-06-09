@@ -136,7 +136,7 @@ def _talent_risk(df: pd.DataFrame) -> dict:
 
     # Nexus employees at risk
     nexus_at_risk = float(
-        df[df["_is_nexus"] == True]["attrition_risk"].mean()
+        df[df["_is_nexus"]]["attrition_risk"].mean()
     ) if df["_is_nexus"].any() else 0.0
     nexus_score = _clamp((1 - nexus_at_risk) * 100)
 
@@ -314,7 +314,7 @@ def _collaboration_density(df: pd.DataFrame) -> dict:
     dept_score  = _clamp(min(dept_count / 5, 1.0) * 100)
 
     # High-impact connectivity: nexus employees span multiple departments
-    nexus_df = df[df["_is_nexus"] == True]
+    nexus_df = df[df["_is_nexus"]]
     if len(nexus_df) > 0:
         nexus_dept_span = nexus_df["department"].nunique() / max(dept_count, 1)
         span_score      = _clamp(nexus_dept_span * 100)

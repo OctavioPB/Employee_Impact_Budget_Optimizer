@@ -1,7 +1,6 @@
 """Silver layer: data cleansing, normalization, and quality enforcement."""
 
 import logging
-import os
 
 import pandas as pd
 import sqlalchemy as sa
@@ -119,7 +118,6 @@ def run_silver_pipeline(engine: sa.Engine) -> dict[str, int]:
 
 
 if __name__ == "__main__":
-    import argparse
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     engine = get_engine()

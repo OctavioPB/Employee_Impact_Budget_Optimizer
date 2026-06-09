@@ -1,0 +1,138 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = [
+    "--cov=.",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-report=xml:coverage.xml",
+    "-v",
+    "--tb=short",
+]
+markers = [
+    "integration: requires running services — deselect with -m 'not integration'",
+    "benchmark: performance benchmarks — deselect with -m 'not benchmark'",
+    "slow: marks tests as slow — deselect with -m 'not slow'",
+]
+
+# ---------------------------------------------------------------------------
+# Coverage
+# ---------------------------------------------------------------------------
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+omit = [
+    "tests/*",
+    "frontend/*",
+    "docs/*",
+    "htmlcov/*",
+    "sdk/*",
+    ".venv/*",
+    "venv/*",
+    "*/migrations/*",
+    "setup.py",
+    "conftest.py",
+    "demo_data/seed_demo.py",     # CLI entry-point, not unit-testable in isolation
+    "workflows/*_flow.py",         # Prefect flows — require running orchestrator
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+# Unit tests alone reach ~40%.  Full suite (integration + security + perf)
+# should reach 70%.  Sprint 9 target is 85%.  Raise this floor incrementally.
+# Run the full suite:  pytest tests/ --cov-fail-under=70
+fail_under = 40
+precision = 1
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "@(abc\\.)?abstractmethod",
+    "\\.\\.\\.\\s*$",           # bare ellipsis stubs
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+title = "EIBO — Coverage Report"
+
+# ---------------------------------------------------------------------------
+# Ruff — linter + formatter
+# ---------------------------------------------------------------------------
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "frontend",
+    "docs",
+    "htmlcov",
+    ".pytest_cache",
+    "sdk",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes (unused imports, undefined names)
+    "I",    # isort import ordering
+    "UP",   # pyupgrade — modernise syntax for Python 3.11+
+    "B",    # flake8-bugbear — likely bugs and design problems
+    "C4",   # flake8-comprehensions — simplify list/dict/set comprehensions
+    "RUF",  # ruff-native rules
+]
+ignore = [
+    "E501",   # line too long — formatter handles this; long strings are unavoidable in ML
+    "E402",   # module-level import not at top — common in ML/demo scripts with env setup
+    "E701",   # multiple statements on one line — flagged but not auto-fixable; low priority
+    "E712",   # == True comparison — pandas boolean indexing requires == not `is`; auto-fix is unsafe here
+    "B008",   # function calls in default arguments — FastAPI Depends() pattern
+    "B904",   # raise … from err inside except — not enforced globally yet
+    "RUF001", # ambiguous unicode char in string  — em-dashes are intentional OPB brand copy
+    "RUF002", # ambiguous unicode char in docstring — same
+    "RUF003", # ambiguous unicode char in comment  — same
+    "RUF012", # ClassVar annotation on mutable class attrs — too noisy for dataclasses
+    "UP007",  # X | Y union syntax — keep Optional[] for code shared with older callers
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "F811",  # redefinition of unused name — fixtures shadow each other intentionally
+]
+"demo_data/generator.py" = [
+    "B007",  # loop variable not used in loop body — common in faker-based generators
+]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "auth",
+    "audit",
+    "backend",
+    "data_pipeline",
+    "demo_data",
+    "forecasting",
+    "health",
+    "integration_hub",
+    "models",
+    "notifications",
+    "optimization_engine",
+    "strategic_planner",
+    "utils",
+    "workflows",
+]
+split-on-trailing-comma = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
