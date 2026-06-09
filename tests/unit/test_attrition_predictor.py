@@ -269,7 +269,9 @@ class TestXGBoostMode:
         except ImportError:
             pytest.skip("XGBoost not installed")
 
-        emp = _make_employees(50)
+        # 100 employees × 25% positive rate = ~25 positives, reliably above the
+        # _MIN_LABELS_FOR_XGB=20 threshold which counts positive-label sum.
+        emp = _make_employees(100)
         labels = self._make_labels(emp["employee_id"].tolist())
         result = compute_attrition_risk(emp, attrition_labels=labels)
         assert result.mode == "xgboost"
