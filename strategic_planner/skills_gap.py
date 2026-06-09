@@ -164,7 +164,7 @@ class SkillsGapAnalyzer:
             SkillsGapAnalysis with per-skill gap results and totals.
         """
         # Build skill lookup
-        skill_name_map, skill_id_map = self._build_skill_maps(skills_df)
+        skill_name_map, _skill_id_map = self._build_skill_maps(skills_df)
         emp_skills = self._build_emp_skill_map(employee_skills_df, skill_name_map)
 
         gaps: list[SkillGapResult] = []

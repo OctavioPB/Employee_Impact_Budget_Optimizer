@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 
 import numpy as np
 import pandas as pd
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Enums & dataclasses
 # ---------------------------------------------------------------------------
 
-class Severity(str, Enum):
+class Severity(StrEnum):
     CRITICAL = "critical"
     HIGH     = "high"
     MODERATE = "moderate"

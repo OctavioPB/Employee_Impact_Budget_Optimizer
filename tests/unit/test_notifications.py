@@ -1067,7 +1067,7 @@ class TestGenericAPIConnector:
             mock_resp = MagicMock()
             mock_resp.status_code = 200
             mock_get.return_value = mock_resp
-            ok, msg = conn.test_connection()
+            ok, _ = conn.test_connection()
             assert ok
 
     def test_fetch_employees_list_response(self):

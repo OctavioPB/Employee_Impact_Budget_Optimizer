@@ -245,7 +245,7 @@ def build_knowledge_data(scenario: str, size: str) -> dict:
         # Transfer investment estimate:
         # Each proficiency point gap ≈ 3 months of focused coaching × $6,000/month
         transfer_months = round(prof_gap * 3.0, 1) if prof_gap > 0 else 0.5
-        transfer_cost   = int(round(transfer_months * 6_000))
+        transfer_cost   = round(transfer_months * 6_000)
 
         # Urgency = concentration risk of the domain (independent of org size)
         # = criticality × (1 / log2(holder_count + 1)), normalised so that

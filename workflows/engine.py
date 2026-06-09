@@ -18,7 +18,7 @@ import traceback
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 # State enums
 # ---------------------------------------------------------------------------
 
-class TaskState(str, Enum):
+class TaskState(StrEnum):
     PENDING   = "pending"
     RUNNING   = "running"
     COMPLETED = "completed"
@@ -38,7 +38,7 @@ class TaskState(str, Enum):
     SKIPPED   = "skipped"
 
 
-class FlowState(str, Enum):
+class FlowState(StrEnum):
     PENDING   = "pending"
     RUNNING   = "running"
     COMPLETED = "completed"

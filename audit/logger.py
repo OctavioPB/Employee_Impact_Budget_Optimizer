@@ -15,7 +15,7 @@ import threading
 from collections import deque
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 # Event categories
 # ---------------------------------------------------------------------------
 
-class EventCategory(str, Enum):
+class EventCategory(StrEnum):
     ACCESS          = "access"
     SIMULATION      = "simulation"
     OVERRIDE        = "override"
@@ -35,7 +35,7 @@ class EventCategory(str, Enum):
     SECURITY        = "security"
 
 
-class EventSeverity(str, Enum):
+class EventSeverity(StrEnum):
     INFO     = "info"
     WARNING  = "warning"
     CRITICAL = "critical"

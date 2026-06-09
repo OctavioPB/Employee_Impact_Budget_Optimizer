@@ -442,7 +442,7 @@ def _compute_skill_gaps(df: pd.DataFrame) -> list[dict]:
                 "recommended_programs": rec_progs,
                 "internal_closeable":   internal,
                 "estimated_cost":       est_cost,
-                "affected_employees":   int(len(grp)),
+                "affected_employees":   len(grp),
             })
     # Sort: critical first, then high
     order = {"critical": 0, "high": 1, "medium": 2, "low": 3}

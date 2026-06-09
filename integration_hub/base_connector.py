@@ -10,7 +10,7 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import pandas as pd
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # Connector status
 # ---------------------------------------------------------------------------
 
-class ConnectorStatus(str, Enum):
+class ConnectorStatus(StrEnum):
     CONFIGURED   = "configured"
     CONNECTED    = "connected"
     DISCONNECTED = "disconnected"
@@ -30,7 +30,7 @@ class ConnectorStatus(str, Enum):
     SYNCING      = "syncing"
 
 
-class SyncMode(str, Enum):
+class SyncMode(StrEnum):
     FULL        = "full"        # replace all records
     INCREMENTAL = "incremental" # add/update changed records since last sync
 

@@ -11,7 +11,7 @@ import threading
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from uuid import uuid4
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # Enums
 # ---------------------------------------------------------------------------
 
-class NotificationType(str, Enum):
+class NotificationType(StrEnum):
     RISK_ALERT        = "risk_alert"
     WORKFLOW_STATUS   = "workflow_status"
     COLLABORATION     = "collaboration"
@@ -31,20 +31,20 @@ class NotificationType(str, Enum):
     ATTRITION_ALERT   = "attrition_alert"
 
 
-class NotificationPriority(str, Enum):
+class NotificationPriority(StrEnum):
     LOW      = "low"
     MEDIUM   = "medium"
     HIGH     = "high"
     CRITICAL = "critical"
 
 
-class NotificationChannel(str, Enum):
+class NotificationChannel(StrEnum):
     IN_APP  = "in_app"
     EMAIL   = "email"
     WEBHOOK = "webhook"
 
 
-class DeliveryStatus(str, Enum):
+class DeliveryStatus(StrEnum):
     PENDING   = "pending"
     DELIVERED = "delivered"
     FAILED    = "failed"

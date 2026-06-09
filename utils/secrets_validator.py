@@ -15,10 +15,10 @@ from __future__ import annotations
 import os
 import re
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class SecretStatus(str, Enum):
+class SecretStatus(StrEnum):
     PRESENT = "present"      # set and passes strength checks
     WEAK    = "weak"         # set but uses a placeholder/default value
     MISSING = "missing"      # not set or empty

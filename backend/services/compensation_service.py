@@ -88,8 +88,8 @@ def build_compensation_data(scenario: str, size: str) -> dict:
         dept_equity.append({
             "department":       dept,
             "headcount":        len(grp),
-            "group_a_count":    int(len(a_sal)),
-            "group_b_count":    int(len(b_sal)),
+            "group_a_count":    len(a_sal),
+            "group_b_count":    len(b_sal),
             "group_a_median":   round(med_a),
             "group_b_median":   round(med_b),
             "raw_gap_pct":      round(raw_gap, 1),
@@ -119,8 +119,8 @@ def build_compensation_data(scenario: str, size: str) -> dict:
             "annual_salary":    int(salary),
             "market_median":    int(median),
             "comp_ratio":       float(row["comp_ratio"]),
-            "correction_cost":  int(round(corr)),
-            "replacement_cost": int(round(repl)),
+            "correction_cost":  round(corr),
+            "replacement_cost": round(repl),
             "roi":              round(roi, 2),
         })
 
