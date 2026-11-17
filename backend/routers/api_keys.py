@@ -21,6 +21,10 @@ class CreateKeyRequest(BaseModel):
     rate_limit: int = Field(default=100, ge=10, le=10000)
 
 
+class VerifyKeyRequest(BaseModel):
+    key: str = Field(default="", max_length=256)
+
+
 @router.get("/v1/api-keys")
 def get_api_keys() -> list[dict]:
     return [
@@ -63,9 +67,8 @@ def delete_api_key(key_id: str) -> dict:
 
 
 @router.post("/v1/api-keys/verify")
-def verify_api_key(body: dict) -> dict:
-    raw_key = body.get("key", "")
-    entry   = authenticate(raw_key)
+def verify_api_key(body: VerifyKeyRequest) -> dict:
+    entry = authenticate(body.key)
     if entry is None:
         raise HTTPException(status_code=401, detail="Invalid or rate-limited key")
     return {"valid": True, "scope": entry.scope, "label": entry.label, "rate_limit": entry.rate_limit}

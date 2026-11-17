@@ -6,7 +6,7 @@ All data endpoints require Authorization: Bearer <api-key>.
 from typing import Annotated
 
 import numpy as np
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 
 from backend.services.api_key_service import ApiKey, authenticate, key_allows_salary
 from backend.services.data_service import get_org
@@ -78,13 +78,13 @@ def v1_dashboard(key: KeyDep, scenario: str = "A", size: str = "small") -> dict:
 
 
 @router.get("/v1/impact")
-def v1_impact(key: KeyDep, scenario: str = "A", size: str = "small", limit: int = 100) -> dict:
+def v1_impact(key: KeyDep, scenario: str = "A", size: str = "small", limit: int = Query(default=100, ge=1, le=500)) -> dict:
     """Impact scores for up to `limit` employees. Salary masked unless key scope ≥ Manager."""
     df = _scored_df(scenario, size)
     show_salary = key_allows_salary(key.scope)
 
     records = []
-    for _, row in df.head(min(limit, 500)).iterrows():
+    for _, row in df.head(limit).iterrows():
         rec: dict = {
             "employee_id":    row["employee_id"],
             "role_title":     row["role_title"],
@@ -132,7 +132,10 @@ def v1_attrition_summary(key: KeyDep, scenario: str = "A", size: str = "small") 
 @router.get("/v1/ohi")
 def v1_ohi(key: KeyDep, scenario: str = "A", size: str = "small") -> dict:
     """OHI composite score and department breakdown."""
-    data    = build_ohi_data(scenario.upper(), size.lower())
+    try:
+        data = build_ohi_data(scenario.upper(), size.lower())
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     summary = data.get("summary", {})
     depts   = data.get("dept_breakdown", [])
     return {

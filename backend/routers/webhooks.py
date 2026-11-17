@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 class WebhookCreateRequest(BaseModel):
-    url:    str        = Field(min_length=1)
+    url:    str        = Field(min_length=1, max_length=2048)
     events: list[str]
     label:  str        = Field(min_length=1, max_length=80)
     secret: str        = Field(default="")
@@ -35,7 +35,7 @@ def _wh_dict(wh: WebhookRegistration) -> dict:
         "label":         wh.label,
         "active":        wh.active,
         "created_at":    wh.created_at,
-        "secret_hint":   wh.secret[:6] + "…",
+        "secret_hint":   "••••••",
         "total_deliveries": len(wh.delivery_log),
         "last_delivery": wh.delivery_log[-1] if wh.delivery_log else None,
     }

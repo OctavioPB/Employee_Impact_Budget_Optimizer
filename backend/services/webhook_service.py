@@ -4,9 +4,13 @@ Webhooks are stored in-memory (demo). In production, persist to PostgreSQL.
 """
 
 import hmac
+import ipaddress
 import json
+import os
 import secrets
+import socket
 import time
+from urllib.parse import urlparse
 
 EVENT_TYPES = [
     "attrition.risk.threshold_crossed",
@@ -41,10 +45,32 @@ class WebhookRegistration:
 _WEBHOOKS: dict[str, WebhookRegistration] = {}
 
 
+def _validate_url(url: str) -> None:
+    """Reject non-http(s) URLs and private/loopback/link-local targets (SSRF guard).
+
+    Set EIBO_ALLOW_PRIVATE_WEBHOOKS=1 to allow internal targets (e.g. local dev).
+    """
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        raise ValueError("Webhook URL must be an absolute http(s) URL")
+    if os.getenv("EIBO_ALLOW_PRIVATE_WEBHOOKS") == "1":
+        return
+    host = parsed.hostname
+    try:
+        infos = socket.getaddrinfo(host, parsed.port or (443 if parsed.scheme == "https" else 80))
+    except socket.gaierror as exc:
+        raise ValueError(f"Cannot resolve webhook host '{host}'") from exc
+    for info in infos:
+        ip = ipaddress.ip_address(info[4][0])
+        if not ip.is_global:
+            raise ValueError("Webhook URL resolves to a non-public address")
+
+
 def register_webhook(url: str, events: list[str], label: str, secret: str = "") -> WebhookRegistration:
     invalid = [e for e in events if e not in EVENT_TYPES]
     if invalid:
         raise ValueError(f"Unknown event types: {invalid}. Valid: {EVENT_TYPES}")
+    _validate_url(url)
     webhook_id = secrets.token_hex(8)
     secret     = secret or secrets.token_hex(24)
     wh = WebhookRegistration(
@@ -89,7 +115,7 @@ async def _deliver(wh: WebhookRegistration, event_type: str, payload: dict, atte
     log: dict = {"event": event_type, "attempt": attempt, "ts": time.time(), "status": "pending"}
 
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with httpx.AsyncClient(timeout=10.0, follow_redirects=False) as client:
             resp = await client.post(
                 wh.url,
                 content=body,

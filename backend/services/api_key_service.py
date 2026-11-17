@@ -4,6 +4,7 @@ Keys are stored in-memory (demo). In production, persist to PostgreSQL.
 """
 
 import hashlib
+import hmac
 import secrets
 import time
 
@@ -93,11 +94,14 @@ def revoke_key(key_id: str) -> bool:
 
 
 def _find_by_hash(raw_key: str) -> ApiKey | None:
+    if not raw_key:
+        return None
     h = hashlib.sha256(raw_key.encode()).hexdigest()
-    for entry in _KEYS.values():
-        if not entry.revoked and entry.key_hash == h:
-            return entry
-    return None
+    found: ApiKey | None = None
+    for entry in _KEYS.values():  # compare every hash in constant time
+        if hmac.compare_digest(entry.key_hash, h) and not entry.revoked:
+            found = entry
+    return found
 
 
 def _consume_token(entry: ApiKey) -> bool:

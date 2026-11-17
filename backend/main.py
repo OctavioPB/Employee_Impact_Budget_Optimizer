@@ -36,10 +36,11 @@ app = FastAPI(
 # ── CORS ──────────────────────────────────────────────────────────────────────
 # In dev: Vite runs on 3000, FastAPI on 8000.
 # In Docker: requests come from the same origin via nginx proxy.
-_ALLOWED_ORIGINS = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:3000,http://localhost:5173",
-).split(",")
+_ALLOWED_ORIGINS = [
+    o.strip()
+    for o in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",")
+    if o.strip()
+]
 
 app.add_middleware(
     CORSMiddleware,

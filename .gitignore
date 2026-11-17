@@ -21,3 +21,8 @@ logs/
 planning/
 .streamlit/secrets.toml
 demo.ps1
+
+node_modules/
+frontend/dist/
+coverage.xml
+audit_logs/
