@@ -211,14 +211,13 @@ def _leadership_pipeline(df: pd.DataFrame) -> dict:
         }
 
     # Succession depth: for each leader, count potential next-level successors in same dept
-    depths: list[int] = []
-    for _, ldr in leaders.iterrows():
-        ldr_rank  = _SEN_RANK.get(str(ldr["seniority_level"]), 4)
-        successors = df[
-            (df["department"] == ldr["department"]) &
-            (df["seniority_level"].map(lambda s: _SEN_RANK.get(str(s), 1)) == ldr_rank - 1)
-        ]
-        depths.append(min(len(successors), 3))  # cap at 3 for scoring
+    # Headcount per (department, rank), computed once instead of per leader
+    ranks      = df["seniority_level"].map(lambda s: _SEN_RANK.get(str(s), 1))
+    rank_sizes = df.groupby([df["department"], ranks]).size().to_dict()
+    depths: list[int] = [
+        min(rank_sizes.get((dept, _SEN_RANK.get(str(sen), 4) - 1), 0), 3)  # cap at 3 for scoring
+        for dept, sen in zip(leaders["department"], leaders["seniority_level"], strict=True)
+    ]
 
     avg_depth   = float(np.mean(depths)) if depths else 0.0
     depth_score = _clamp(avg_depth / 3 * 100)

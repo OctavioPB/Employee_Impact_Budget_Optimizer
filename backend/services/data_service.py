@@ -213,7 +213,7 @@ def run_simulation(
         if not feasible:
             infeasibility_reason = "No feasible solution found within the budget and constraints. Try increasing the budget or relaxing constraints."
 
-        retained_ids = {eid for eid, var in x.items() if pulp.value(var) == 1} if feasible else set()
+        retained_ids = {eid for eid, var in x.items() if (pulp.value(var) or 0) > 0.5} if feasible else set()
 
     except ImportError:
         # Greedy fallback: sort by impact/salary ratio, fill budget

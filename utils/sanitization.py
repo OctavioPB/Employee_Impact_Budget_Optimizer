@@ -8,6 +8,7 @@ Prevents XSS, path traversal, and injection vectors at the system boundary.
 from __future__ import annotations
 
 import html
+import math
 import re
 import unicodedata
 
@@ -128,6 +129,8 @@ def sanitize_budget_value(value: float | int | str) -> float:
         v = float(str(value).replace(",", "").replace("$", ""))
     except (ValueError, TypeError):
         return 0.0
+    if not math.isfinite(v):
+        return 0.0
     return max(_MIN_BUDGET, min(_MAX_BUDGET, v))
 
 
@@ -137,6 +140,8 @@ def sanitize_percentage(value: float | int | str) -> float:
         v = float(value)
     except (ValueError, TypeError):
         return 0.0
+    if not math.isfinite(v):
+        return 0.0
     return max(0.0, min(100.0, v))
 
 
@@ -144,7 +149,7 @@ def sanitize_positive_int(value: int | str, max_value: int = 100_000) -> int:
     """Sanitize to a non-negative integer in [0, max_value]."""
     try:
         v = int(float(str(value)))
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, OverflowError):
         return 0
     return max(0, min(max_value, v))
 

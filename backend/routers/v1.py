@@ -29,7 +29,9 @@ def _require_key(authorization: str = Header(default="")) -> ApiKey:
     return key
 
 
-KeyDep = Annotated[ApiKey, Depends(_require_key)]
+KeyDep    = Annotated[ApiKey, Depends(_require_key)]
+ScenarioQ = Annotated[str, Query(pattern="^[ABCabc]$")]
+SizeQ     = Annotated[str, Query(pattern="^(small|medium|large)$")]
 
 
 # ── Shared score computation ───────────────────────────────────────────────────
@@ -61,7 +63,7 @@ def v1_health() -> dict:
 
 
 @router.get("/v1/dashboard")
-def v1_dashboard(key: KeyDep, scenario: str = "A", size: str = "small") -> dict:
+def v1_dashboard(key: KeyDep, scenario: ScenarioQ = "A", size: SizeQ = "small") -> dict:
     """Org-level KPI summary."""
     df = _scored_df(scenario, size)
     return {
@@ -78,7 +80,7 @@ def v1_dashboard(key: KeyDep, scenario: str = "A", size: str = "small") -> dict:
 
 
 @router.get("/v1/impact")
-def v1_impact(key: KeyDep, scenario: str = "A", size: str = "small", limit: int = Query(default=100, ge=1, le=500)) -> dict:
+def v1_impact(key: KeyDep, scenario: ScenarioQ = "A", size: SizeQ = "small", limit: int = Query(default=100, ge=1, le=500)) -> dict:
     """Impact scores for up to `limit` employees. Salary masked unless key scope ≥ Manager."""
     df = _scored_df(scenario, size)
     show_salary = key_allows_salary(key.scope)
@@ -108,7 +110,7 @@ def v1_impact(key: KeyDep, scenario: str = "A", size: str = "small", limit: int 
 
 
 @router.get("/v1/attrition-summary")
-def v1_attrition_summary(key: KeyDep, scenario: str = "A", size: str = "small") -> dict:
+def v1_attrition_summary(key: KeyDep, scenario: ScenarioQ = "A", size: SizeQ = "small") -> dict:
     """Org-level attrition risk distribution."""
     df = _scored_df(scenario, size)
     risks = df["attrition_risk"]
@@ -130,7 +132,7 @@ def v1_attrition_summary(key: KeyDep, scenario: str = "A", size: str = "small") 
 
 
 @router.get("/v1/ohi")
-def v1_ohi(key: KeyDep, scenario: str = "A", size: str = "small") -> dict:
+def v1_ohi(key: KeyDep, scenario: ScenarioQ = "A", size: SizeQ = "small") -> dict:
     """OHI composite score and department breakdown."""
     try:
         data = build_ohi_data(scenario.upper(), size.lower())
@@ -157,7 +159,7 @@ def v1_ohi(key: KeyDep, scenario: str = "A", size: str = "small") -> dict:
 
 
 @router.get("/v1/forecast")
-def v1_forecast(key: KeyDep, scenario: str = "A", size: str = "small") -> dict:
+def v1_forecast(key: KeyDep, scenario: ScenarioQ = "A", size: SizeQ = "small") -> dict:
     """6-month budget forecast with 80% confidence bands."""
     df             = _scored_df(scenario, size)
     monthly_budget = float(df["annual_salary"].sum() + df["annual_benefits"].sum()) / 12

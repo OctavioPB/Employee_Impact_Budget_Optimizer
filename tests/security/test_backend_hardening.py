@@ -38,3 +38,30 @@ def test_authenticate_rejects_empty_and_unknown():
     assert authenticate("") is None
     assert authenticate("eibo_demo_nope") is None
     assert authenticate(get_sandbox_key()) is not None
+
+
+@pytest.mark.parametrize("path", ["pulse", "ohi", "dashboard", "v1/dashboard"])
+def test_invalid_scenario_is_rejected_not_500(path):
+    h = {"Authorization": f"Bearer {get_sandbox_key()}"}
+    assert client.get(f"/api/{path}?scenario=Z", headers=h).status_code == 422
+
+
+def test_post_bodies_validate_scenario():
+    assert client.post("/api/ohi/preview", json={"scenario": "Z"}).status_code == 422
+    assert client.post("/api/ld/pareto", json={"size": "huge"}).status_code == 422
+
+
+def test_mobility_endpoint_works():
+    """Regression: dict(groupby) raised TypeError and the endpoint returned 500."""
+    assert client.get("/api/mobility?scenario=A&size=small").status_code == 200
+
+
+def test_numeric_sanitizers_handle_nan_and_inf():
+    from utils.sanitization import (
+        sanitize_budget_value,
+        sanitize_percentage,
+        sanitize_positive_int,
+    )
+    assert sanitize_budget_value("nan") == 0.0
+    assert sanitize_percentage(float("inf")) == 0.0
+    assert sanitize_positive_int("inf") == 0

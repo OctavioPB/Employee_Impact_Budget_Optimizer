@@ -100,15 +100,14 @@ def _compute_resilience_score(df: pd.DataFrame) -> dict:
     if len(leaders) == 0:
         leadership_depth = 50.0
     else:
-        depth2 = 0
-        for _, ldr in leaders.iterrows():
-            ldr_rank = _SEN_RANK.get(str(ldr["seniority_level"]), 4)
-            successors = df[
-                (df["department"] == ldr["department"]) &
-                (df["seniority_level"].map(lambda s: _SEN_RANK.get(str(s), 1)) == ldr_rank - 1)
-            ]
-            if len(successors) >= 2:
-                depth2 += 1
+        # Headcount per (department, rank), computed once instead of per leader
+        ranks      = df["seniority_level"].map(lambda s: _SEN_RANK.get(str(s), 1))
+        rank_sizes = df.groupby([df["department"], ranks]).size().to_dict()
+        depth2 = sum(
+            1
+            for dept, sen in zip(leaders["department"], leaders["seniority_level"], strict=True)
+            if rank_sizes.get((dept, _SEN_RANK.get(str(sen), 4) - 1), 0) >= 2
+        )
         leadership_depth = min(100.0, depth2 / len(leaders) * 100)
 
     # ── 3. Knowledge redundancy ───────────────────────────────────────────────
@@ -194,25 +193,27 @@ def _cascade_simulation(
             break
 
         prev_wave = df[df["employee_id"].isin(prev_wave_ids)]
-        pressure  = pd.Series(0.0, index=remaining.index)
+        rem_rank  = remaining["seniority_level"].map(lambda s: _SEN_RANK.get(str(s), 1)).to_numpy()
+        rem_dept  = remaining["department"].to_numpy()
+        press     = np.zeros(len(remaining))
 
-        for _, dep in prev_wave.iterrows():
-            dep_dept    = dep["department"]
-            dep_is_nexus = bool(dep["_is_nexus"])
-            dep_rank    = _SEN_RANK.get(str(dep.get("seniority_level", "mid")), 2)
-            same_dept   = remaining["department"] == dep_dept
+        # Aggregate the departed wave per department: one pass per department
+        # instead of one full-frame update per departed employee.
+        wave_rank = prev_wave["seniority_level"].map(lambda s: _SEN_RANK.get(str(s), 2))
+        for dep_dept, grp in prev_wave.groupby("department"):
+            same_dept = rem_dept == dep_dept
+            if not same_dept.any():
+                continue
+            press[same_dept] += (
+                0.28 * int(grp["_is_nexus"].sum())
+                + float(grp["impact_score"].sum()) / 100.0 * 0.05
+            )
+            # lead / director / exec departures pressure everyone below them
+            leader_ranks = wave_rank.loc[grp.index]
+            for rank, n in leader_ranks[leader_ranks >= 4].value_counts().items():
+                press[same_dept & (rem_rank < rank)] += 0.22 * n
 
-            if dep_is_nexus:
-                pressure[same_dept] += 0.28
-            if dep_rank >= 4:                       # lead / director / exec
-                direct_reports = same_dept & (
-                    remaining["seniority_level"].map(
-                        lambda s: _SEN_RANK.get(str(s), 1)
-                    ) < dep_rank
-                )
-                pressure[direct_reports] += 0.22
-            impact_contrib = float(dep.get("impact_score", 50)) / 100.0 * 0.05
-            pressure[same_dept] += impact_contrib
+        pressure = pd.Series(press, index=remaining.index)
 
         departed_mask = (remaining["attrition_risk"] + pressure) > _CASCADE_THRESHOLD
         triggered     = remaining[departed_mask]

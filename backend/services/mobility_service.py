@@ -86,7 +86,7 @@ def build_mobility_data(scenario: str, size: str) -> dict:
             emp_skill_map.setdefault(eid, set()).add(sn)
 
     # employee_id → list of kpi records
-    perf_by_emp: dict[str, pd.DataFrame] = dict(perf_df.groupby("employee_id"))
+    perf_by_emp: dict[str, pd.DataFrame] = dict(iter(perf_df.groupby("employee_id")))
 
     # ── Salary percentile within (dept, seniority) cohort ─────────────────
     emp_df["sal_pct_in_cohort"] = emp_df.groupby(["department", "seniority_level"])[
@@ -253,6 +253,7 @@ def build_mobility_data(scenario: str, size: str) -> dict:
     leaders = emp_df[emp_df["seniority_level"].isin(leadership_ranks)].copy()
 
     succession_rows: list[dict] = []
+    emp_rank = emp_df["seniority_level"].map(_SEN_RANK)
 
     for _, leader in leaders.iterrows():
         l_dept = str(leader["department"])
@@ -262,7 +263,7 @@ def build_mobility_data(scenario: str, size: str) -> dict:
         # Depth 1: same dept, one level below, stagnation < 50
         depth_1 = emp_df[
             (emp_df["department"] == l_dept) &
-            (emp_df["seniority_level"].map(_SEN_RANK) == l_rank - 1) &
+            (emp_rank == l_rank - 1) &
             (emp_df["stagnation_score"] < 50) &
             (emp_df["employee_id"] != leader["employee_id"])
         ]["full_name"].tolist()
@@ -270,7 +271,7 @@ def build_mobility_data(scenario: str, size: str) -> dict:
         # Depth 2: same dept two levels below OR adjacent dept one level below
         depth_2_same = emp_df[
             (emp_df["department"] == l_dept) &
-            (emp_df["seniority_level"].map(_SEN_RANK) == l_rank - 2) &
+            (emp_rank == l_rank - 2) &
             (emp_df["employee_id"] != leader["employee_id"])
         ]["full_name"].tolist()
 
@@ -279,7 +280,7 @@ def build_mobility_data(scenario: str, size: str) -> dict:
         # Depth 3: same dept, broader pool (3+ levels below)
         depth_3 = emp_df[
             (emp_df["department"] == l_dept) &
-            (emp_df["seniority_level"].map(_SEN_RANK) <= l_rank - 3) &
+            (emp_rank <= l_rank - 3) &
             (emp_df["employee_id"] != leader["employee_id"])
         ]["full_name"].tolist()[:5]
 

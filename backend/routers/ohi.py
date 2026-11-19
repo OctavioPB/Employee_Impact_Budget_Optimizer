@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from backend.schemas.common import OrgSize, ScenarioId
 from backend.services.data_service import get_org
 from backend.services.ohi_service import _add_scores, _compute_ohi, build_ohi_data
 
@@ -8,8 +9,8 @@ router = APIRouter()
 
 
 class PreviewRequest(BaseModel):
-    scenario:      str   = "A"
-    size:          str   = "small"
+    scenario:      ScenarioId   = "A"
+    size:          OrgSize   = "small"
     retention_pct: float = Field(default=0.80, ge=0.5, le=1.0)
 
 

@@ -15,7 +15,7 @@ from optimization_engine.ilp_solver import OptimizationResult, solve
 
 logger = logging.getLogger(__name__)
 
-# Budget fraction sweep: from 50 % to 120 % of current spend in 13 steps
+# Budget fraction sweep: from 50 % to 120 % of current spend in 15 steps
 _PARETO_FRACTIONS = [0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85,
                      0.90, 0.95, 1.00, 1.05, 1.10, 1.15, 1.20]
 

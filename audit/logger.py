@@ -61,7 +61,7 @@ class AuditEvent:
     ip_address:  str = "local"
     session_id:  str = ""
     outcome:     str = "success"        # "success" | "failure" | "blocked"
-    metadata:    dict = None            # extra key-value pairs
+    metadata:    dict | None = None            # extra key-value pairs
 
     def __post_init__(self):
         if self.metadata is None:

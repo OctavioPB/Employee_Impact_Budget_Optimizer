@@ -41,8 +41,22 @@ _CACHE: dict[str, tuple[str, bool, str]] = {}
 
 # ── Ollama I/O ────────────────────────────────────────────────────────────────
 
+_OLLAMA_STATUS_TTL = 30.0  # seconds
+_ollama_status_cache: tuple[float, dict] | None = None
+
+
 def check_ollama() -> dict:
-    """Return Ollama availability status dict."""
+    """Return Ollama availability status dict (cached for a few seconds)."""
+    global _ollama_status_cache
+    now = time.monotonic()
+    if _ollama_status_cache and now - _ollama_status_cache[0] < _OLLAMA_STATUS_TTL:
+        return _ollama_status_cache[1]
+    status = _probe_ollama()
+    _ollama_status_cache = (now, status)
+    return status
+
+
+def _probe_ollama() -> dict:
     try:
         req = urllib.request.Request(f"{OLLAMA_BASE}/api/tags", method="GET")
         with urllib.request.urlopen(req, timeout=2) as r:
@@ -616,7 +630,8 @@ def _generate(
 
     t0 = time.time()
     prompt   = prompt_fn(source)
-    llm_text = _call_ollama(prompt)
+    # Skip the network round-trip when Ollama is known to be down
+    llm_text = _call_ollama(prompt) if check_ollama()["available"] else None
     is_llm   = llm_text is not None
     text     = llm_text if is_llm else template_fn(source)
     elapsed  = int((time.time() - t0) * 1000)

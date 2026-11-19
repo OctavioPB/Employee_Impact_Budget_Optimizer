@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
+from backend.schemas.common import OrgSize, ScenarioId
 from backend.services.data_service import get_org
 from backend.services.ld_service import (
     _add_scores,
@@ -13,16 +14,16 @@ router = APIRouter()
 
 
 class OptimizeRequest(BaseModel):
-    scenario:         str   = "A"
-    size:             str   = "small"
+    scenario:         ScenarioId   = "A"
+    size:             OrgSize   = "small"
     budget:           float = 50000
     max_per_employee: int   = 2
     close_gaps:       bool  = False
 
 
 class ParetoRequest(BaseModel):
-    scenario:     str   = "A"
-    size:         str   = "small"
+    scenario:     ScenarioId   = "A"
+    size:         OrgSize   = "small"
     total_budget: float = 300000
 
 

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from backend.schemas.common import OrgSize, ScenarioId
 from backend.services.narrative_service import (
     build_narrative_data,
     check_ollama,
@@ -14,8 +15,8 @@ router = APIRouter()
 
 
 class GenerateRequest(BaseModel):
-    scenario:    str   = "A"
-    size:        str   = "small"
+    scenario:    ScenarioId   = "A"
+    size:        OrgSize   = "small"
     employee_id: str   = ""
     budget_pct:  float = Field(default=0.80, ge=0.5, le=1.0)
 

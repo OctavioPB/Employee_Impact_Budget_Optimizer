@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from backend.schemas.common import OrgSize, ScenarioId
 from backend.services import decision_room_service as svc
 
 router = APIRouter()
@@ -12,8 +13,8 @@ class CreateSessionBody(BaseModel):
     name:            str
     owner_name:      str
     owner_id:        str
-    scenario:        str   = "A"
-    size:            str   = "small"
+    scenario:        ScenarioId   = "A"
+    size:            OrgSize   = "small"
     budget_pct:      float = 85.0
     resolution_mode: str   = "owner"
 
@@ -82,8 +83,8 @@ class SignOffBody(BaseModel):
 
 
 class SeedBody(BaseModel):
-    scenario: str = "A"
-    size:     str = "small"
+    scenario: ScenarioId = "A"
+    size:     OrgSize = "small"
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

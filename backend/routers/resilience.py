@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
+from backend.schemas.common import OrgSize, ScenarioId
 from backend.services.data_service import get_org
 from backend.services.resilience_service import (
     _add_scores,
@@ -12,8 +13,8 @@ router = APIRouter()
 
 
 class ScenarioRequest(BaseModel):
-    scenario:      str   = "A"
-    size:          str   = "small"
+    scenario:      ScenarioId   = "A"
+    size:          OrgSize   = "small"
     scenario_type: str
     params:        dict  = {}
 
