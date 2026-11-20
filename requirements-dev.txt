@@ -13,4 +13,4 @@ mypy>=1.10.0               # static type checking
 
 # Security scanning
 bandit>=1.7.9              # SAST — OWASP top-10 checks
-pip-audit>=2.7             # dependency CVE scanner (used in CI)
+pip-audit>=2.10.1             # dependency CVE scanner (used in CI)
