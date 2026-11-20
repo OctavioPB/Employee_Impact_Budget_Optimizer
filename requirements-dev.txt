@@ -12,5 +12,5 @@ black>=24.0.0              # formatter fallback / IDE integration
 mypy>=1.10.0               # static type checking
 
 # Security scanning
-bandit>=1.7.9              # SAST — OWASP top-10 checks
+bandit>=1.9.4              # SAST — OWASP top-10 checks
 pip-audit>=2.7             # dependency CVE scanner (used in CI)
