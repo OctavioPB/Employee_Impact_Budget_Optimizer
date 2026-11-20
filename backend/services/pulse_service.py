@@ -109,7 +109,7 @@ def _add_scores(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _anon_id(employee_id: str, role: str) -> str:
-    h = hashlib.md5(employee_id.encode()).hexdigest()[:5].upper()
+    h = hashlib.md5(employee_id.encode(), usedforsecurity=False).hexdigest()[:5].upper()
     role_short = role.split()[0] if role else "EMP"
     return f"[{role_short}-{h}]"
 

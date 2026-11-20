@@ -32,6 +32,8 @@ from backend.services.data_service import get_org
 # ── Ollama config ─────────────────────────────────────────────────────────────
 
 OLLAMA_BASE  = os.getenv("OLLAMA_URL",   "http://localhost:11434")
+if not OLLAMA_BASE.startswith(("http://", "https://")):
+    raise ValueError("OLLAMA_URL must be an http(s) URL")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "mistral:7b-instruct-q4_K_M")
 LLM_TIMEOUT  = int(os.getenv("LLM_TIMEOUT_SEC", "30"))
 
@@ -59,7 +61,8 @@ def check_ollama() -> dict:
 def _probe_ollama() -> dict:
     try:
         req = urllib.request.Request(f"{OLLAMA_BASE}/api/tags", method="GET")
-        with urllib.request.urlopen(req, timeout=2) as r:
+        # OLLAMA_URL scheme is validated at import time
+        with urllib.request.urlopen(req, timeout=2) as r:  # nosec B310
             body = json.loads(r.read())
             models = [m["name"] for m in body.get("models", [])]
             return {"available": True, "model": OLLAMA_MODEL,
@@ -86,7 +89,8 @@ def _call_ollama(prompt: str, max_tokens: int = 350, temperature: float = 0.25) 
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with urllib.request.urlopen(req, timeout=LLM_TIMEOUT) as r:
+        # OLLAMA_URL scheme is validated at import time
+        with urllib.request.urlopen(req, timeout=LLM_TIMEOUT) as r:  # nosec B310
             body = json.loads(r.read())
             return (body.get("response") or "").strip() or None
     except Exception:
@@ -95,7 +99,7 @@ def _call_ollama(prompt: str, max_tokens: int = 350, temperature: float = 0.25) 
 
 def _cache_key(narrative_type: str, employee_id: str | None) -> str:
     raw = f"{narrative_type}:{employee_id or 'org'}:{date.today().isoformat()}"
-    return hashlib.md5(raw.encode()).hexdigest()
+    return hashlib.md5(raw.encode(), usedforsecurity=False).hexdigest()
 
 
 # ── Score helpers (same seed as resilience / ld services) ─────────────────────
@@ -118,7 +122,7 @@ def _add_scores(df: pd.DataFrame) -> pd.DataFrame:
 # ── PII stripping ─────────────────────────────────────────────────────────────
 
 def _anon_id(employee_id: str) -> str:
-    return hashlib.md5(employee_id.encode()).hexdigest()[:5].upper()
+    return hashlib.md5(employee_id.encode(), usedforsecurity=False).hexdigest()[:5].upper()
 
 
 def _anon_label(role: str, employee_id: str) -> str:

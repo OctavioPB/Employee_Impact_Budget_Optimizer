@@ -1,5 +1,20 @@
 # EIBO — Employee Impact & Budget Optimizer
 
+[![CI](https://github.com/OctavioPB/Employee_Impact_Budget_Optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/OctavioPB/Employee_Impact_Budget_Optimizer/actions/workflows/ci.yml)
+[![Coverage floor](https://img.shields.io/badge/coverage-%E2%89%A555%25-brightgreen)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![Dependabot](https://img.shields.io/badge/dependabot-enabled-025E8C?logo=dependabot&logoColor=white)](https://github.com/OctavioPB/Employee_Impact_Budget_Optimizer/network/updates)
+
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React 18](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![PuLP](https://img.shields.io/badge/optimization-PuLP%20%2F%20CBC-orange)](https://coin-or.github.io/pulp/)
+[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](docker-compose.yml)
+
 > **Decision support for organizational leaders who need to balance budget constraints with critical talent retention — without losing the humans at the center of the decision.**
 
 EIBO is a Capital and Budget Optimization Platform (COCP) that combines data science, graph theory, integer linear programming, and predictive analytics into a locally-deployed application. It does not make workforce decisions. It illuminates them: surfacing impact scores, attrition risk, collaboration dependencies, and budget trade-offs so that leaders can make better-informed choices with full transparency and human override at every step.
@@ -909,6 +924,18 @@ cd frontend && npm run build
 # Frontend lint
 cd frontend && npx tsc --noEmit
 ```
+
+CI (`.github/workflows/ci.yml`) runs on every push to `master` and on every pull request:
+
+| Job | What it checks |
+|---|---|
+| Lint | `ruff check .` |
+| Tests | Full `pytest tests/` suite on Python 3.11 and 3.12, coverage floor 55% |
+| Frontend | `npm ci`, `npm run type-check`, `npm run build` |
+| Security | `bandit` (medium+), `pip-audit`, `npm audit` (high+) |
+| Docker build | Builds backend and frontend images (no push), after lint/tests/frontend pass |
+
+Dependabot (`.github/dependabot.yml`) opens weekly update PRs for pip and npm and monthly ones for GitHub Actions.
 
 Performance thresholds (small org, 50 employees):
 

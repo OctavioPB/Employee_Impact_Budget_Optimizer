@@ -41,10 +41,9 @@ omit = [
 [tool.coverage.report]
 show_missing = true
 skip_covered = false
-# Unit tests alone reach ~40%.  Full suite (integration + security + perf)
-# should reach 70%.  Sprint 9 target is 85%.  Raise this floor incrementally.
-# Run the full suite:  pytest tests/ --cov-fail-under=70
-fail_under = 40
+# Full suite (pytest tests/) reaches ~58%; CI enforces this floor.
+# Raise it as coverage improves.  Sprint 9 target is 85%.
+fail_under = 55
 precision = 1
 exclude_lines = [
     "pragma: no cover",
