@@ -95,17 +95,17 @@ function ParetoCurve({ points }: { points: ParetoPoint[] }) {
             stroke="var(--gold-light)" strokeDasharray="3 3" strokeWidth={1} opacity={0.5} />
       {/* X axis */}
       <line x1={PAD.left} y1={PAD.top+innerH} x2={PAD.left+innerW} y2={PAD.top+innerH}
-            stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
+            stroke="currentColor" strokeOpacity={0.12} strokeWidth={1} />
       {/* X labels */}
       {[0, 25, 50, 75, 100].map(v => (
         <text key={v} x={xScale(v)} y={H - 6} textAnchor="middle"
-          style={{ fontSize: 9, fill: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)' }}>
+          style={{ fontSize: 9, fill: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)' }}>
           {v}%
         </text>
       ))}
       {/* Y axis label */}
       <text x={12} y={H/2} textAnchor="middle" transform={`rotate(-90,12,${H/2})`}
-        style={{ fontSize: 9, fill: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)' }}>
+        style={{ fontSize: 9, fill: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)' }}>
         COMBINED SCORE
       </text>
       {/* Optimal label */}
@@ -115,7 +115,7 @@ function ParetoCurve({ points }: { points: ParetoPoint[] }) {
       </text>
       {/* X axis title */}
       <text x={PAD.left + innerW / 2} y={H - 2} textAnchor="middle"
-        style={{ fontSize: 9, fill: 'rgba(255,255,255,0.35)', fontFamily: 'var(--fb)' }}>
+        style={{ fontSize: 9, fill: 'rgba(var(--ink-rgb),0.35)', fontFamily: 'var(--fb)' }}>
         % OF BUDGET ALLOCATED TO L&D
       </text>
     </svg>
@@ -142,7 +142,7 @@ function TrackBadge({ track }: { track: string }) {
 
 function AllocationTable({ allocations }: { allocations: TrainingAllocation[] }) {
   if (allocations.length === 0) return (
-    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, padding: '16px 0' }}>
+    <p style={{ color: 'rgba(var(--ink-rgb),0.4)', fontSize: 12, padding: '16px 0' }}>
       No training allocations — try increasing the budget.
     </p>
   )
@@ -158,8 +158,8 @@ function AllocationTable({ allocations }: { allocations: TrainingAllocation[] })
   }
   const hdr: React.CSSProperties = {
     ...cols,
-    borderBottom: '1px solid rgba(255,255,255,0.08)',
-    color: 'rgba(255,255,255,0.35)',
+    borderBottom: '1px solid rgba(var(--ink-rgb),0.08)',
+    color: 'rgba(var(--ink-rgb),0.35)',
     fontSize: 8,
     letterSpacing: '1.5px',
     textTransform: 'uppercase',
@@ -178,18 +178,18 @@ function AllocationTable({ allocations }: { allocations: TrainingAllocation[] })
       {allocations.map((a, i) => (
         <div key={i} style={{
           ...cols,
-          backgroundColor: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
+          backgroundColor: i % 2 === 0 ? 'rgba(var(--ink-rgb),0.02)' : 'transparent',
           borderRadius: 4,
         }}>
           <div>
-            <div style={{ fontWeight: 600, color: 'var(--light)' }}>{a.full_name}</div>
-            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>
+            <div style={{ fontWeight: 600, color: 'var(--dark)' }}>{a.full_name}</div>
+            <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.4)', marginTop: 1 }}>
               {a.department} · {a.seniority_level}
             </div>
           </div>
-          <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: 11 }}>{a.program_name}</div>
+          <div style={{ color: 'rgba(var(--ink-rgb),0.75)', fontSize: 11 }}>{a.program_name}</div>
           <TrackBadge track={a.track} />
-          <div style={{ textAlign: 'right', color: 'rgba(255,255,255,0.6)' }}>${fmt(a.cost)}</div>
+          <div style={{ textAlign: 'right', color: 'rgba(var(--ink-rgb),0.6)' }}>${fmt(a.cost)}</div>
           <div style={{ textAlign: 'right', color: '#1a8c4e', fontWeight: 600 }}>+{a.impact_delta.toFixed(1)}</div>
           <div style={{ textAlign: 'right', color: '#2a7ab0', fontWeight: 600 }}>−{(a.attrition_reduction * 100).toFixed(1)}%</div>
           <div style={{ textAlign: 'right', color: 'var(--gold-light)', fontWeight: 600 }}>{a.roi.toFixed(1)}×</div>
@@ -227,7 +227,7 @@ function OptimizerTab({ data, scenario, size }: OptimizerTabProps) {
 
   const card: React.CSSProperties = {
     backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-    border: '1px solid rgba(255,255,255,0.06)', padding: '16px 20px',
+    border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '16px 20px',
   }
 
   return (
@@ -236,21 +236,21 @@ function OptimizerTab({ data, scenario, size }: OptimizerTabProps) {
       <div style={{ ...card, display: 'flex', gap: 24, alignItems: 'flex-end', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 280px' }}>
           <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-            textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>
+            textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 8 }}>
             L&D Budget: {fmtK(budget)}
           </div>
           <input type="range" min={10000} max={defaultBudget * 2} step={10000}
             value={budget} onChange={e => setBudget(Number(e.target.value))}
             style={{ width: '100%', accentColor: 'var(--gold-light)' }} />
           <div style={{ display: 'flex', justifyContent: 'space-between',
-            fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 4, fontFamily: 'var(--fb)' }}>
+            fontSize: 9, color: 'rgba(var(--ink-rgb),0.3)', marginTop: 4, fontFamily: 'var(--fb)' }}>
             <span>$10K</span><span>{fmtK(defaultBudget * 2)}</span>
           </div>
         </div>
 
         <div>
           <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-            textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>
+            textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 8 }}>
             Max programs / employee
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
@@ -259,8 +259,8 @@ function OptimizerTab({ data, scenario, size }: OptimizerTabProps) {
                 style={{
                   padding: '5px 14px', borderRadius: 4, border: 'none', cursor: 'pointer',
                   fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 600,
-                  backgroundColor: maxPer === v ? 'var(--gold-light)' : 'rgba(255,255,255,0.07)',
-                  color: maxPer === v ? '#003366' : 'rgba(255,255,255,0.6)',
+                  backgroundColor: maxPer === v ? 'var(--gold-light)' : 'rgba(var(--ink-rgb),0.07)',
+                  color: maxPer === v ? '#003366' : 'rgba(var(--ink-rgb),0.6)',
                 }}>
                 {v}
               </button>
@@ -271,7 +271,7 @@ function OptimizerTab({ data, scenario, size }: OptimizerTabProps) {
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
           <input type="checkbox" checked={closeGaps} onChange={e => setCloseGaps(e.target.checked)}
             style={{ accentColor: 'var(--gold-light)', width: 14, height: 14 }} />
-          <span style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>
+          <span style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'rgba(var(--ink-rgb),0.6)' }}>
             Prioritize skill gap closure
           </span>
         </label>
@@ -292,18 +292,18 @@ function OptimizerTab({ data, scenario, size }: OptimizerTabProps) {
         {[
           { label: 'Budget Used',          value: fmtK(result.budget_used), sub: `of ${fmtK(result.budget)}` },
           { label: 'Employees Receiving Training', value: String(result.unique_employees), sub: `${result.total_allocations} total programs` },
-          { label: 'Expected Impact Gain',  value: `+${result.expected_impact_gain.toFixed(1)}`, sub: 'points avg across org' },
-          { label: 'Attrition Reduction',  value: pct(result.expected_attrition_reduction), sub: 'projected risk drop' },
+          { label: 'Expected Impact Gain',  value: `+${result.expected_impact_gain.toFixed(1)}`, sub: 'total impact points gained' },
+          { label: 'Attrition Reduction',  value: pct(result.expected_attrition_reduction), sub: 'avg risk drop per trained employee' },
         ].map(k => (
           <div key={k.label} style={{ ...card, textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-              textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>
+              textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 6 }}>
               {k.label}
             </div>
             <div style={{ fontFamily: 'var(--fd)', fontSize: 28, color: 'var(--gold-light)', lineHeight: 1 }}>
               {k.value}
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>{k.sub}</div>
+            <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.35)', marginTop: 4 }}>{k.sub}</div>
           </div>
         ))}
       </div>
@@ -311,7 +311,7 @@ function OptimizerTab({ data, scenario, size }: OptimizerTabProps) {
       {/* Allocation table */}
       <div style={card}>
         <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 12 }}>
+          textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 12 }}>
           Optimized Training Assignments — {result.status}
         </div>
         <AllocationTable allocations={result.allocations} />
@@ -320,10 +320,10 @@ function OptimizerTab({ data, scenario, size }: OptimizerTabProps) {
       {/* Pareto frontier */}
       <div style={card}>
         <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
+          textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 4 }}>
           Retention vs L&D Investment — Pareto Frontier
         </div>
-        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginBottom: 12 }}>
+        <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.35)', marginBottom: 12 }}>
           How splitting a shared budget between retention and training affects combined workforce impact.
         </div>
         <div style={{ overflowX: 'auto' }}>
@@ -332,13 +332,13 @@ function OptimizerTab({ data, scenario, size }: OptimizerTabProps) {
         <div style={{ display: 'flex', gap: 20, marginTop: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ width: 24, height: 2, backgroundColor: 'var(--gold-light)' }} />
-            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)' }}>
+            <span style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)' }}>
               COMBINED SCORE
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ width: 14, height: 10, backgroundColor: 'rgba(42,122,176,0.3)', borderRadius: 2 }} />
-            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)' }}>
+            <span style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)' }}>
               RETENTION CONTRIBUTION
             </span>
           </div>
@@ -356,13 +356,13 @@ function ProgramEffectivenessBar({ prog }: { prog: TrainingProgramEffectiveness 
     <div style={{
       padding: '10px 14px',
       borderRadius: 6,
-      backgroundColor: 'rgba(255,255,255,0.03)',
+      backgroundColor: 'rgba(var(--ink-rgb),0.03)',
       border: `1px solid ${trackColor(prog.track)}22`,
       marginBottom: 8,
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
         <div>
-          <div style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 600, color: 'var(--light)' }}>
+          <div style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 600, color: 'var(--dark)' }}>
             {prog.program_name}
           </div>
           <div style={{ marginTop: 3 }}>
@@ -373,15 +373,15 @@ function ProgramEffectivenessBar({ prog }: { prog: TrainingProgramEffectiveness 
           <div style={{ fontFamily: 'var(--fd)', fontSize: 18, color: 'var(--gold-light)' }}>
             {prog.roi.toFixed(1)}×
           </div>
-          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--fb)' }}>ROI</div>
+          <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.35)', fontFamily: 'var(--fb)' }}>ROI</div>
         </div>
       </div>
       <div style={{ display: 'flex', gap: 16, marginBottom: 6 }}>
         <span style={{ fontSize: 10, color: '#1a8c4e' }}>+{prog.impact_delta.toFixed(1)} impact</span>
         <span style={{ fontSize: 10, color: '#2a7ab0' }}>−{(prog.attrition_reduction * 100).toFixed(1)}% attrition risk</span>
-        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>{prog.duration_weeks}w · ${fmt(prog.cost)}</span>
+        <span style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.4)' }}>{prog.duration_weeks}w · ${fmt(prog.cost)}</span>
       </div>
-      <div style={{ height: 4, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 2 }}>
+      <div style={{ height: 4, backgroundColor: 'rgba(var(--ink-rgb),0.06)', borderRadius: 2 }}>
         <div style={{ height: '100%', width: `${barW}%`, backgroundColor: trackColor(prog.track), borderRadius: 2 }} />
       </div>
     </div>
@@ -398,11 +398,11 @@ function PreviewTab({ previews }: { previews: EmployeePreview[] }) {
       {/* Employee list */}
       <div style={{
         backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-        border: '1px solid rgba(255,255,255,0.06)', overflowY: 'auto', maxHeight: 600,
+        border: '1px solid rgba(var(--ink-rgb),0.06)', overflowY: 'auto', maxHeight: 600,
       }}>
-        <div style={{ padding: '12px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)',
+        <div style={{ padding: '12px 14px', borderBottom: '1px solid rgba(var(--ink-rgb),0.06)',
           fontFamily: 'var(--fb)', fontSize: 8, letterSpacing: '1.5px',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+          textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)' }}>
           Priority Employees (by risk × impact)
         </div>
         {previews.map((e, i) => (
@@ -413,10 +413,10 @@ function PreviewTab({ previews }: { previews: EmployeePreview[] }) {
               backgroundColor: i === selectedIdx ? 'rgba(201,168,76,0.08)' : 'transparent',
               borderLeft: i === selectedIdx ? '3px solid var(--gold-light)' : '3px solid transparent',
             }}>
-            <div style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 600, color: 'var(--light)' }}>
+            <div style={{ fontFamily: 'var(--fb)', fontSize: 11, fontWeight: 600, color: 'var(--dark)' }}>
               {e.full_name}
             </div>
-            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+            <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.4)', marginTop: 2 }}>
               {e.department} · {e.seniority_level}
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 3 }}>
@@ -431,33 +431,33 @@ function PreviewTab({ previews }: { previews: EmployeePreview[] }) {
       <div>
         <div style={{
           backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-          border: '1px solid rgba(255,255,255,0.06)', padding: '16px 20px', marginBottom: 16,
+          border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '16px 20px', marginBottom: 16,
         }}>
-          <div style={{ fontFamily: 'var(--fd)', fontSize: 18, color: 'var(--light)', marginBottom: 4 }}>
+          <div style={{ fontFamily: 'var(--fd)', fontSize: 18, color: 'var(--dark)', marginBottom: 4 }}>
             {emp.full_name}
           </div>
-          <div style={{ display: 'flex', gap: 20, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+          <div style={{ display: 'flex', gap: 20, fontSize: 11, color: 'rgba(var(--ink-rgb),0.5)' }}>
             <span>{emp.department}</span>
             <span>{emp.role_title}</span>
             <span style={{ textTransform: 'capitalize' }}>{emp.seniority_level}</span>
           </div>
           <div style={{ display: 'flex', gap: 24, marginTop: 12 }}>
             <div>
-              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)',
+              <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)',
                 textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 2 }}>Learning Velocity</div>
               <div style={{ fontFamily: 'var(--fd)', fontSize: 22, color: 'var(--gold-light)' }}>
                 {(emp.learning_velocity * 100).toFixed(0)}%
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)',
+              <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)',
                 textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 2 }}>Attrition Risk</div>
               <div style={{ fontFamily: 'var(--fd)', fontSize: 22, color: '#e07030' }}>
                 {pct(emp.attrition_risk)}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)',
+              <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)',
                 textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 2 }}>Impact Score</div>
               <div style={{ fontFamily: 'var(--fd)', fontSize: 22, color: '#1a8c4e' }}>
                 {emp.impact_score.toFixed(0)}
@@ -467,7 +467,7 @@ function PreviewTab({ previews }: { previews: EmployeePreview[] }) {
         </div>
 
         <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+          textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 10 }}>
           Training programs — ranked by ROI
         </div>
         <div style={{ maxHeight: 440, overflowY: 'auto' }}>
@@ -485,15 +485,15 @@ function PreviewTab({ previews }: { previews: EmployeePreview[] }) {
 function GapsTab({ gaps }: { gaps: SkillGapRow[] }) {
   const card: React.CSSProperties = {
     backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-    border: '1px solid rgba(255,255,255,0.06)', padding: '16px 20px',
+    border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '16px 20px',
   }
   const hdrStyle: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: '1fr 140px 80px 80px 120px 80px',
     gap: '0 12px', padding: '6px 12px',
     fontFamily: 'var(--fb)', fontSize: 8, letterSpacing: '1.5px',
-    textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)',
-    borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 4,
+    textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.35)',
+    borderBottom: '1px solid rgba(var(--ink-rgb),0.08)', marginBottom: 4,
   }
   const rowStyle: React.CSSProperties = {
     display: 'grid',
@@ -530,24 +530,24 @@ function GapsTab({ gaps }: { gaps: SkillGapRow[] }) {
           <span style={{ textAlign: 'right' }}>EST. COST</span>
         </div>
         {gaps.length === 0 && (
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, padding: '12px 0' }}>
+          <p style={{ color: 'rgba(var(--ink-rgb),0.4)', fontSize: 12, padding: '12px 0' }}>
             No skill gaps detected in this org.
           </p>
         )}
         {gaps.map((g, i) => (
           <div key={i} style={{
             ...rowStyle,
-            backgroundColor: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
+            backgroundColor: i % 2 === 0 ? 'rgba(var(--ink-rgb),0.02)' : 'transparent',
             borderRadius: 4,
           }}>
             <div>
-              <div style={{ fontWeight: 600, color: 'var(--light)' }}>{g.skill}</div>
-              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', marginTop: 1 }}>
+              <div style={{ fontWeight: 600, color: 'var(--dark)' }}>{g.skill}</div>
+              <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.35)', marginTop: 1 }}>
                 {g.internal_closeable ? '✓ Closeable via training' : '→ May require external hire'}
               </div>
             </div>
-            <div style={{ color: 'rgba(255,255,255,0.6)' }}>{g.department}</div>
-            <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
+            <div style={{ color: 'rgba(var(--ink-rgb),0.6)' }}>{g.department}</div>
+            <div style={{ textAlign: 'center', color: 'rgba(var(--ink-rgb),0.5)' }}>
               {g.current_holders} / {g.required_holders}
             </div>
             <div style={{ textAlign: 'center' }}>
@@ -560,10 +560,10 @@ function GapsTab({ gaps }: { gaps: SkillGapRow[] }) {
                 {g.gap_severity}
               </span>
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>
+            <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.5)' }}>
               {g.recommended_programs.length > 0 ? g.recommended_programs.join(', ') : '—'}
             </div>
-            <div style={{ textAlign: 'right', color: 'rgba(255,255,255,0.6)' }}>
+            <div style={{ textAlign: 'right', color: 'rgba(var(--ink-rgb),0.6)' }}>
               {g.estimated_cost > 0 ? `$${fmt(g.estimated_cost)}` : '—'}
             </div>
           </div>
@@ -582,15 +582,15 @@ function ROIBar({ predicted, actual }: { predicted: number; actual: number }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 100 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ flex: 1, height: 4, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 2 }}>
-          <div style={{ height: '100%', width: `${pw}%`, backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 2 }} />
+        <div style={{ flex: 1, height: 4, backgroundColor: 'rgba(var(--ink-rgb),0.06)', borderRadius: 2 }}>
+          <div style={{ height: '100%', width: `${pw}%`, backgroundColor: 'rgba(var(--ink-rgb),0.25)', borderRadius: 2 }} />
         </div>
-        <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', width: 30, textAlign: 'right', fontFamily: 'var(--fb)' }}>
+        <span style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.4)', width: 30, textAlign: 'right', fontFamily: 'var(--fb)' }}>
           {predicted}×
         </span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{ flex: 1, height: 4, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 2 }}>
+        <div style={{ flex: 1, height: 4, backgroundColor: 'rgba(var(--ink-rgb),0.06)', borderRadius: 2 }}>
           <div style={{ height: '100%', width: `${aw}%`,
             backgroundColor: actual >= predicted ? '#1a8c4e' : '#e03448', borderRadius: 2 }} />
         </div>
@@ -606,7 +606,7 @@ function ROIBar({ predicted, actual }: { predicted: number; actual: number }) {
 function ROITab({ records }: { records: ROIRecord[] }) {
   const card: React.CSSProperties = {
     backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-    border: '1px solid rgba(255,255,255,0.06)', padding: '16px 20px',
+    border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '16px 20px',
   }
 
   const avgActual    = records.reduce((s, r) => s + r.actual_roi, 0) / Math.max(records.length, 1)
@@ -627,13 +627,13 @@ function ROITab({ records }: { records: ROIRecord[] }) {
         ].map(k => (
           <div key={k.label} style={{ ...card, textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-              textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>
+              textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 6 }}>
               {k.label}
             </div>
             <div style={{ fontFamily: 'var(--fd)', fontSize: 26, color: 'var(--gold-light)', lineHeight: 1 }}>
               {k.value}
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>{k.sub}</div>
+            <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.35)', marginTop: 4 }}>{k.sub}</div>
           </div>
         ))}
       </div>
@@ -641,13 +641,13 @@ function ROITab({ records }: { records: ROIRecord[] }) {
       {/* ROI table */}
       <div style={card}>
         <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 12 }}>
+          textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 12 }}>
           Training Cohort ROI History
         </div>
         <div style={{ display: 'flex', gap: 12, marginBottom: 8, fontSize: 9,
-          color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--fb)' }}>
+          color: 'rgba(var(--ink-rgb),0.35)', fontFamily: 'var(--fb)' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 20, height: 3, backgroundColor: 'rgba(255,255,255,0.25)' }} /> PREDICTED
+            <div style={{ width: 20, height: 3, backgroundColor: 'rgba(var(--ink-rgb),0.25)' }} /> PREDICTED
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <div style={{ width: 20, height: 3, backgroundColor: '#1a8c4e' }} /> ACTUAL (above)
@@ -662,18 +662,18 @@ function ROITab({ records }: { records: ROIRecord[] }) {
             display: 'grid',
             gridTemplateColumns: '1fr 120px 70px 70px 110px 90px',
             gap: '0 12px', alignItems: 'center', padding: '9px 10px',
-            backgroundColor: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
+            backgroundColor: i % 2 === 0 ? 'rgba(var(--ink-rgb),0.02)' : 'transparent',
             borderRadius: 4, fontFamily: 'var(--fb)',
           }}>
             <div>
-              <div style={{ fontWeight: 600, fontSize: 11, color: 'var(--light)' }}>{r.program_name}</div>
-              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', marginTop: 1 }}>{r.completion_month}</div>
+              <div style={{ fontWeight: 600, fontSize: 11, color: 'var(--dark)' }}>{r.program_name}</div>
+              <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.35)', marginTop: 1 }}>{r.completion_month}</div>
             </div>
             <TrackBadge track={r.track} />
-            <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>
+            <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(var(--ink-rgb),0.55)' }}>
               {r.participants} emp.
             </div>
-            <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>
+            <div style={{ textAlign: 'right', fontSize: 11, color: 'rgba(var(--ink-rgb),0.55)' }}>
               ${fmt(r.total_cost)}
             </div>
             <ROIBar predicted={r.predicted_roi} actual={r.actual_roi} />
@@ -701,11 +701,11 @@ function CatalogSidebar({ data }: { data: LDData }) {
   return (
     <div style={{
       backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-      border: '1px solid rgba(255,255,255,0.06)', padding: '16px',
+      border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '16px',
       width: 220, flexShrink: 0,
     }}>
       <div style={{ fontFamily: 'var(--fb)', fontSize: 8, letterSpacing: '1.5px',
-        textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 12 }}>
+        textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.35)', marginBottom: 12 }}>
         Training Catalog
       </div>
       {tracks.map(track => (
@@ -714,10 +714,10 @@ function CatalogSidebar({ data }: { data: LDData }) {
           {data.catalog.filter(p => p.track === track).map(prog => (
             <div key={prog.id} style={{ marginBottom: 6, paddingLeft: 8,
               borderLeft: `2px solid ${trackColor(track)}44` }}>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', lineHeight: 1.3 }}>
+              <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.7)', lineHeight: 1.3 }}>
                 {prog.name}
               </div>
-              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+              <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.35)', marginTop: 2 }}>
                 ${fmt(prog.cost)} · {prog.duration_weeks}w
               </div>
             </div>
@@ -748,7 +748,7 @@ export default function LDPage() {
     padding: '32px 40px',
     minHeight: '100vh',
     backgroundColor: 'var(--light)',
-    color: 'var(--light)',
+    color: 'var(--dark)',
   }
 
   if (error) return (
@@ -761,7 +761,7 @@ export default function LDPage() {
 
   if (!data) return (
     <div style={{ ...pageStyle, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <span style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)', fontSize: 13 }}>
+      <span style={{ color: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)', fontSize: 13 }}>
         Loading learning & development data…
       </span>
     </div>
@@ -773,7 +773,7 @@ export default function LDPage() {
     background: 'none', border: 'none', cursor: 'pointer',
     fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '2px',
     textTransform: 'uppercase', padding: '7px 14px', borderRadius: 3,
-    color: tab === t ? 'var(--gold-light)' : 'rgba(255,255,255,0.45)',
+    color: tab === t ? 'var(--gold-light)' : 'rgba(var(--ink-rgb),0.45)',
     backgroundColor: tab === t ? 'rgba(201,168,76,0.12)' : 'transparent',
   })
 
@@ -782,10 +782,10 @@ export default function LDPage() {
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontFamily: 'var(--fd)', fontSize: 28, fontWeight: 300,
-          color: 'var(--light)', margin: 0, marginBottom: 4 }}>
+          color: 'var(--dark)', margin: 0, marginBottom: 4 }}>
           Learning &amp; Development Optimizer
         </h1>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+        <p style={{ fontSize: 12, color: 'rgba(var(--ink-rgb),0.45)', margin: 0 }}>
           Optimize training investment to maximize impact score gains and reduce attrition risk across the workforce.
         </p>
       </div>
@@ -801,23 +801,23 @@ export default function LDPage() {
         ].map(k => (
           <div key={k.label} style={{
             backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-            border: '1px solid rgba(255,255,255,0.06)', padding: '16px 20px', textAlign: 'center',
+            border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '16px 20px', textAlign: 'center',
           }}>
             <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-              textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>
+              textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 6 }}>
               {k.label}
             </div>
             <div style={{ fontFamily: 'var(--fd)', fontSize: 30, color: 'var(--gold-light)', lineHeight: 1 }}>
               {k.value}
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 5 }}>{k.sub}</div>
+            <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.35)', marginTop: 5 }}>{k.sub}</div>
           </div>
         ))}
       </div>
 
       {/* Tab bar */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 24,
-        borderBottom: '1px solid rgba(255,255,255,0.07)', paddingBottom: 12 }}>
+        borderBottom: '1px solid rgba(var(--ink-rgb),0.07)', paddingBottom: 12 }}>
         <button style={tabStyle('optimizer')} onClick={() => setTab('optimizer')}>Optimizer</button>
         <button style={tabStyle('preview')}   onClick={() => setTab('preview')}>Training Preview</button>
         <button style={tabStyle('gaps')}      onClick={() => setTab('gaps')}>Skill Gaps</button>

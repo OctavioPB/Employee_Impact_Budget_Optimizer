@@ -5,6 +5,16 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # requirements.txt uses ">=" floors, not pins. Only touch a floor when the
+    # current range no longer allows the latest version. Without this, Dependabot
+    # raises floors to releases that need Python >= 3.12 (e.g. numpy 2.5,
+    # networkx 3.7), which breaks the Python 3.11 CI job.
+    versioning-strategy: increase-if-necessary
+    ignore:
+      # PuLP 4 removes the bundled CBC solver and changes the modelling API.
+      # Upgrade manually with a code migration.
+      - dependency-name: pulp
+        update-types: ["version-update:semver-major"]
     groups:
       python-minor:
         update-types: ["minor", "patch"]
@@ -14,6 +24,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # Majors (vite 8, @vitejs/plugin-react 6, typescript 7) break `npm ci`
+      # or the type-check; upgrade them together by hand.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       npm-minor:
         update-types: ["minor", "patch"]

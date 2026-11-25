@@ -14,7 +14,9 @@ if str(_REPO_ROOT) not in sys.path:
 import dataclasses
 
 import numpy as np
+import pandas as pd
 
+from backend.services.scoring import impact_for
 from demo_data.generator import DemoGenerator, GeneratedOrg
 from demo_data.scenarios import load_scenario
 
@@ -76,13 +78,11 @@ def build_dashboard_data(scenario: str, size: str) -> dict:
     # ── Per-employee derived metrics (impact + attrition proxy) ────────────
     rng = np.random.default_rng(42)
 
-    # Impact score: 0-100 heuristic (salary rank + nexus flag + tenure proxy)
+    # Impact score: shared 4-component model (KPI · network · skills · cost)
     sal_rank = emp_df["annual_salary"].rank(pct=True)
-    nexus_bonus = emp_df["_is_nexus"].astype(float) * 15
-    noise = rng.normal(0, 5, len(emp_df))
-    impact_raw = sal_rank * 70 + nexus_bonus + noise
+    rng.normal(0, 5, len(emp_df))  # former impact noise: keeps the draws below unchanged
     emp_df = emp_df.copy()
-    emp_df["impact_score"] = np.clip(impact_raw, 0, 100).round(1)
+    emp_df["impact_score"] = impact_for(emp_df, org)
 
     # Attrition risk: 0-1 heuristic
     sal_inv_rank = 1 - sal_rank
@@ -168,6 +168,119 @@ def build_dashboard_data(scenario: str, size: str) -> dict:
 # Simulation
 # ---------------------------------------------------------------------------
 
+_LEADER_LEVELS = frozenset({"lead", "director", "exec"})
+
+
+def _constraint_groups(
+    org: GeneratedOrg, candidate_ids: set[str],
+) -> tuple[dict[str, list[str]], dict[str, list[str]], dict[str, str]]:
+    """Build the coverage groups the simulation can enforce.
+
+    Returns (team_leaders, skill_holders, skill_names), keyed by team_id /
+    skill_id, listing candidate short IDs. Groups with no candidate are left
+    out: a team with no available leader cannot be constrained to keep one.
+    """
+    emp = org.employees
+    short = emp["employee_id"].astype(str).str[:8].str.upper()
+    full_to_short = dict(zip(emp["employee_id"].astype(str), short, strict=True))
+
+    team_leaders: dict[str, list[str]] = {}
+    is_leader = emp["seniority_level"].isin(_LEADER_LEVELS)
+    for sid, team, lead in zip(short, emp["team_id"].astype(str), is_leader, strict=True):
+        if lead and sid in candidate_ids:
+            team_leaders.setdefault(team, []).append(sid)
+
+    critical = org.skills[org.skills["is_critical"].astype(bool)]
+    skill_names = dict(zip(critical["skill_id"].astype(str), critical["skill_name"], strict=True))
+    skill_holders: dict[str, list[str]] = {}
+    es = org.employee_skills
+    es = es[es["skill_id"].astype(str).isin(skill_names)]
+    for eid, skill in zip(es["employee_id"].astype(str), es["skill_id"].astype(str), strict=True):
+        sid = full_to_short.get(eid)
+        if sid in candidate_ids:
+            skill_holders.setdefault(skill, []).append(sid)
+    return team_leaders, skill_holders, skill_names
+
+
+DEFAULT_HEADCOUNT_COST = 10.0  # impact-percentile points charged per retained person
+
+
+def _impact_percentiles(employees: list[dict]) -> dict[str, float]:
+    """Impact rank within the whole org as a 0-100 percentile (ties share the average rank).
+
+    Raw impact scores cluster in a narrow band (~25-75), so summing them rewards
+    headcount over impact. Percentiles spread people evenly across 0-100.
+    """
+    scores = pd.Series({e["employee_id"]: e["impact_score"] for e in employees}, dtype=float)
+    return (scores.rank(pct=True) * 100).round(2).to_dict()
+
+
+def _solve_retention(
+    candidates: list[dict],
+    budget: float,
+    retain_set: set[str],
+    groups: list[list[str]],
+    weights: dict[str, float],
+    headcount_cost: float,
+) -> tuple[bool, set[str]]:
+    """Maximize Σ (weight_i − headcount_cost)·x_i under the budget; each group needs >= 1 retained.
+
+    weight is the employee's impact percentile (0-100). headcount_cost is a fixed charge
+    per person kept, in the same units, so headcount is never free: someone ranked below
+    it is only kept when a constraint or an override requires it, even if budget remains.
+
+    Uses PuLP/CBC when available, otherwise a greedy heuristic that first covers every
+    group with its cheapest member, then fills by net value per dollar.
+    """
+    try:
+        import pulp  # type: ignore
+    except ImportError:
+        return _greedy_retention(candidates, budget, retain_set, groups, weights, headcount_cost)
+
+    prob = pulp.LpProblem("retention", pulp.LpMaximize)
+    x = {e["employee_id"]: pulp.LpVariable(f"x_{i}", cat="Binary") for i, e in enumerate(candidates)}
+    prob += pulp.lpSum((weights[eid] - headcount_cost) * var for eid, var in x.items())
+    prob += pulp.lpSum(e["annual_salary"] * x[e["employee_id"]] for e in candidates) <= budget
+    for eid in retain_set & x.keys():
+        prob += x[eid] == 1
+    for members in groups:
+        prob += pulp.lpSum(x[m] for m in members) >= 1
+
+    status = prob.solve(pulp.PULP_CBC_CMD(msg=0, timeLimit=8))
+    if pulp.LpStatus[status] != "Optimal":
+        return False, set()
+    return True, {eid for eid, var in x.items() if (pulp.value(var) or 0) > 0.5}
+
+
+def _greedy_retention(
+    candidates: list[dict], budget: float, retain_set: set[str], groups: list[list[str]],
+    weights: dict[str, float], headcount_cost: float,
+) -> tuple[bool, set[str]]:
+    by_id = {e["employee_id"]: e for e in candidates}
+    retained = {eid for eid in retain_set if eid in by_id}
+    for members in groups:
+        if not retained.intersection(members):
+            retained.add(min(members, key=lambda m: by_id[m]["annual_salary"]))
+    spent = sum(by_id[eid]["annual_salary"] for eid in retained)
+    if spent > budget:
+        return False, set()
+    def net(e: dict) -> float:
+        return weights[e["employee_id"]] - headcount_cost
+
+    for e in sorted(candidates, key=lambda e: net(e) / max(e["annual_salary"], 1), reverse=True):
+        if net(e) <= 0:
+            break  # everyone after this one is worth less than a seat costs
+        if e["employee_id"] not in retained and spent + e["annual_salary"] <= budget:
+            retained.add(e["employee_id"])
+            spent += e["annual_salary"]
+    return True, retained
+
+
+def _coverage(groups: dict[str, list[str]], retained: set[str]) -> tuple[int, list[str]]:
+    uncovered = [k for k, members in groups.items() if not retained.intersection(members)]
+    return len(groups) - len(uncovered), uncovered
+
+
 def run_simulation(
     scenario: str,
     size: str,
@@ -176,60 +289,76 @@ def run_simulation(
     exclude: list[str],
     leadership_constraint: bool,
     skills_constraint: bool,
+    headcount_cost: float = DEFAULT_HEADCOUNT_COST,
 ) -> dict:
-    """Simple ILP-lite simulation (PuLP if available, greedy fallback)."""
+    """Retention ILP: maximize rank-weighted impact within budget, honoring overrides and constraints.
+
+    - Objective: Σ (impact_percentile_i − headcount_cost)·x_i (see _solve_retention).
+    - leadership_constraint: every team that has an available leader keeps at least one.
+    - skills_constraint: every critical skill that has an available holder keeps at least one.
+    """
     dashboard = build_dashboard_data(scenario, size)
     employees = dashboard["employee_table"]
     total_budget = dashboard["total_budget"] * (budget_pct / 100.0)
 
-    # Exclude set
     exclude_set = {e.upper() for e in exclude}
     retain_set  = {r.upper() for r in force_retain}
+    candidates  = [e for e in employees if e["employee_id"] not in exclude_set]
+    weights     = _impact_percentiles(employees)  # ranked over the whole org, before exclusions
 
-    candidates = [e for e in employees if e["employee_id"] not in exclude_set]
+    team_leaders, skill_holders, skill_names = _constraint_groups(
+        get_org(scenario, size), {e["employee_id"] for e in candidates},
+    )
+    active = {
+        "leadership": list(team_leaders.values()) if leadership_constraint else [],
+        "skills":     list(skill_holders.values()) if skills_constraint else [],
+    }
 
-    # Attempt ILP with PuLP
-    try:
-        import pulp  # type: ignore
-        prob = pulp.LpProblem("retention", pulp.LpMaximize)
-        x = {e["employee_id"]: pulp.LpVariable(f"x_{i}", cat="Binary") for i, e in enumerate(candidates)}
+    feasible, retained_ids = _solve_retention(
+        candidates, total_budget, retain_set, active["leadership"] + active["skills"],
+        weights, headcount_cost,
+    )
 
-        # Objective: maximize total impact
-        prob += pulp.lpSum(e["impact_score"] * x[e["employee_id"]] for e in candidates)
+    infeasibility_reason = None
+    if not feasible:
+        # Diagnose: which enabled constraint, dropped on its own, makes the budget work?
+        culprits = [
+            label for key, label in (("leadership", "leadership coverage"), ("skills", "critical skills coverage"))
+            if active[key] and _solve_retention(
+                candidates, total_budget, retain_set,
+                [g for k, gs in active.items() if k != key for g in gs],
+                weights, headcount_cost,
+            )[0]
+        ]
+        if culprits:
+            with_overrides = " together with the force-retained employees" if retain_set else ""
+            fewer = ", protect fewer employees," if retain_set else ""
+            infeasibility_reason = (
+                f"The budget cannot cover {' and '.join(culprits)}{with_overrides}. "
+                f"Increase the budget{fewer} or relax {' or '.join(culprits)}."
+            )
+        else:
+            infeasibility_reason = (
+                "No feasible solution within this budget. The force-retained employees alone may exceed it; "
+                "increase the budget or protect fewer employees."
+            )
 
-        # Budget constraint
-        prob += pulp.lpSum(e["annual_salary"] * x[e["employee_id"]] for e in candidates) <= total_budget
-
-        # Force-retain
-        for e in candidates:
-            if e["employee_id"] in retain_set:
-                prob += x[e["employee_id"]] == 1
-
-        solver = pulp.PULP_CBC_CMD(msg=0, timeLimit=8)
-        status = prob.solve(solver)
-        feasible = pulp.LpStatus[status] == "Optimal"
-
-        infeasibility_reason = None
-        if not feasible:
-            infeasibility_reason = "No feasible solution found within the budget and constraints. Try increasing the budget or relaxing constraints."
-
-        retained_ids = {eid for eid, var in x.items() if (pulp.value(var) or 0) > 0.5} if feasible else set()
-
-    except ImportError:
-        # Greedy fallback: sort by impact/salary ratio, fill budget
-        feasible = True
-        infeasibility_reason = None
-        retained_ids: set[str] = set()
-        sorted_cands = sorted(
-            candidates,
-            key=lambda e: (e["employee_id"] in retain_set, e["impact_score"] / max(e["annual_salary"], 1)),
-            reverse=True,
-        )
-        remaining = total_budget
-        for e in sorted_cands:
-            if e["employee_id"] in retain_set or e["annual_salary"] <= remaining:
-                retained_ids.add(e["employee_id"])
-                remaining -= e["annual_salary"]
+    lead_covered, lead_gaps   = _coverage(team_leaders, retained_ids)
+    skill_covered, skill_gaps = _coverage(skill_holders, retained_ids)
+    constraints = {
+        "leadership": {
+            "enabled":   leadership_constraint,
+            "covered":   lead_covered,
+            "total":     len(team_leaders),
+            "uncovered": sorted(lead_gaps),
+        },
+        "critical_skills": {
+            "enabled":   skills_constraint,
+            "covered":   skill_covered,
+            "total":     len(skill_holders),
+            "uncovered": sorted(skill_names[s] for s in skill_gaps),
+        },
+    }
 
     result_employees = []
     for e in candidates:
@@ -241,6 +370,7 @@ def run_simulation(
             "role_title":   e["role_title"],
             "annual_salary":e["annual_salary"],
             "impact_score": e["impact_score"],
+            "impact_percentile": weights[e["employee_id"]],
             "is_nexus":     e["is_nexus"],
             "retained":     retained,
             "override":     e["employee_id"] in retain_set,
@@ -262,6 +392,11 @@ def run_simulation(
         "employees":           result_employees,
         "feasible":            feasible,
         "infeasibility_reason": infeasibility_reason,
+        "constraints":         constraints,
+        "objective": {
+            "weighting":      "impact_percentile",
+            "headcount_cost": headcount_cost,
+        },
     }
 
 

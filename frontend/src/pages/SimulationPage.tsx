@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useMemo } from 'react'
 import { api, SimulationResult, SimulationEmployee } from '../services/api'
 import { useDemoStore } from '../stores/demoStore'
+import { ImpactBands, impactBands, impactColor as impactColorFor, quantile } from '../utils/impact'
 
 type SimTab = 'configure' | 'impact'
 
@@ -66,7 +67,7 @@ function RetentionBadge({ retained, override }: { retained: boolean; override: b
   )
 }
 
-function EmployeeRow({ emp }: { emp: SimulationEmployee }) {
+function EmployeeRow({ emp, bands }: { emp: SimulationEmployee; bands: ImpactBands }) {
   return (
     <tr style={{ borderBottom: '1px solid var(--primary-10)' }}>
       <td style={{ padding: '10px 12px', fontFamily: 'var(--fb)', fontSize: 13, color: 'var(--dark)', fontWeight: 500 }}>
@@ -86,7 +87,7 @@ function EmployeeRow({ emp }: { emp: SimulationEmployee }) {
       </td>
       <td style={{ padding: '10px 12px', textAlign: 'center' }}>
         <span style={{ fontFamily: 'var(--fd)', fontSize: 15, fontWeight: 700,
-          color: emp.impact_score >= 75 ? 'var(--status-green)' : emp.impact_score >= 50 ? 'var(--gold)' : 'var(--mid)',
+          color: impactColorFor(emp.impact_score, bands),
         }}>{emp.impact_score.toFixed(0)}</span>
       </td>
       <td style={{ padding: '10px 12px', textAlign: 'center' }}>
@@ -185,15 +186,14 @@ function DeptRetentionChart({ employees }: { employees: SimulationEmployee[] }) 
 }
 
 function ImpactShift({ employees }: { employees: SimulationEmployee[] }) {
-  const ranges: Array<[number, number]> = [[0, 20], [20, 40], [40, 60], [60, 80], [80, 100]]
-  const labels = ['0–20', '20–40', '40–60', '60–80', '80–100']
+  // Brackets are org quintiles: fixed 0–20…80–100 ranges put nearly everyone in one bar
+  const scores = employees.map(e => e.impact_score)
+  const cuts   = [0.2, 0.4, 0.6, 0.8].map(q => quantile(scores, q))
+  const labels = ['Bottom 20%', '20–40%', '40–60%', '60–80%', 'Top 20%']
+  const bucket = (s: number) => cuts.filter(c => s >= c).length
 
-  const allCounts = ranges.map(([lo, hi]) =>
-    employees.filter(e => e.impact_score >= lo && (hi === 100 ? e.impact_score <= hi : e.impact_score < hi)).length
-  )
-  const retCounts = ranges.map(([lo, hi]) =>
-    employees.filter(e => e.retained && e.impact_score >= lo && (hi === 100 ? e.impact_score <= hi : e.impact_score < hi)).length
-  )
+  const allCounts = labels.map((_, i) => employees.filter(e => bucket(e.impact_score) === i).length)
+  const retCounts = labels.map((_, i) => employees.filter(e => e.retained && bucket(e.impact_score) === i).length)
 
   const maxCount = Math.max(...allCounts, 1)
   const W = 340
@@ -480,17 +480,25 @@ export default function SimulationPage() {
   const [budgetPct,   setBudgetPct]   = useState(80)
   const [leadership,  setLeadership]  = useState(true)
   const [skills,      setSkills]      = useState(true)
+  const [headcountCost, setHeadcountCost] = useState(10)
   const [forceRetain, setForceRetain] = useState('')
   const [exclude,     setExclude]     = useState('')
 
   const [result,  setResult]  = useState<SimulationResult | null>(null)
+
+  const bands = useMemo(() => impactBands(result ? result.employees.map(e => e.impact_score) : []), [result])
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<SimTab>('configure')
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const requestId   = useRef(0)
 
   const runSimulation = useCallback(async (pct: number) => {
+    // Any run supersedes a pending slider-triggered one, and only the newest
+    // response is applied (requests can resolve out of order).
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    const id = ++requestId.current
     setLoading(true)
     setError(null)
     try {
@@ -502,19 +510,24 @@ export default function SimulationPage() {
         exclude:               exclude.split(',').map(s => s.trim()).filter(Boolean),
         leadership_constraint: leadership,
         skills_constraint:     skills,
+        headcount_cost:        headcountCost,
       })
-      setResult(res)
+      if (id === requestId.current) setResult(res)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Simulation failed')
+      if (id === requestId.current) setError(e instanceof Error ? e.message : 'Simulation failed')
     } finally {
-      setLoading(false)
+      if (id === requestId.current) setLoading(false)
     }
-  }, [scenario, size, forceRetain, exclude, leadership, skills])
+  }, [scenario, size, forceRetain, exclude, leadership, skills, headcountCost])
+
+  // The debounced call must use the settings at fire time, not at slider-move time
+  const runRef = useRef(runSimulation)
+  runRef.current = runSimulation
 
   const handleSlider = (val: number) => {
     setBudgetPct(val)
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => runSimulation(val), 500)
+    debounceRef.current = setTimeout(() => runRef.current(val), 500)
   }
 
   // ── Tab button style ───────────────────────────────────────────────────────
@@ -623,6 +636,25 @@ export default function SimulationPage() {
                 ))}
               </div>
 
+              {/* Headcount cost: fixed charge per person kept, in impact-percentile points */}
+              <div style={{ marginBottom: 20 }}>
+                <span style={labelStyle}>Headcount Cost</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <input
+                    type="range" min={0} max={50} step={5} value={headcountCost}
+                    onChange={e => setHeadcountCost(Number(e.target.value))}
+                    aria-label="Headcount cost"
+                    style={{ flex: 1, accentColor: 'var(--gold)' }}
+                  />
+                  <span style={{ fontFamily: 'var(--fd)', fontSize: 16, fontWeight: 700, color: 'var(--primary)', minWidth: 28, textAlign: 'right' }}>{headcountCost}</span>
+                </div>
+                <div style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'var(--mid)', marginTop: 4, lineHeight: 1.5 }}>
+                  {headcountCost === 0
+                    ? 'Headcount is free: the plan keeps as many people as the budget allows.'
+                    : `People ranked below the ${headcountCost}th impact percentile are kept only when a constraint or override requires it.`}
+                </div>
+              </div>
+
               {/* Force retain */}
               <div style={{ marginBottom: 16 }}>
                 <span style={labelStyle}>Force Retain (IDs, comma-separated)</span>
@@ -696,6 +728,38 @@ export default function SimulationPage() {
                     </div>
                   )}
 
+                  {/* Constraint coverage: shows the effect of the toggles even when the plan doesn't change */}
+                  {result.feasible && (
+                    <div style={{ ...cardStyle, display: 'flex', gap: 28, flexWrap: 'wrap', marginBottom: 20, padding: '14px 24px' }}>
+                      {([
+                        ['Leadership coverage', result.constraints.leadership, 'teams keep a leader'],
+                        ['Critical skills coverage', result.constraints.critical_skills, 'critical skills retained'],
+                      ] as const).map(([label, c, unit]) => {
+                        const full = c.covered === c.total
+                        return (
+                          <div key={label} style={{ fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--dark)' }}>
+                            <div style={{ fontSize: 10, letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--mid)', marginBottom: 4 }}>
+                              {label} · {c.enabled ? 'enforced' : 'not enforced'}
+                            </div>
+                            <span style={{ fontWeight: 700, color: full ? 'var(--status-green)' : 'var(--status-orange)' }}>
+                              {c.covered}/{c.total}
+                            </span>{' '}{unit}
+                            {c.uncovered.length > 0 && label === 'Critical skills coverage' && (
+                              <span style={{ color: 'var(--mid)' }}> · gaps: {c.uncovered.join(', ')}</span>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  {result.feasible && result.budget_used_pct < 97 && result.objective.headcount_cost > 0 && (
+                    <div style={{ ...cardStyle, marginBottom: 20, padding: '12px 24px', fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--mid)' }}>
+                      {(100 - result.budget_used_pct).toFixed(1)}% of the budget is left unused: the next candidates rank below
+                      the headcount cost of {result.objective.headcount_cost} percentile points. Lower the headcount cost to fill it.
+                    </div>
+                  )}
+
                   {/* Stats strip */}
                   <div style={{ ...cardStyle, display: 'flex', gap: 28, marginBottom: 20 }}>
                     <StatBox value={String(result.retained_count)}            caption="Retained"          />
@@ -752,7 +816,7 @@ export default function SimulationPage() {
                           {result.employees
                             .slice()
                             .sort((a, b) => (b.retained ? 1 : 0) - (a.retained ? 1 : 0))
-                            .map(emp => <EmployeeRow key={emp.employee_id} emp={emp} />)
+                            .map(emp => <EmployeeRow key={emp.employee_id} emp={emp} bands={bands} />)
                           }
                         </tbody>
                       </table>

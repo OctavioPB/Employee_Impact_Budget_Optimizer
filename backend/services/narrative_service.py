@@ -24,10 +24,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-import numpy as np
 import pandas as pd
 
 from backend.services.data_service import get_org
+from backend.services.scoring import add_scores
 
 # ── Ollama config ─────────────────────────────────────────────────────────────
 
@@ -104,19 +104,7 @@ def _cache_key(narrative_type: str, employee_id: str | None) -> str:
 
 # ── Score helpers (same seed as resilience / ld services) ─────────────────────
 
-def _add_scores(df: pd.DataFrame) -> pd.DataFrame:
-    rng      = np.random.default_rng(42)
-    sal_rank = df["annual_salary"].rank(pct=True)
-    nexus_b  = df["_is_nexus"].astype(float) * 15
-    noise    = rng.normal(0, 5, len(df))
-    df       = df.copy()
-    df["impact_score"] = np.clip(sal_rank * 70 + nexus_b + noise, 0, 100).round(1)
-
-    sal_inv  = 1 - sal_rank
-    nexus_r  = df["_is_nexus"].astype(float) * 0.15
-    attr_raw = sal_inv * 0.6 + rng.uniform(0, 0.4, len(df)) - nexus_r
-    df["attrition_risk"] = np.clip(attr_raw, 0.01, 0.99).round(3)
-    return df
+_add_scores = add_scores  # shared scoring: backend/services/scoring.py
 
 
 # ── PII stripping ─────────────────────────────────────────────────────────────

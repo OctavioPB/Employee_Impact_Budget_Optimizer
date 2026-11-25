@@ -65,3 +65,11 @@ def test_numeric_sanitizers_handle_nan_and_inf():
     assert sanitize_budget_value("nan") == 0.0
     assert sanitize_percentage(float("inf")) == 0.0
     assert sanitize_positive_int("inf") == 0
+
+
+def test_ld_attrition_reduction_is_a_bounded_average():
+    """Regression: summing per-allocation reductions showed '1049%' in the UI."""
+    r = client.post("/api/ld/optimize", json={"budget": 567000, "max_per_employee": 2})
+    assert r.status_code == 200
+    red = r.json()["expected_attrition_reduction"]
+    assert 0.0 <= red <= 1.0

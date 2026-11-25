@@ -16,7 +16,7 @@ function dirColor(direction: string): string {
   return direction === 'risk' ? '#e07030'
     : direction === 'protective' ? '#1a8c4e'
     : direction === 'positive'   ? '#2a7ab0'
-    : 'rgba(255,255,255,0.4)'
+    : 'rgba(var(--ink-rgb),0.4)'
 }
 
 function pct(n: number): string { return `${(n * 100).toFixed(0)}%` }
@@ -48,11 +48,11 @@ function OllamaBanner({ available, model }: { available: boolean; model: string 
           color, letterSpacing: '0.5px' }}>
           {label}
         </div>
-        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>{sub}</div>
+        <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.45)', marginTop: 2 }}>{sub}</div>
       </div>
       {!available && (
         <div style={{ marginLeft: 'auto', fontSize: 9, fontFamily: 'var(--fb)',
-          color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+          color: 'rgba(var(--ink-rgb),0.3)', textTransform: 'uppercase', letterSpacing: '1px' }}>
           docker run -d -p 11434:11434 ollama/ollama
         </div>
       )}
@@ -67,7 +67,7 @@ function NarrativePanel({
 }: { result: NarrativeResult | null; loading: boolean }) {
   const card: React.CSSProperties = {
     backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-    border: '1px solid rgba(255,255,255,0.06)',
+    border: '1px solid rgba(var(--ink-rgb),0.06)',
     padding: '20px 24px', marginTop: 16,
   }
 
@@ -79,7 +79,7 @@ function NarrativePanel({
         borderTop: '2px solid var(--gold-light)',
         animation: 'spin 0.8s linear infinite',
       }} />
-      <span style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+      <span style={{ fontFamily: 'var(--fb)', fontSize: 11, color: 'rgba(var(--ink-rgb),0.5)' }}>
         Generating narrative…
       </span>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -104,17 +104,17 @@ function NarrativePanel({
             {result.is_llm ? `LLM · ${result.model.split(':')[0]}` : 'Template'}
           </div>
           {result.cached && (
-            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--fb)' }}>
+            <span style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.3)', fontFamily: 'var(--fb)' }}>
               cached
             </span>
           )}
           {result.generation_ms !== undefined && (
-            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--fb)' }}>
+            <span style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.3)', fontFamily: 'var(--fb)' }}>
               {result.generation_ms}ms
             </span>
           )}
         </div>
-        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', fontFamily: 'var(--fb)' }}>
+        <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.25)', fontFamily: 'var(--fb)' }}>
           {result.generated_at?.slice(0, 10)}
         </div>
       </div>
@@ -125,7 +125,7 @@ function NarrativePanel({
           <p key={i} style={{
             margin: 0, fontSize: 13, lineHeight: 1.75,
             color: para.startsWith('RETENTION') || para.startsWith('RISK') || para.startsWith('PROTECTIVE') || para.startsWith('RECOMMENDED') || para.startsWith('SUGGESTED')
-              ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.82)',
+              ? 'rgba(var(--ink-rgb),0.55)' : 'rgba(var(--ink-rgb),0.82)',
             fontFamily: para.startsWith('RETENTION CONVERSATION') ? 'var(--fb)' : 'inherit',
             fontWeight: para.startsWith('RETENTION CONVERSATION') ? 700 : 400,
             whiteSpace: 'pre-wrap',
@@ -138,10 +138,10 @@ function NarrativePanel({
       {/* Disclaimer */}
       <div style={{
         marginTop: 18, paddingTop: 14,
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        borderTop: '1px solid rgba(var(--ink-rgb),0.06)',
         display: 'flex', alignItems: 'center', gap: 8,
       }}>
-        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
+        <span style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.25)', fontStyle: 'italic' }}>
           ⓘ {result.disclaimer}
         </span>
       </div>
@@ -157,22 +157,22 @@ function DriverBreakdown({ drivers }: { drivers: NarrativeDriver[] }) {
 
   return (
     <div style={{
-      backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 6,
-      border: '1px solid rgba(255,255,255,0.05)', padding: '14px 16px',
+      backgroundColor: 'rgba(var(--ink-rgb),0.02)', borderRadius: 6,
+      border: '1px solid rgba(var(--ink-rgb),0.05)', padding: '14px 16px',
     }}>
       <div style={{ fontFamily: 'var(--fb)', fontSize: 8, letterSpacing: '1.5px',
-        textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 12 }}>
+        textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.35)', marginBottom: 12 }}>
         Source Factors (transparency)
       </div>
       {drivers.map((d, i) => (
         <div key={i} style={{ marginBottom: 10 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)' }}>{d.factor}</span>
+            <span style={{ fontSize: 11, color: 'rgba(var(--ink-rgb),0.65)' }}>{d.factor}</span>
             <span style={{ fontSize: 10, color: dirColor(d.direction), fontFamily: 'var(--fb)', fontWeight: 600 }}>
               {d.value}
             </span>
           </div>
-          <div style={{ height: 3, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 2 }}>
+          <div style={{ height: 3, backgroundColor: 'rgba(var(--ink-rgb),0.06)', borderRadius: 2 }}>
             <div style={{
               height: '100%',
               width: `${(d.contribution / maxContrib) * 100}%`,
@@ -199,7 +199,7 @@ function EmployeeSelector({
   return (
     <div>
       <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-        textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>
+        textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 8 }}>
         {label}
       </div>
       <select
@@ -207,9 +207,9 @@ function EmployeeSelector({
         onChange={e => onSelect(e.target.value)}
         style={{
           width: '100%', padding: '8px 12px', borderRadius: 4,
-          backgroundColor: 'rgba(255,255,255,0.06)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          color: 'var(--light)', fontFamily: 'var(--fb)', fontSize: 11,
+          backgroundColor: 'rgba(var(--ink-rgb),0.06)',
+          border: '1px solid rgba(var(--ink-rgb),0.12)',
+          color: 'var(--dark)', fontFamily: 'var(--fb)', fontSize: 11,
           cursor: 'pointer',
         }}
       >
@@ -227,7 +227,7 @@ function EmployeeSelector({
         if (!emp) return null
         return (
           <div style={{ display: 'flex', gap: 20, marginTop: 8, fontSize: 10,
-            color: 'rgba(255,255,255,0.45)', fontFamily: 'var(--fb)' }}>
+            color: 'rgba(var(--ink-rgb),0.45)', fontFamily: 'var(--fb)' }}>
             <span>Impact <strong style={{ color: '#2a7ab0' }}>{emp.impact_score.toFixed(0)}</strong></span>
             <span>Attrition risk <strong style={{ color: '#e07030' }}>{pct(emp.attrition_risk)}</strong></span>
             {emp.is_nexus && <span style={{ color: 'var(--gold-light)' }}>★ Nexus</span>}
@@ -279,7 +279,7 @@ function ImpactTab({ data, scenario, size }: { data: NarrativePageData; scenario
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{
         backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-        border: '1px solid rgba(255,255,255,0.06)', padding: '20px 24px',
+        border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '20px 24px',
       }}>
         <EmployeeSelector employees={emps} selectedId={selectedId}
           onSelect={id => { setSelectedId(id); setResult(null) }}
@@ -319,7 +319,7 @@ function AttritionTab({ data, scenario, size }: { data: NarrativePageData; scena
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{
         backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-        border: '1px solid rgba(255,255,255,0.06)', padding: '20px 24px',
+        border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '20px 24px',
       }}>
         <EmployeeSelector employees={emps} selectedId={selectedId}
           onSelect={id => { setSelectedId(id); setResult(null) }}
@@ -358,7 +358,7 @@ function SimulationTab({ data, scenario, size }: { data: NarrativePageData; scen
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{
         backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-        border: '1px solid rgba(255,255,255,0.06)', padding: '20px 24px',
+        border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '20px 24px',
       }}>
         {/* Org context */}
         <div style={{ display: 'flex', gap: 24, marginBottom: 20, flexWrap: 'wrap' }}>
@@ -370,7 +370,7 @@ function SimulationTab({ data, scenario, size }: { data: NarrativePageData; scen
           ].map(k => (
             <div key={k.label}>
               <div style={{ fontFamily: 'var(--fb)', fontSize: 8, letterSpacing: '1.5px',
-                textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 2 }}>
+                textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.35)', marginBottom: 2 }}>
                 {k.label}
               </div>
               <div style={{ fontFamily: 'var(--fd)', fontSize: 22, color: 'var(--gold-light)' }}>
@@ -383,7 +383,7 @@ function SimulationTab({ data, scenario, size }: { data: NarrativePageData; scen
         {/* Budget slider */}
         <div>
           <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-            textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>
+            textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 8 }}>
             Budget target: {pct(budgetPct)} of current spend
             &nbsp;(retaining ~{Math.round(stats.n_employees * budgetPct)} of {stats.n_employees} employees)
           </div>
@@ -391,7 +391,7 @@ function SimulationTab({ data, scenario, size }: { data: NarrativePageData; scen
             value={budgetPct} onChange={e => { setBudgetPct(Number(e.target.value)); setResult(null) }}
             style={{ width: '100%', accentColor: 'var(--gold-light)' }} />
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9,
-            color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--fb)', marginTop: 4 }}>
+            color: 'rgba(var(--ink-rgb),0.3)', fontFamily: 'var(--fb)', marginTop: 4 }}>
             <span>50% budget</span><span>100% (no change)</span>
           </div>
         </div>
@@ -412,10 +412,10 @@ function SimulationTab({ data, scenario, size }: { data: NarrativePageData; scen
           ].map(k => (
             <div key={k.label} style={{
               backgroundColor: 'var(--surface)', borderRadius: 6,
-              border: '1px solid rgba(255,255,255,0.06)', padding: '12px 16px', textAlign: 'center',
+              border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '12px 16px', textAlign: 'center',
             }}>
               <div style={{ fontFamily: 'var(--fb)', fontSize: 8, letterSpacing: '1.5px',
-                textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>
+                textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.35)', marginBottom: 4 }}>
                 {k.label}
               </div>
               <div style={{ fontFamily: 'var(--fd)', fontSize: 22, color: 'var(--gold-light)' }}>
@@ -456,7 +456,7 @@ function BriefTab({ data, scenario, size }: { data: NarrativePageData; scenario:
         padding: '10px 16px', borderRadius: 6,
         backgroundColor: 'rgba(42,122,176,0.08)',
         border: '1px solid rgba(42,122,176,0.15)',
-        fontSize: 11, color: 'rgba(255,255,255,0.55)',
+        fontSize: 11, color: 'rgba(var(--ink-rgb),0.55)',
       }}>
         Manager briefs are available for employees with elevated retention priority (high attrition risk ×
         high impact). All briefs are anonymized in the generation prompt — employee names are never sent to the LLM.
@@ -465,7 +465,7 @@ function BriefTab({ data, scenario, size }: { data: NarrativePageData; scenario:
 
       <div style={{
         backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-        border: '1px solid rgba(255,255,255,0.06)', padding: '20px 24px',
+        border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '20px 24px',
       }}>
         <EmployeeSelector employees={emps} selectedId={selectedId}
           onSelect={id => { setSelectedId(id); setResult(null) }}
@@ -474,20 +474,20 @@ function BriefTab({ data, scenario, size }: { data: NarrativePageData; scenario:
         {selected && (
           <div style={{
             marginTop: 14, padding: '10px 14px', borderRadius: 6,
-            backgroundColor: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.05)',
+            backgroundColor: 'rgba(var(--ink-rgb),0.03)',
+            border: '1px solid rgba(var(--ink-rgb),0.05)',
           }}>
             <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1px',
-              textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 8 }}>
+              textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.3)', marginBottom: 8 }}>
               Anonymized profile sent to LLM
             </div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', fontFamily: 'monospace' }}>
+            <div style={{ fontSize: 11, color: 'rgba(var(--ink-rgb),0.6)', fontFamily: 'monospace' }}>
               [{selected.seniority_level} {selected.role_title}]-[{selected.employee_id.slice(-5).toUpperCase()}]
               &nbsp;·&nbsp;{selected.department}&nbsp;·&nbsp;
               Impact {selected.impact_score.toFixed(0)}/100&nbsp;·&nbsp;
               Risk {pct(selected.attrition_risk)}
             </div>
-            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', marginTop: 4, fontFamily: 'var(--fb)' }}>
+            <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.25)', marginTop: 4, fontFamily: 'var(--fb)' }}>
               ✓ Name not included in prompt &nbsp;·&nbsp; ✓ Salary not included &nbsp;·&nbsp; ✓ Local inference only
             </div>
           </div>
@@ -525,7 +525,7 @@ export default function NarrativePage() {
 
   const pageStyle: React.CSSProperties = {
     padding: '32px 40px', minHeight: '100vh',
-    backgroundColor: 'var(--light)', color: 'var(--light)',
+    backgroundColor: 'var(--light)', color: 'var(--dark)',
   }
 
   if (error) return (
@@ -538,7 +538,7 @@ export default function NarrativePage() {
 
   if (!data) return (
     <div style={{ ...pageStyle, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <span style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)', fontSize: 13 }}>
+      <span style={{ color: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)', fontSize: 13 }}>
         Loading narrative engine…
       </span>
     </div>
@@ -551,7 +551,7 @@ export default function NarrativePage() {
     background: 'none', border: 'none', cursor: 'pointer',
     fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '2px',
     textTransform: 'uppercase', padding: '7px 14px', borderRadius: 3,
-    color: tab === t ? 'var(--gold-light)' : 'rgba(255,255,255,0.45)',
+    color: tab === t ? 'var(--gold-light)' : 'rgba(var(--ink-rgb),0.45)',
     backgroundColor: tab === t ? 'rgba(201,168,76,0.12)' : 'transparent',
   })
 
@@ -560,10 +560,10 @@ export default function NarrativePage() {
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontFamily: 'var(--fd)', fontSize: 28, fontWeight: 300,
-          color: 'var(--light)', margin: 0, marginBottom: 4 }}>
+          color: 'var(--dark)', margin: 0, marginBottom: 4 }}>
           Decision Narrative Engine
         </h1>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+        <p style={{ fontSize: 12, color: 'rgba(var(--ink-rgb),0.45)', margin: 0 }}>
           Plain-language explanations for impact scores, attrition risk, and simulation outcomes.
           Powered by local LLM (Ollama) or high-quality deterministic templates — zero data leaves the perimeter.
         </p>
@@ -602,23 +602,23 @@ export default function NarrativePage() {
         ].map(k => (
           <div key={k.label} style={{
             backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-            border: '1px solid rgba(255,255,255,0.06)', padding: '16px 20px', textAlign: 'center',
+            border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '16px 20px', textAlign: 'center',
           }}>
             <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-              textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>
+              textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 6 }}>
               {k.label}
             </div>
             <div style={{ fontFamily: 'var(--fd)', fontSize: 28, color: k.color, lineHeight: 1 }}>
               {k.value}
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 5 }}>{k.sub}</div>
+            <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.35)', marginTop: 5 }}>{k.sub}</div>
           </div>
         ))}
       </div>
 
       {/* Tab bar */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 24,
-        borderBottom: '1px solid rgba(255,255,255,0.07)', paddingBottom: 12 }}>
+        borderBottom: '1px solid rgba(var(--ink-rgb),0.07)', paddingBottom: 12 }}>
         <button style={tabStyle('impact')}     onClick={() => setTab('impact')}>Impact Score</button>
         <button style={tabStyle('attrition')}  onClick={() => setTab('attrition')}>Attrition Risk</button>
         <button style={tabStyle('simulation')} onClick={() => setTab('simulation')}>Simulation</button>

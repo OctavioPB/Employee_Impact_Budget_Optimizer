@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { api, DashboardData, EmployeeRow } from '../services/api'
 import { useDemoStore } from '../stores/demoStore'
+import { ImpactBands, impactBands, impactColor as impactColorFor } from '../utils/impact'
 
 // ── Breadcrumb ────────────────────────────────────────────────────────────────
 
@@ -32,8 +33,8 @@ function Breadcrumbs({ crumbs, onJump }: { crumbs: Crumb[]; onJump: (i: number) 
 
 // ── Employee profile card ─────────────────────────────────────────────────────
 
-function EmployeeProfile({ emp }: { emp: EmployeeRow }) {
-  const impactColor = emp.impact_score >= 75 ? 'var(--status-green)' : emp.impact_score >= 50 ? 'var(--gold)' : 'var(--mid)'
+function EmployeeProfile({ emp, bands }: { emp: EmployeeRow; bands: ImpactBands }) {
+  const impactColor = impactColorFor(emp.impact_score, bands)
   const attrRisk    = Math.round(emp.attrition_risk * 100)
   const attrColor   = attrRisk >= 70 ? 'var(--status-red)' : attrRisk >= 40 ? 'var(--status-orange)' : 'var(--status-green)'
 
@@ -109,9 +110,10 @@ function EmployeeProfile({ emp }: { emp: EmployeeRow }) {
 
 // ── Department view ───────────────────────────────────────────────────────────
 
-function DepartmentView({ dept, employees, onEmployee }: {
+function DepartmentView({ dept, employees, bands, onEmployee }: {
   dept: string
   employees: EmployeeRow[]
+  bands: ImpactBands
   onEmployee: (emp: EmployeeRow) => void
 }) {
   const avgImpact = employees.reduce((s, e) => s + e.impact_score, 0) / employees.length
@@ -168,7 +170,7 @@ function DepartmentView({ dept, employees, onEmployee }: {
                 <td style={{ padding: '11px 16px', fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--mid)' }}>{emp.role_title}</td>
                 <td style={{ padding: '11px 16px', fontFamily: 'var(--fb)', fontSize: 12, color: 'var(--mid)' }}>{emp.team_name}</td>
                 <td style={{ padding: '11px 16px' }}>
-                  <span style={{ fontFamily: 'var(--fd)', fontSize: 14, fontWeight: 700, color: emp.impact_score >= 75 ? 'var(--status-green)' : emp.impact_score >= 50 ? 'var(--gold)' : 'var(--mid)' }}>
+                  <span style={{ fontFamily: 'var(--fd)', fontSize: 14, fontWeight: 700, color: impactColorFor(emp.impact_score, bands) }}>
                     {emp.impact_score.toFixed(0)}
                   </span>
                 </td>
@@ -256,6 +258,8 @@ export default function DrillDownPage() {
   }
 
   const deptEmployees = data ? data.employee_table.filter(e => e.department === activeDept) : []
+  // Bands from the whole org, so a colour means the same thing in every department
+  const bands = useMemo(() => impactBands(data ? data.employee_table.map(e => e.impact_score) : []), [data])
 
   return (
     <div>
@@ -279,8 +283,8 @@ export default function DrillDownPage() {
           <>
             <Breadcrumbs crumbs={crumbs} onJump={jumpTo} />
             {view === 'org'        && <OrgView data={data} onDept={goDept} />}
-            {view === 'department' && activeDept && <DepartmentView dept={activeDept} employees={deptEmployees} onEmployee={goEmp} />}
-            {view === 'employee'   && activeEmp  && <EmployeeProfile emp={activeEmp} />}
+            {view === 'department' && activeDept && <DepartmentView dept={activeDept} employees={deptEmployees} bands={bands} onEmployee={goEmp} />}
+            {view === 'employee'   && activeEmp  && <EmployeeProfile emp={activeEmp} bands={bands} />}
           </>
         )}
       </div>

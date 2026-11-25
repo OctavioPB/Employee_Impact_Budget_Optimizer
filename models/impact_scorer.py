@@ -213,39 +213,37 @@ class ImpactScorer:
             how="left",
         )
 
-        rows: list[dict] = []
         # Track skill → employee count for uniqueness calculation
-        skill_holder_counts = (
-            merged.groupby("skill_id")["employee_id"].nunique()
-        ).to_dict()
+        skill_holder_counts = merged.groupby("skill_id")["employee_id"].nunique()
+        n_employees = employee_skills_df["employee_id"].nunique()
 
-        for emp_id, group in merged.groupby("employee_id"):
-            critical = group[group["is_critical"]]
-            if not critical.empty:
-                skill_crit = float(
-                    (critical["proficiency"] * critical["market_scarcity"]).mean()
-                )
-            else:
-                skill_crit = 0.0
+        # Vectorised per-employee aggregation (the former per-employee loop recomputed
+        # n_employees inside the loop and took ~11 s on a 5,000-employee org).
+        critical = merged[merged["is_critical"].eq(True)]
+        by_emp = critical["employee_id"]
 
-            # knowledge_uniqueness: inverse of avg holders for employee's critical skills
-            # 1.0 = sole holder, 0.0 = common skills
-            if not critical.empty:
-                holder_counts = critical["skill_id"].map(skill_holder_counts).to_numpy(float)
-                n_employees = employee_skills_df["employee_id"].nunique()
-                # Normalize: 1 / (holders / total_employees) → inverted frequency
-                uniqueness = float(np.mean(1.0 / np.maximum(holder_counts / n_employees, 0.01)))
-                uniqueness = float(np.clip(uniqueness, 0.0, 1.0))
-            else:
-                uniqueness = 0.3  # no critical skills → moderate uniqueness
+        # skill_criticality: mean of proficiency × market scarcity over critical skills
+        # Per-group Series.mean / np.mean keep the original summation order (bit-identical scores)
+        skill_crit = (critical["proficiency"] * critical["market_scarcity"]).groupby(by_emp).agg(
+            lambda v: v.mean()
+        )
 
-            rows.append({
-                "employee_id": str(emp_id),
-                "skill_criticality": round(skill_crit, 4),
-                "knowledge_uniqueness": round(uniqueness, 4),
-            })
+        # knowledge_uniqueness: inverse of avg holders for employee's critical skills
+        # 1.0 = sole holder, 0.0 = common skills. Normalize: 1 / (holders / total_employees)
+        holder_counts = critical["skill_id"].map(skill_holder_counts).astype(float)
+        inv_freq = 1.0 / np.maximum(holder_counts / n_employees, 0.01)
+        uniqueness = inv_freq.groupby(by_emp).agg(lambda v: float(np.mean(v.to_numpy()))).clip(0.0, 1.0)
 
-        return pd.DataFrame(rows)
+        out = pd.DataFrame({"employee_id": merged["employee_id"].drop_duplicates().astype(str).to_numpy()})
+        # Python round() (not Series.round) to match the previous per-row rounding exactly
+        out["skill_criticality"] = [
+            round(float(v), 4) for v in out["employee_id"].map(skill_crit.rename(index=str)).fillna(0.0)
+        ]
+        # no critical skills → moderate uniqueness
+        out["knowledge_uniqueness"] = [
+            round(float(v), 4) for v in out["employee_id"].map(uniqueness.rename(index=str)).fillna(0.3)
+        ]
+        return out
 
     @staticmethod
     def _tenure_years(hire_date_series: pd.Series) -> pd.Series:

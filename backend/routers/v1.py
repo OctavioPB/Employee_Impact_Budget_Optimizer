@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from backend.services.api_key_service import ApiKey, authenticate, key_allows_salary
 from backend.services.data_service import get_org
 from backend.services.ohi_service import build_ohi_data
+from backend.services.scoring import add_scores
 
 router = APIRouter()
 
@@ -42,17 +43,7 @@ def _scored_df(scenario: str, size: str):
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    if "impact_score" not in df.columns:
-        rng      = np.random.default_rng(42)
-        sal_rank = df["annual_salary"].rank(pct=True)
-        nexus_b  = df["_is_nexus"].astype(float) * 15
-        df["impact_score"]   = np.clip(sal_rank * 70 + nexus_b + rng.normal(0, 5, len(df)), 0, 100).round(1)
-        df["attrition_risk"] = np.clip(
-            (1 - sal_rank) * 0.6 + rng.uniform(0, 0.4, len(df)) - df["_is_nexus"].astype(float) * 0.15,
-            0.01, 0.99,
-        ).round(3)
-
-    return df
+    return add_scores(df.reset_index(drop=True))
 
 
 # ── Endpoints ──────────────────────────────────────────────────────────────────
