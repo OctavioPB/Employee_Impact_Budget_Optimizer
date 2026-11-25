@@ -52,6 +52,7 @@ export interface SimulationRequest {
   exclude:      string[]
   leadership_constraint:  boolean
   skills_constraint:      boolean
+  headcount_cost?:        number   // impact-percentile points charged per person kept (0–50)
 }
 
 export interface SimulationEmployee {
@@ -61,9 +62,17 @@ export interface SimulationEmployee {
   role_title:   string
   annual_salary: number
   impact_score:  number
+  impact_percentile: number   // 0–100 rank within the org; what the optimizer maximizes
   is_nexus:      boolean
   retained:      boolean
   override:      boolean
+}
+
+export interface ConstraintCoverage {
+  enabled:   boolean
+  covered:   number
+  total:     number
+  uncovered: string[]
 }
 
 export interface SimulationResult {
@@ -76,6 +85,14 @@ export interface SimulationResult {
   employees:       SimulationEmployee[]
   feasible:        boolean
   infeasibility_reason: string | null
+  constraints: {
+    leadership:      ConstraintCoverage
+    critical_skills: ConstraintCoverage
+  }
+  objective: {
+    weighting:      'impact_percentile'
+    headcount_cost: number
+  }
 }
 
 export interface AttritionEmployee {

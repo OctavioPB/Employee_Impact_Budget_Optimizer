@@ -23,8 +23,78 @@ The machine suggests. People decide.
 
 ---
 
+## Screenshots
+
+<p align="center"><a href="docs/images/screenshots/overview.png"><img src="docs/images/screenshots/overview.png" alt="EIBO platform overview" width="900"></a></p>
+
+<table>
+  <tr>
+    <td width="50%"><a href="docs/images/screenshots/dashboard.png"><img src="docs/images/screenshots/dashboard.png" alt="Executive Dashboard"></a><br><b>Executive Dashboard</b>: budget variance by department, payroll mix, impact and risk KPIs</td>
+    <td width="50%"><a href="docs/images/screenshots/simulation.png"><img src="docs/images/screenshots/simulation.png" alt="Optimization Simulator"></a><br><b>Optimization Simulator</b>: ILP retention scenario at 80% of spend, with leadership and critical-skill coverage</td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="docs/images/screenshots/predictive.png"><img src="docs/images/screenshots/predictive.png" alt="Retention Risk"></a><br><b>Retention Risk</b>: risk bands and top driver per employee</td>
+    <td width="50%"><a href="docs/images/screenshots/forecast.png"><img src="docs/images/screenshots/forecast.png" alt="Forecast & Stress Test"></a><br><b>Forecast & Stress Test</b>: 12-month trajectory with uncertainty bands, Monte Carlo breach odds</td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="docs/images/screenshots/compensation.png"><img src="docs/images/screenshots/compensation.png" alt="Pay Equity & Benchmarking"></a><br><b>Pay Equity & Benchmarking</b>: comp-ratio scatter, adjusted pay gaps, retention ROI</td>
+    <td width="50%"><a href="docs/images/screenshots/fairness.png"><img src="docs/images/screenshots/fairness.png" alt="Bias Audit"></a><br><b>Bias Audit</b>: EEOC 4/5ths and chi-square checks on simulated outcomes</td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="docs/images/screenshots/knowledge.png"><img src="docs/images/screenshots/knowledge.png" alt="Knowledge Graph"></a><br><b>Knowledge Graph</b>: domain coverage and single-knowledge-holder alerts</td>
+    <td width="50%"><a href="docs/images/screenshots/resilience.png"><img src="docs/images/screenshots/resilience.png" alt="Resilience Stress Testing"></a><br><b>Resilience Stress Testing</b>: six sub-scores and cascade departure modeling</td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="docs/images/screenshots/ohi.png"><img src="docs/images/screenshots/ohi.png" alt="Organizational Health Index"></a><br><b>Organizational Health Index</b>: six weighted dimensions, department breakdown, trend</td>
+    <td width="50%"><a href="docs/images/screenshots/pulse.png"><img src="docs/images/screenshots/pulse.png" alt="Pulse Monitoring"></a><br><b>Pulse Monitoring</b>: metadata-only engagement signals with anomaly flags</td>
+  </tr>
+</table>
+
+<details>
+<summary><b>More screens</b> (8)</summary>
+
+<table>
+  <tr>
+    <td width="50%"><a href="docs/images/screenshots/drilldown.png"><img src="docs/images/screenshots/drilldown.png" alt="Org Drill-Down"></a><br><b>Org Drill-Down</b>: department cards with impact and fragility</td>
+    <td width="50%"><a href="docs/images/screenshots/mobility.png"><img src="docs/images/screenshots/mobility.png" alt="Talent Mobility"></a><br><b>Talent Mobility</b>: career paths, stagnation and succession depth</td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="docs/images/screenshots/strategic.png"><img src="docs/images/screenshots/strategic.png" alt="Future State Designer"></a><br><b>Future State Designer</b>: skills gaps and build-vs-buy analysis</td>
+    <td width="50%"><a href="docs/images/screenshots/learning-development.png"><img src="docs/images/screenshots/learning-development.png" alt="L&D Optimizer"></a><br><b>L&D Optimizer</b>: ILP training allocation under an L&D budget</td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="docs/images/screenshots/narrative.png"><img src="docs/images/screenshots/narrative.png" alt="Decision Narratives"></a><br><b>Decision Narratives</b>: local-LLM explanations with zero PII</td>
+    <td width="50%"><a href="docs/images/screenshots/decision-room.png"><img src="docs/images/screenshots/decision-room.png" alt="Decision Room"></a><br><b>Decision Room</b>: multi-stakeholder sessions with sign-off</td>
+  </tr>
+  <tr>
+    <td width="50%"><a href="docs/images/screenshots/alerts.png"><img src="docs/images/screenshots/alerts.png" alt="Notification Center"></a><br><b>Notification Center</b>: bundled risk and budget alerts</td>
+    <td width="50%"><a href="docs/images/screenshots/admin.png"><img src="docs/images/screenshots/admin.png" alt="Admin Console"></a><br><b>Admin Console</b>: service health, users, audit log, API keys, webhooks</td>
+  </tr>
+</table>
+
+</details>
+
+All screenshots show **Scenario A (Growing Company), small org (50 employees)** of the synthetic demo data, captured at 1440×900. See [Engineering → Regenerating the README screenshots](docs/ENGINEERING.md#regenerating-the-readme-screenshots).
+
+---
+
+## In-Depth Documentation
+
+| Document | Read it if you want to know… |
+|---|---|
+| [Architecture](docs/ARCHITECTURE.md) | How the system fits together: components, request lifecycle, data and state, optimization, security, deployment |
+| [Applied AI](docs/APPLIED_AI.md) | Which models and algorithms power each capability, how they work, and their limits |
+| [Engineering](docs/ENGINEERING.md) | Code organization, conventions, CI, testing strategy and performance work |
+| [MCP Server](docs/MCP_SERVER.md) | How managers and people analysts use EIBO from Claude Desktop, Claude Code or another MCP client |
+| [Business Value](docs/BUSINESS_VALUE.md) | Which decisions EIBO informs, who uses it, and what it does not do |
+| [Lessons Learned](docs/LESSONS_LEARNED.md) | What went wrong, how it was fixed, and what is still open |
+
+---
+
 ## Table of Contents
 
+- [Screenshots](#screenshots)
+- [In-Depth Documentation](#in-depth-documentation)
 - [Why EIBO Exists](#why-eibo-exists)
 - [Core Design Principles](#core-design-principles)
 - [Platform Capabilities](#platform-capabilities)
@@ -35,6 +105,7 @@ The machine suggests. People decide.
 - [Demo Scenarios](#demo-scenarios)
 - [RBAC Permission Model](#rbac-permission-model)
 - [Public API (v1)](#public-api-v1)
+- [MCP Server for LLM Clients](#mcp-server-for-llm-clients)
 - [Data Architecture](#data-architecture)
 - [Optimization Engine](#optimization-engine)
 - [Security & Privacy](#security--privacy)
@@ -496,6 +567,12 @@ eibo/
 │   │   └── webhook_service.py       # HMAC-SHA256 signing, async fan-out
 │   └── Dockerfile
 │
+├── mcp_server/                      # MCP server for LLM clients (docs/MCP_SERVER.md)
+│   ├── server.py                    # 13 read-only tools, 2 resources, 3 prompts
+│   ├── access.py                    # RBAC scope, salary masking, name redaction
+│   ├── config.py                    # identity + options from EIBO_MCP_* env vars
+│   └── __main__.py                  # stdio / Streamable HTTP (bearer token) entry point
+│
 ├── sdk/
 │   ├── python/
 │   │   └── eibo_client.py           # Python SDK (stdlib-only, typed dataclasses)
@@ -569,7 +646,7 @@ eibo/
 ├── ui/                              # Legacy Streamlit UI (kept for reference)
 │   └── main.py
 │
-├── planning/                        # Engineering and design documentation
+├── planning/                        # Local planning notes (git-ignored, not in the repo)
 │   ├── CLAUDE.md                    # Development guide and core principles
 │   ├── PLAN.md                      # Sprint plan and backlog
 │   ├── BRAND.md                     # OPB visual identity guide
@@ -704,6 +781,10 @@ curl "http://localhost:8000/api/dashboard?scenario=A&size=small&demo=true" | pyt
 
 ---
 
+### Option D — MCP Server for Claude Desktop / Claude Code
+
+No running services needed. Install the Python requirements, then follow [MCP Server for LLM Clients](#mcp-server-for-llm-clients).
+
 ### Option C — Production Deployment
 
 ```bash
@@ -832,6 +913,109 @@ Drop any widget into an existing page — no build step required:
 
 ---
 
+## MCP Server for LLM Clients
+
+Managers and people analysts can use EIBO from Claude Desktop, Claude Code or any [Model Context Protocol](https://modelcontextprotocol.io) client, asking questions in plain language instead of navigating the UI. The server is read-only and applies the same role-based access as the platform.
+
+### 1. Install
+
+```bash
+git clone https://github.com/OctavioPB/Employee_Impact_Budget_Optimizer.git
+cd Employee_Impact_Budget_Optimizer
+pip install -r requirements.txt        # Python 3.11+; includes the mcp SDK
+```
+
+No database, backend or frontend needs to be running: the server calls EIBO's analytics in-process on the bundled demo organizations.
+
+### 2. Choose who you are
+
+The server returns only what your role may see. Pick a demo identity with `EIBO_MCP_USER`:
+
+| ID | Role | Scope | Salary shown |
+|---|---|---|---|
+| `U004` | Manager | Engineering | exact |
+| `U005` | People analyst | Engineering, Analytics | band (e.g. $140k–$160k) |
+| `U003` | Director | all departments | exact |
+| `U002` | Executive | all departments | exact |
+| `U006` | Viewer | Operations | hidden |
+
+To define your own role instead, set `EIBO_MCP_ROLE` (for example `manager`) and `EIBO_MCP_DEPARTMENTS` (for example `Sales,Marketing`).
+
+### 3. Connect your client
+
+**Claude Code**
+
+```bash
+claude mcp add eibo --scope user --env EIBO_MCP_USER=U004 \
+  -- python /path/to/Employee_Impact_Budget_Optimizer/mcp_server/__main__.py
+```
+
+**Claude Desktop.** Open Settings → Developer → Edit Config, add the server to `claude_desktop_config.json`, then restart Claude Desktop:
+
+```json
+{
+  "mcpServers": {
+    "eibo": {
+      "command": "python",
+      "args": ["/path/to/Employee_Impact_Budget_Optimizer/mcp_server/__main__.py"],
+      "env": { "EIBO_MCP_USER": "U004" }
+    }
+  }
+}
+```
+
+Use absolute paths. If `python` on your `PATH` is not the environment where you installed the requirements, put that interpreter's full path in `command`.
+
+### 4. Check it works
+
+Ask: *"Use the eibo tools: who am I and what can I see?"* The assistant should call `whoami` and report your role and departments.
+
+### 5. Use it
+
+**Managers**
+- "Which of my people need a retention conversation, and what's driving it?"
+- "Prepare me for a 1:1 with 5AC236BE." (or run the `prepare_retention_conversation` prompt)
+- "Which knowledge in my team has no backup holder?"
+- "Who could step in if our engineering manager left?"
+
+**People analysts**
+- "Compare 70%, 80% and 90% budgets with leadership and skills coverage on."
+- "At 80%, how many top-impact people does the plan keep? What changes with headcount cost 25?"
+- "Run the fairness audit and tell me which flags need investigation." (or the `review_budget_scenario` prompt)
+- "What happens to resilience if the top 5 people by impact left?"
+
+| What's available | |
+|---|---|
+| **13 tools** | `whoami`, `org_overview`, `list_employees`, `employee_profile`, `retention_risks`, `simulate_budget`, `compare_budget_scenarios`, `org_health`, `knowledge_risks`, `succession_depth`, `resilience_stress_test`, `fairness_audit`, `pay_equity` |
+| **3 prompts** | `prepare_retention_conversation`, `team_health_check`, `review_budget_scenario` |
+| **2 resources** | `eibo://guide/methodology`, `eibo://guide/language` |
+
+Every tool takes an optional `scenario` (`A`/`B`/`C`) and `size` (`small`/`medium`/`large`); set the defaults with `EIBO_MCP_SCENARIO` and `EIBO_MCP_SIZE`.
+
+### Privacy
+
+Tool results go to the model your client uses, which may be a hosted model.
+
+- **Names are redacted by default.** People appear as `<role> #<ID>`. Set `EIBO_MCP_SHARE_NAMES=1` only if your organization approves sending names to the model provider.
+- **Salaries follow your role.**
+- **Every call is written to the audit trail** (`audit_logs/audit.jsonl`).
+
+### Optional: HTTP instead of stdio
+
+```bash
+export EIBO_MCP_USER=U005
+export EIBO_MCP_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+python -m mcp_server --transport http      # http://127.0.0.1:8790/mcp
+```
+
+- **Authentication.** Clients must send `Authorization: Bearer $EIBO_MCP_TOKEN`.
+- **One identity per server.** Everyone with the token sees what that identity sees.
+- **Binding.** The server listens on localhost by default; expose it only behind TLS.
+
+Full reference (all variables, role matrix, limitations): [docs/MCP_SERVER.md](docs/MCP_SERVER.md).
+
+---
+
 ## Data Architecture
 
 EIBO uses a three-layer medallion architecture:
@@ -879,7 +1063,9 @@ Subject to:
 
 The CBC (Coin-or Branch and Cut) solver handles problems up to 5,000 employees within a configurable time limit. For infeasible problems, EIBO identifies conflicting constraints and proposes resolution paths.
 
-The backend falls back to a greedy impact/cost-ratio sort when PuLP is unavailable, ensuring the simulation endpoint always returns a result.
+The web Simulation page optimizes **rank-weighted impact with a per-person headcount cost**: maximize Σ (impact_percentile_i − λ)·x_i. Impact scores cluster in a narrow band, so summing raw scores would favor keeping the most people rather than the highest-impact ones. λ (default 10, adjustable on the page) makes every seat cost something. See [Applied AI §4](docs/APPLIED_AI.md#4-budget-optimization-ilp).
+
+The backend falls back to a constraint-aware greedy heuristic when PuLP is unavailable, ensuring the simulation endpoint always returns a result.
 
 The same ILP framework is reused in the L&D optimizer: binary `y_{i,t}` variables assign employees to training programs to maximize org-wide return under a separate L&D budget ceiling.
 
@@ -1048,31 +1234,30 @@ cd frontend && npm run build
 | 19 | Workforce Intelligence API v1, webhooks, widgets, SDKs | Complete |
 | 20 | Real-time engagement signals, IsolationForest, CUSUM, Pulse UI | Complete |
 
-**Codebase**: 130+ Python modules · React SPA (19 pages) · FastAPI REST layer (19 routers) · Python & JS SDKs · 4 embeddable widgets · 35,000+ lines · 734 tests
+**Codebase**: 75+ Python modules · React SPA (19 pages) · FastAPI REST layer (19 routers) · Python & JS SDKs · 4 embeddable widgets · 35,000+ lines · 707 tests
 
 ---
 
 ## Documentation
 
-All design and engineering documentation lives in `planning/`. Each file has a specific audience and purpose.
-
-| File | Audience | Purpose |
+| Document | Audience | Purpose |
 |---|---|---|
-| [`planning/DECISIONS.md`](planning/DECISIONS.md) | Engineers, technical leads, students | Justifies every engineering decision — architecture, algorithms, libraries, API design, security, and deployment. Includes a tech stack deep-dive (every library explained: what it is, why it was chosen, what it costs to replace) and a business-value-by-capability section translating all 17 modules into organizational outcomes. |
-| [`planning/Business.md`](planning/Business.md) | CHROs, Finance Directors, HR Business Partners, Legal | Plain-language explanation of what EIBO is and is not, the organizational problems it addresses, 13 people analytics concepts explained (ONA, attrition, pay equity, adverse impact, ILP, Monte Carlo, SHAP, SKH, OHI, and more), and a section-by-section breakdown of all 17 capabilities in business terms. Closes with what the platform cannot do and the organizational conditions required to get value from it. |
-| [`planning/UI_Decisions.md`](planning/UI_Decisions.md) | Frontend engineers, designers | Complete reference for the OPB design system as implemented: design tokens, typography rules, colour hierarchy, and detailed code specifications for the navigation bar, hero section, footer, all chart types (diverging bar, donut, histogram, scatter/quadrant, radar, heatmap, sparkline), data tables, status badges, KPI cards, progress bars, and avatar components. Sufficient to replicate the visual system exactly from this document alone. |
-| [`planning/UI_migration.md`](planning/UI_migration.md) | Engineers migrating from Streamlit | Step-by-step guide for porting a Streamlit application to this React + TypeScript + Vite + Zustand stack. Covers the mental model shift, project scaffolding, API extraction (Python function → FastAPI router → api.ts), state migration (st.session_state → useState/Zustand), routing migration, and a widget-by-widget mapping of every Streamlit component to its React + OPB equivalent. Includes a full worked example and a migration checklist. |
-| [`planning/BRAND.md`](planning/BRAND.md) | Designers, UI engineers | Visual identity specification for the OPB brand system: colour palette, typography choices, spacing scale, and component usage rules. |
-| [`planning/CLAUDE.md`](planning/CLAUDE.md) | Contributors, AI assistants | Development guide: core principles (human-in-the-loop, privacy-first, explainability), non-negotiable language rules, sprint guidelines, and useful commands. Read this before writing any code or UI copy. |
-| [`planning/PLAN.md`](planning/PLAN.md) | Project leads | Sprint plan, feature backlog, and implementation notes across all 20 sprints. |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Engineers, technical evaluators | Components, request lifecycle, data and state, optimization, security, deployment |
+| [`docs/APPLIED_AI.md`](docs/APPLIED_AI.md) | Data scientists, ML engineers | Each model and algorithm, how it is implemented, what is live vs library-only, limitations |
+| [`docs/ENGINEERING.md`](docs/ENGINEERING.md) | Contributors | Code organization, conventions, CI, testing strategy, performance work, local development |
+| [`docs/MCP_SERVER.md`](docs/MCP_SERVER.md) | Managers, people analysts, admins | Using EIBO from Claude Desktop / Claude Code: setup, roles, privacy, tools, prompts |
+| [`docs/BUSINESS_VALUE.md`](docs/BUSINESS_VALUE.md) | CHROs, finance leaders, HRBPs, legal | The decisions EIBO informs, capability value, appropriate use and limits |
+| [`docs/LESSONS_LEARNED.md`](docs/LESSONS_LEARNED.md) | Everyone | Problems found after the feature sprints, how they were handled, open items |
+| [`docs/user_guide/quickstart.md`](docs/user_guide/quickstart.md) | New users | Getting started with the demo |
+| [`docs/admin_guide/deployment.md`](docs/admin_guide/deployment.md) | Operators | Deployment and configuration |
+| [`docs/developer_guide/contributing.md`](docs/developer_guide/contributing.md) | Contributors | Contribution workflow |
 
 ### Quick reference: which document to read first
 
-- **Evaluating the platform for your organization** → `Business.md`
-- **Understanding why specific technical decisions were made** → `DECISIONS.md`
-- **Building a new page or component** → `UI_Decisions.md`
-- **Porting an existing Streamlit app to this stack** → `UI_migration.md`
-- **Contributing to the codebase** → `CLAUDE.md` then `DECISIONS.md`
+- **Evaluating the platform for your organization** → [Business Value](docs/BUSINESS_VALUE.md)
+- **Understanding how it is built** → [Architecture](docs/ARCHITECTURE.md), then [Engineering](docs/ENGINEERING.md)
+- **Understanding the models** → [Applied AI](docs/APPLIED_AI.md)
+- **Knowing what is not finished** → [Lessons Learned](docs/LESSONS_LEARNED.md)
 
 ---
 

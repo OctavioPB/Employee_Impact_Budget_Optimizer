@@ -38,7 +38,7 @@ function fmt(n: number): string { return n.toLocaleString(undefined, { maximumFr
 
 const card: React.CSSProperties = {
   backgroundColor: 'var(--surface)', borderRadius: 'var(--radius)',
-  border: '1px solid rgba(255,255,255,0.06)', padding: '16px 20px',
+  border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '16px 20px',
 }
 
 // ── Alert banner ──────────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ function AlertBanner({ alert }: { alert: OHIAlert }) {
           color: sevColor(alert.severity) }}>
           OHI Alert — {alert.severity.toUpperCase()}
         </div>
-        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>
+        <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.55)', marginTop: 2 }}>
           {alert.message}
         </div>
       </div>
@@ -82,14 +82,14 @@ function OHIGauge({ score, grade }: { score: number; grade: string }) {
   return (
     <svg width={W} height={H} style={{ display: 'block', margin: '0 auto' }}>
       {/* Track */}
-      <path d={trackD} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={14}
+      <path d={trackD} fill="none" stroke="currentColor" strokeOpacity={0.08} strokeWidth={14}
         strokeLinecap="round" />
       {/* Fill */}
       <path d={fillD} fill="none" stroke={gradeColor(grade)} strokeWidth={14}
         strokeLinecap="round" />
       {/* Score */}
       <text x={cx} y={cy - 16} textAnchor="middle"
-        style={{ fontFamily: 'var(--fd)', fontSize: 34, fill: 'var(--light)' }}>
+        style={{ fontFamily: 'var(--fd)', fontSize: 34, fill: 'var(--dark)' }}>
         {score.toFixed(0)}
       </text>
       {/* Grade */}
@@ -113,17 +113,17 @@ function SubIndexCard({ dimKey, dim, onClick, selected }: {
     <div onClick={onClick} style={{
       ...card,
       cursor: 'pointer',
-      borderColor: selected ? `${color}55` : 'rgba(255,255,255,0.06)',
+      borderColor: selected ? `${color}55` : 'rgba(var(--ink-rgb),0.06)',
       borderLeftWidth: 3, borderLeftColor: color,
       transition: 'border-color 0.15s',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
         <div>
           <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-            textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
+            textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 4 }}>
             {dim.label}
           </div>
-          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--fb)' }}>
+          <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.3)', fontFamily: 'var(--fb)' }}>
             weight {(dim.weight * 100).toFixed(0)}%
           </div>
         </div>
@@ -138,7 +138,7 @@ function SubIndexCard({ dimKey, dim, onClick, selected }: {
         </div>
       </div>
       {/* Score bar */}
-      <div style={{ height: 4, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 2, marginBottom: 10 }}>
+      <div style={{ height: 4, backgroundColor: 'rgba(var(--ink-rgb),0.06)', borderRadius: 2, marginBottom: 10 }}>
         <div style={{ height: '100%', width: `${dim.score}%`, backgroundColor: color, borderRadius: 2 }} />
       </div>
       {/* Component breakdown (shown when selected) */}
@@ -147,19 +147,19 @@ function SubIndexCard({ dimKey, dim, onClick, selected }: {
           {compEntries.map(([k, v]) => (
             <div key={k}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)' }}>
+                <span style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.5)' }}>
                   {dim.labels?.[k] ?? k}
                 </span>
                 <span style={{ fontSize: 9, color, fontWeight: 600, fontFamily: 'var(--fb)' }}>
                   {v.toFixed(0)}
                 </span>
               </div>
-              <div style={{ height: 3, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+              <div style={{ height: 3, backgroundColor: 'rgba(var(--ink-rgb),0.05)', borderRadius: 2 }}>
                 <div style={{ height: '100%', width: `${v}%`, backgroundColor: `${color}88`, borderRadius: 2 }} />
               </div>
             </div>
           ))}
-          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 4, lineHeight: 1.5 }}>
+          <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.3)', marginTop: 4, lineHeight: 1.5 }}>
             {dim.detail}
           </div>
         </div>
@@ -180,37 +180,37 @@ function DeptTable({ rows }: { rows: OHIDeptRow[] }) {
   return (
     <div style={card}>
       <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-        textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+        textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 10 }}>
         Department Health
       </div>
-      <div style={{ ...rowGrid, fontSize: 8, color: 'rgba(255,255,255,0.3)',
+      <div style={{ ...rowGrid, fontSize: 8, color: 'rgba(var(--ink-rgb),0.3)',
         letterSpacing: '1.5px', textTransform: 'uppercase',
-        borderBottom: '1px solid rgba(255,255,255,0.07)', paddingBottom: 6 }}>
+        borderBottom: '1px solid rgba(var(--ink-rgb),0.07)', paddingBottom: 6 }}>
         {hdrs.map(h => <span key={h}>{h}</span>)}
       </div>
       {rows.map((r, i) => (
         <div key={r.department} style={{
           ...rowGrid,
-          backgroundColor: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
+          backgroundColor: i % 2 === 0 ? 'rgba(var(--ink-rgb),0.02)' : 'transparent',
           borderRadius: 4,
         }}>
-          <div style={{ fontWeight: 600, color: 'var(--light)' }}>{r.department}</div>
+          <div style={{ fontWeight: 600, color: 'var(--dark)' }}>{r.department}</div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: gradeColor(r.grade),
               fontFamily: 'var(--fd)' }}>{r.score.toFixed(0)}</div>
-            <div style={{ height: 2, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 1, marginTop: 2 }}>
+            <div style={{ height: 2, backgroundColor: 'rgba(var(--ink-rgb),0.05)', borderRadius: 1, marginTop: 2 }}>
               <div style={{ height: '100%', width: `${r.score}%`,
                 backgroundColor: gradeColor(r.grade), borderRadius: 1 }} />
             </div>
           </div>
           <span style={{ fontFamily: 'var(--fb)', fontSize: 10, fontWeight: 700,
             color: gradeColor(r.grade) }}>{r.grade}</span>
-          <span style={{ color: 'rgba(255,255,255,0.6)' }}>{r.headcount}</span>
-          <span style={{ color: r.nexus_count > 0 ? 'var(--gold-light)' : 'rgba(255,255,255,0.3)' }}>
+          <span style={{ color: 'rgba(var(--ink-rgb),0.6)' }}>{r.headcount}</span>
+          <span style={{ color: r.nexus_count > 0 ? 'var(--gold-light)' : 'rgba(var(--ink-rgb),0.3)' }}>
             {r.nexus_count > 0 ? `★ ${r.nexus_count}` : '—'}
           </span>
           <span style={{ color: '#2a7ab0' }}>{r.avg_impact.toFixed(0)}</span>
-          <span style={{ color: r.avg_attrition > 0.5 ? '#e07030' : 'rgba(255,255,255,0.55)' }}>
+          <span style={{ color: r.avg_attrition > 0.5 ? '#e07030' : 'rgba(var(--ink-rgb),0.55)' }}>
             {(r.avg_attrition * 100).toFixed(0)}%
           </span>
         </div>
@@ -267,9 +267,9 @@ function TrendChart({ points }: { points: OHITrendPoint[] }) {
       {yTicks.map(v => (
         <g key={v}>
           <line x1={PAD.left} y1={yScale(v)} x2={PAD.left + innerW} y2={yScale(v)}
-            stroke="rgba(255,255,255,0.05)" strokeWidth={1} />
+            stroke="currentColor" strokeOpacity={0.05} strokeWidth={1} />
           <text x={PAD.left - 6} y={yScale(v) + 4} textAnchor="end"
-            style={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontFamily: 'var(--fb)' }}>
+            style={{ fontSize: 9, fill: 'rgba(var(--ink-rgb),0.3)', fontFamily: 'var(--fb)' }}>
             {v}
           </text>
         </g>
@@ -293,9 +293,9 @@ function TrendChart({ points }: { points: OHITrendPoint[] }) {
       {events.map(e => (
         <g key={e.i}>
           <line x1={xScale(e.i)} y1={PAD.top} x2={xScale(e.i)} y2={PAD.top + innerH}
-            stroke="rgba(255,255,255,0.15)" strokeWidth={1} strokeDasharray="3 3" />
+            stroke="currentColor" strokeOpacity={0.15} strokeWidth={1} strokeDasharray="3 3" />
           <text x={xScale(e.i) + 3} y={PAD.top + 14}
-            style={{ fontSize: 7.5, fill: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)' }}>
+            style={{ fontSize: 7.5, fill: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)' }}>
             {e.event}
           </text>
         </g>
@@ -318,19 +318,19 @@ function TrendChart({ points }: { points: OHITrendPoint[] }) {
 
       {/* X axis */}
       <line x1={PAD.left} y1={PAD.top + innerH} x2={PAD.left + innerW} y2={PAD.top + innerH}
-        stroke="rgba(255,255,255,0.08)" />
+        stroke="currentColor" strokeOpacity={0.08} />
 
       {/* X labels */}
       {xLabels.map(({ i, label }) => (
         <text key={i} x={xScale(i)} y={H - 6} textAnchor="middle"
-          style={{ fontSize: 8.5, fill: 'rgba(255,255,255,0.35)', fontFamily: 'var(--fb)' }}>
+          style={{ fontSize: 8.5, fill: 'rgba(var(--ink-rgb),0.35)', fontFamily: 'var(--fb)' }}>
           {label.split(' ')[0]}
         </text>
       ))}
 
       {/* Y axis label */}
       <text x={10} y={H / 2} textAnchor="middle" transform={`rotate(-90,10,${H/2})`}
-        style={{ fontSize: 9, fill: 'rgba(255,255,255,0.35)', fontFamily: 'var(--fb)' }}>
+        style={{ fontSize: 9, fill: 'rgba(var(--ink-rgb),0.35)', fontFamily: 'var(--fb)' }}>
         OHI SCORE
       </text>
     </svg>
@@ -361,7 +361,7 @@ function PreviewPareto({ points, selectedPct }: {
 
   return (
     <svg width={W} height={H} style={{ display: 'block' }}>
-      <path d={linePath} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={1.5} />
+      <path d={linePath} fill="none" stroke="currentColor" strokeOpacity={0.2} strokeWidth={1.5} />
       {points.map((p, i) => {
         const isSelected = p.retention_pct === selectedPct
         return (
@@ -383,25 +383,25 @@ function PreviewPareto({ points, selectedPct }: {
       ))}
       {/* Axes */}
       <line x1={PAD.left} y1={PAD.top + innerH} x2={PAD.left + innerW} y2={PAD.top + innerH}
-        stroke="rgba(255,255,255,0.08)" />
+        stroke="currentColor" strokeOpacity={0.08} />
       {[0, 10, 20, 30, 40, 50].map(v => (
         <text key={v} x={xScale(v)} y={H - 6} textAnchor="middle"
-          style={{ fontSize: 8, fill: 'rgba(255,255,255,0.35)', fontFamily: 'var(--fb)' }}>
+          style={{ fontSize: 8, fill: 'rgba(var(--ink-rgb),0.35)', fontFamily: 'var(--fb)' }}>
           {v}%
         </text>
       ))}
       {[minOHI, (minOHI + maxOHI) / 2, maxOHI].map(v => (
         <text key={v} x={PAD.left - 4} y={yScale(v) + 4} textAnchor="end"
-          style={{ fontSize: 8, fill: 'rgba(255,255,255,0.3)', fontFamily: 'var(--fb)' }}>
+          style={{ fontSize: 8, fill: 'rgba(var(--ink-rgb),0.3)', fontFamily: 'var(--fb)' }}>
           {Math.round(v)}
         </text>
       ))}
       <text x={PAD.left + innerW / 2} y={H - 2} textAnchor="middle"
-        style={{ fontSize: 8.5, fill: 'rgba(255,255,255,0.3)', fontFamily: 'var(--fb)' }}>
+        style={{ fontSize: 8.5, fill: 'rgba(var(--ink-rgb),0.3)', fontFamily: 'var(--fb)' }}>
         BUDGET SAVINGS (%)
       </text>
       <text x={8} y={H / 2} textAnchor="middle" transform={`rotate(-90,8,${H/2})`}
-        style={{ fontSize: 8.5, fill: 'rgba(255,255,255,0.3)', fontFamily: 'var(--fb)' }}>
+        style={{ fontSize: 8.5, fill: 'rgba(var(--ink-rgb),0.3)', fontFamily: 'var(--fb)' }}>
         OHI SCORE
       </text>
     </svg>
@@ -423,9 +423,9 @@ function BenchmarkChart({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {/* Legend */}
       <div style={{ display: 'flex', gap: 20, fontSize: 9, fontFamily: 'var(--fb)',
-        color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
+        color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 4 }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 20, height: 8, backgroundColor: 'rgba(255,255,255,0.10)',
+          <div style={{ width: 20, height: 8, backgroundColor: 'rgba(var(--ink-rgb),0.10)',
             borderRadius: 2 }} />
           P25–P75 synthetic benchmark band
         </span>
@@ -451,11 +451,11 @@ function BenchmarkChart({
         return (
           <div key={key}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'rgba(255,255,255,0.65)' }}>
+              <span style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'rgba(var(--ink-rgb),0.65)' }}>
                 {sub.label}
               </span>
               <span style={{ display: 'flex', gap: 12, fontSize: 10, fontFamily: 'var(--fb)' }}>
-                <span style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <span style={{ color: 'rgba(var(--ink-rgb),0.35)' }}>
                   P50 {band.p50}
                 </span>
                 <span style={{
@@ -469,16 +469,16 @@ function BenchmarkChart({
             <div style={{ position: 'relative', height: 16, width: BAR_W }}>
               {/* Track */}
               <div style={{ position: 'absolute', top: 6, left: 0, right: 0, height: 4,
-                backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 2 }} />
+                backgroundColor: 'rgba(var(--ink-rgb),0.06)', borderRadius: 2 }} />
               {/* P25-P75 band */}
               <div style={{
                 position: 'absolute', top: 6, left: p25x, width: p75x - p25x, height: 4,
-                backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 2,
+                backgroundColor: 'rgba(var(--ink-rgb),0.12)', borderRadius: 2,
               }} />
               {/* P50 tick */}
               <div style={{
                 position: 'absolute', top: 4, left: px(band.p50) - 1, width: 2, height: 8,
-                backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 1,
+                backgroundColor: 'rgba(var(--ink-rgb),0.25)', borderRadius: 1,
               }} />
               {/* Current */}
               <div style={{
@@ -488,7 +488,7 @@ function BenchmarkChart({
               }} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between',
-              fontSize: 8, color: 'rgba(255,255,255,0.25)', fontFamily: 'var(--fb)', marginTop: 2 }}>
+              fontSize: 8, color: 'rgba(var(--ink-rgb),0.25)', fontFamily: 'var(--fb)', marginTop: 2 }}>
               <span>{band.p25} P25</span>
               <span>{band.p75} P75</span>
             </div>
@@ -523,21 +523,21 @@ function OverviewTab({ data }: { data: OHIData }) {
                 {s.trend_direction.toUpperCase()}
               </span>
             </div>
-            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', marginTop: 3,
+            <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.35)', marginTop: 3,
               fontFamily: 'var(--fb)' }}>
               {s.trend_delta_90d >= 0 ? '+' : ''}{s.trend_delta_90d.toFixed(1)} pts / 90 days
             </div>
           </div>
           <div style={{ display: 'flex', gap: 16, marginTop: 4 }}>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--fb)', fontSize: 8, color: 'rgba(255,255,255,0.35)',
+              <div style={{ fontFamily: 'var(--fb)', fontSize: 8, color: 'rgba(var(--ink-rgb),0.35)',
                 textTransform: 'uppercase', letterSpacing: '1px' }}>Employees</div>
-              <div style={{ fontFamily: 'var(--fd)', fontSize: 18, color: 'var(--light)' }}>
+              <div style={{ fontFamily: 'var(--fd)', fontSize: 18, color: 'var(--dark)' }}>
                 {fmt(s.n_employees)}
               </div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--fb)', fontSize: 8, color: 'rgba(255,255,255,0.35)',
+              <div style={{ fontFamily: 'var(--fb)', fontSize: 8, color: 'rgba(var(--ink-rgb),0.35)',
                 textTransform: 'uppercase', letterSpacing: '1px' }}>Nexus</div>
               <div style={{ fontFamily: 'var(--fd)', fontSize: 18, color: 'var(--gold-light)' }}>
                 {s.nexus_count}
@@ -571,7 +571,7 @@ function TrendTab({ data }: { data: OHIData }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div style={card}>
         <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 12 }}>
+          textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 12 }}>
           24-Month OHI Time Series + 6-Month Forecast
         </div>
         <div style={{ overflowX: 'auto' }}>
@@ -579,7 +579,7 @@ function TrendTab({ data }: { data: OHIData }) {
         </div>
         {/* Legend */}
         <div style={{ display: 'flex', gap: 20, marginTop: 12, fontSize: 9,
-          color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)' }}>
+          color: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div style={{ width: 20, height: 2, backgroundColor: 'var(--gold-light)' }} />
             Historical OHI
@@ -590,8 +590,8 @@ function TrendTab({ data }: { data: OHIData }) {
             Forecast
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 1, height: 14, backgroundColor: 'rgba(255,255,255,0.25)',
-              borderLeft: '1px dashed rgba(255,255,255,0.25)' }} />
+            <div style={{ width: 1, height: 14, backgroundColor: 'rgba(var(--ink-rgb),0.25)',
+              borderLeft: '1px dashed rgba(var(--ink-rgb),0.25)' }} />
             Event annotation
           </span>
         </div>
@@ -601,19 +601,19 @@ function TrendTab({ data }: { data: OHIData }) {
       {events.length > 0 && (
         <div style={card}>
           <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-            textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+            textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 10 }}>
             Annotated Events
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {events.map((e, i) => (
               <div key={i} style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-                <span style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'rgba(255,255,255,0.35)',
+                <span style={{ fontFamily: 'var(--fb)', fontSize: 10, color: 'rgba(var(--ink-rgb),0.35)',
                   width: 72, flexShrink: 0 }}>
                   {e.month}
                 </span>
                 <div style={{ width: 6, height: 6, borderRadius: '50%',
-                  backgroundColor: 'rgba(255,255,255,0.3)', flexShrink: 0 }} />
-                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)' }}>{e.event}</span>
+                  backgroundColor: 'rgba(var(--ink-rgb),0.3)', flexShrink: 0 }} />
+                <span style={{ fontSize: 11, color: 'rgba(var(--ink-rgb),0.65)' }}>{e.event}</span>
                 <span style={{ fontFamily: 'var(--fd)', fontSize: 14, color: 'var(--gold-light)',
                   marginLeft: 'auto' }}>{e.score.toFixed(0)}</span>
               </div>
@@ -636,7 +636,7 @@ function PreviewTab({ data }: { data: OHIData }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Intro */}
-      <div style={{ ...card, fontSize: 11, color: 'rgba(255,255,255,0.55)', lineHeight: 1.65 }}>
+      <div style={{ ...card, fontSize: 11, color: 'rgba(var(--ink-rgb),0.55)', lineHeight: 1.65 }}>
         Simulate the OHI impact of different budget retention levels before executing any structural change.
         Sliding left reduces headcount and shows the projected OHI cost of that decision.
       </div>
@@ -644,7 +644,7 @@ function PreviewTab({ data }: { data: OHIData }) {
       {/* Slider + KPI */}
       <div style={card}>
         <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>
+          textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 8 }}>
           Retention scenario: keep {sel.retention_pct}% of headcount ({sel.n_retained} employees)
         </div>
         <input type="range" min={0} max={points.length - 1} step={1}
@@ -663,7 +663,7 @@ function PreviewTab({ data }: { data: OHIData }) {
           ].map(k => (
             <div key={k.label} style={{ ...card, textAlign: 'center' }}>
               <div style={{ fontFamily: 'var(--fb)', fontSize: 8, letterSpacing: '1.5px',
-                textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 6 }}>
+                textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.35)', marginBottom: 6 }}>
                 {k.label}
               </div>
               <div style={{ fontFamily: 'var(--fd)', fontSize: 26, color: k.color, lineHeight: 1 }}>
@@ -677,7 +677,7 @@ function PreviewTab({ data }: { data: OHIData }) {
       {/* Before → After */}
       <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
         <div style={{ ...card, flex: 1, textAlign: 'center' }}>
-          <div style={{ fontFamily: 'var(--fb)', fontSize: 8, color: 'rgba(255,255,255,0.35)',
+          <div style={{ fontFamily: 'var(--fb)', fontSize: 8, color: 'rgba(var(--ink-rgb),0.35)',
             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 6 }}>
             Current OHI
           </div>
@@ -685,10 +685,10 @@ function PreviewTab({ data }: { data: OHIData }) {
             {baseOHI.toFixed(1)}
           </div>
         </div>
-        <div style={{ fontSize: 24, color: 'rgba(255,255,255,0.3)' }}>→</div>
+        <div style={{ fontSize: 24, color: 'rgba(var(--ink-rgb),0.3)' }}>→</div>
         <div style={{ ...card, flex: 1, textAlign: 'center',
-          borderColor: sel.ohi_delta < -5 ? '#e0344844' : 'rgba(255,255,255,0.06)' }}>
-          <div style={{ fontFamily: 'var(--fb)', fontSize: 8, color: 'rgba(255,255,255,0.35)',
+          borderColor: sel.ohi_delta < -5 ? '#e0344844' : 'rgba(var(--ink-rgb),0.06)' }}>
+          <div style={{ fontFamily: 'var(--fb)', fontSize: 8, color: 'rgba(var(--ink-rgb),0.35)',
             textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 6 }}>
             Projected OHI ({sel.retention_pct}% retained)
           </div>
@@ -702,10 +702,10 @@ function PreviewTab({ data }: { data: OHIData }) {
       {/* Pareto chart */}
       <div style={card}>
         <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>
+          textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 4 }}>
           Budget Savings vs OHI Cost — Pareto Frontier
         </div>
-        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginBottom: 12 }}>
+        <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.35)', marginBottom: 12 }}>
           Each point shows the OHI score achievable at a given budget reduction level.
           Highlighted point matches the slider above.
         </div>
@@ -739,17 +739,17 @@ function BenchmarkTab({ data }: { data: OHIData }) {
         ].map(k => (
           <div key={k.label} style={{ textAlign: 'center', flex: 1 }}>
             <div style={{ fontFamily: 'var(--fb)', fontSize: 8, letterSpacing: '1.5px',
-              textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>
+              textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.35)', marginBottom: 4 }}>
               {k.label}
             </div>
             <div style={{ fontFamily: 'var(--fd)', fontSize: 28, color: 'var(--gold-light)' }}>
               {k.value}
             </div>
-            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>{k.sub}</div>
+            <div style={{ fontSize: 9, color: 'rgba(var(--ink-rgb),0.35)', marginTop: 2 }}>{k.sub}</div>
           </div>
         ))}
-        <div style={{ flex: 2, fontSize: 10, color: 'rgba(255,255,255,0.35)', lineHeight: 1.6,
-          borderLeft: '1px solid rgba(255,255,255,0.08)', paddingLeft: 20 }}>
+        <div style={{ flex: 2, fontSize: 10, color: 'rgba(var(--ink-rgb),0.35)', lineHeight: 1.6,
+          borderLeft: '1px solid rgba(var(--ink-rgb),0.08)', paddingLeft: 20 }}>
           ⓘ {bm.source}. Comparator profiles are generated from synthetic organizational data across
           similar workforce sizes. Not based on real company benchmarks.
         </div>
@@ -758,7 +758,7 @@ function BenchmarkTab({ data }: { data: OHIData }) {
       {/* Benchmark chart */}
       <div style={card}>
         <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>
+          textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 16 }}>
           Sub-Index Position vs Synthetic Benchmark
         </div>
         <BenchmarkChart subIndices={data.sub_indices} benchmark={bm.sub_indices} />
@@ -785,7 +785,7 @@ export default function OHIPage() {
 
   const pageStyle: React.CSSProperties = {
     padding: '32px 40px', minHeight: '100vh',
-    backgroundColor: 'var(--light)', color: 'var(--light)',
+    backgroundColor: 'var(--light)', color: 'var(--dark)',
   }
 
   if (error) return (
@@ -798,7 +798,7 @@ export default function OHIPage() {
 
   if (!data) return (
     <div style={{ ...pageStyle, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <span style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--fb)', fontSize: 13 }}>
+      <span style={{ color: 'rgba(var(--ink-rgb),0.4)', fontFamily: 'var(--fb)', fontSize: 13 }}>
         Computing Organizational Health Index…
       </span>
     </div>
@@ -810,7 +810,7 @@ export default function OHIPage() {
     background: 'none', border: 'none', cursor: 'pointer',
     fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '2px',
     textTransform: 'uppercase', padding: '7px 14px', borderRadius: 3,
-    color: tab === t ? 'var(--gold-light)' : 'rgba(255,255,255,0.45)',
+    color: tab === t ? 'var(--gold-light)' : 'rgba(var(--ink-rgb),0.45)',
     backgroundColor: tab === t ? 'rgba(201,168,76,0.12)' : 'transparent',
   })
 
@@ -819,10 +819,10 @@ export default function OHIPage() {
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
         <h1 style={{ fontFamily: 'var(--fd)', fontSize: 28, fontWeight: 300,
-          color: 'var(--light)', margin: 0, marginBottom: 4 }}>
+          color: 'var(--dark)', margin: 0, marginBottom: 4 }}>
           Organizational Health Index
         </h1>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+        <p style={{ fontSize: 12, color: 'rgba(var(--ink-rgb),0.45)', margin: 0 }}>
           Composite systemic health metric across six dimensions — tracked over time,
           benchmarked against synthetic comparators, and projected against decision scenarios.
         </p>
@@ -843,20 +843,20 @@ export default function OHIPage() {
         ].map(k => (
           <div key={k.label} style={{ ...card, textAlign: 'center' }}>
             <div style={{ fontFamily: 'var(--fb)', fontSize: 9, letterSpacing: '1.5px',
-              textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>
+              textTransform: 'uppercase', color: 'rgba(var(--ink-rgb),0.4)', marginBottom: 6 }}>
               {k.label}
             </div>
             <div style={{ fontFamily: 'var(--fd)', fontSize: 30, color: k.color, lineHeight: 1 }}>
               {k.value}
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 5 }}>{k.sub}</div>
+            <div style={{ fontSize: 10, color: 'rgba(var(--ink-rgb),0.35)', marginTop: 5 }}>{k.sub}</div>
           </div>
         ))}
       </div>
 
       {/* Tab bar */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 24,
-        borderBottom: '1px solid rgba(255,255,255,0.07)', paddingBottom: 12 }}>
+        borderBottom: '1px solid rgba(var(--ink-rgb),0.07)', paddingBottom: 12 }}>
         <button style={tabStyle('overview')}   onClick={() => setTab('overview')}>Overview</button>
         <button style={tabStyle('trend')}      onClick={() => setTab('trend')}>24-Month Trend</button>
         <button style={tabStyle('preview')}    onClick={() => setTab('preview')}>Decision Preview</button>

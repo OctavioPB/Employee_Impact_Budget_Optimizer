@@ -121,6 +121,7 @@ known-first-party = [
     "forecasting",
     "health",
     "integration_hub",
+    "mcp_server",
     "models",
     "notifications",
     "optimization_engine",

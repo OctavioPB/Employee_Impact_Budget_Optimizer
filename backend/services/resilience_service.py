@@ -25,6 +25,7 @@ import numpy as np
 import pandas as pd
 
 from backend.services.data_service import get_org
+from backend.services.scoring import add_scores
 
 # ── Seniority ranking ─────────────────────────────────────────────────────────
 _SEN_RANK: dict[str, int] = {
@@ -57,20 +58,7 @@ _CASCADE_THRESHOLD = 0.75  # attrition_risk + pressure must exceed this to casca
 
 # ── Score helpers ─────────────────────────────────────────────────────────────
 
-def _add_scores(df: pd.DataFrame) -> pd.DataFrame:
-    """Replicate impact_score + attrition_risk from data_service (same seed)."""
-    rng        = np.random.default_rng(42)
-    sal_rank   = df["annual_salary"].rank(pct=True)
-    nexus_b    = df["_is_nexus"].astype(float) * 15
-    noise      = rng.normal(0, 5, len(df))
-    df         = df.copy()
-    df["impact_score"] = np.clip(sal_rank * 70 + nexus_b + noise, 0, 100).round(1)
-
-    sal_inv    = 1 - sal_rank
-    nexus_r    = df["_is_nexus"].astype(float) * 0.15
-    attr_raw   = sal_inv * 0.6 + rng.uniform(0, 0.4, len(df)) - nexus_r
-    df["attrition_risk"] = np.clip(attr_raw, 0.01, 0.99).round(3)
-    return df
+_add_scores = add_scores  # shared scoring: backend/services/scoring.py
 
 
 def _gini(values: np.ndarray) -> float:
@@ -290,7 +278,9 @@ def run_disruption_scenario(
         primary_df = dept_df.sample(n=min(n, len(dept_df)), random_state=42)
 
     elif scenario_type == "competitive_poaching":
-        thresh     = float(params.get("impact_threshold", 65.0))
+        # Default: the org's top-10% impact band (scale-free; an absolute cut-off
+        # silently selects almost nobody when the score distribution changes).
+        thresh     = float(params.get("impact_threshold", df["impact_score"].quantile(0.90)))
         n          = int(params.get("n", 8))
         primary_df = df[df["impact_score"] >= thresh].nlargest(n, "impact_score")
         if primary_df.empty:
@@ -483,9 +473,9 @@ def _build_presets(df: pd.DataFrame) -> list[dict]:
             "params": {"department": top_dept, "pct": 0.30},
         },
         {
-            "label":  "Competitive Poaching (Impact ≥65)",
+            "label":  "Competitive Poaching (Top 10% Impact)",
             "type":   "competitive_poaching",
-            "params": {"impact_threshold": 65.0, "n": 8},
+            "params": {"n": 8},
         },
         {
             "label":  "All Leaders Vacate",

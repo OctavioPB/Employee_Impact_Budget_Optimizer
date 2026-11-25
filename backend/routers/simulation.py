@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from backend.services.data_service import run_simulation
+from backend.services.data_service import DEFAULT_HEADCOUNT_COST, run_simulation
 
 router = APIRouter()
 
@@ -14,6 +14,8 @@ class SimulationRequest(BaseModel):
     exclude:               list[str] = Field(default_factory=list)
     leadership_constraint: bool      = Field(default=True)
     skills_constraint:     bool      = Field(default=True)
+    # Impact-percentile points charged per person kept (0 = headcount is free)
+    headcount_cost:        float     = Field(default=DEFAULT_HEADCOUNT_COST, ge=0.0, le=50.0)
 
 
 @router.post("/simulate")
@@ -27,6 +29,7 @@ def simulate(body: SimulationRequest) -> dict:
             exclude=body.exclude,
             leadership_constraint=body.leadership_constraint,
             skills_constraint=body.skills_constraint,
+            headcount_cost=body.headcount_cost,
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

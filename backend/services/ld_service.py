@@ -33,6 +33,7 @@ from pulp import (
 )
 
 from backend.services.data_service import get_org
+from backend.services.scoring import add_scores
 
 # ── Training catalog ──────────────────────────────────────────────────────────
 
@@ -161,20 +162,7 @@ _LEADER_LEVELS = {"lead", "director", "exec"}
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-def _add_scores(df: pd.DataFrame) -> pd.DataFrame:
-    """Replicate impact_score + attrition_risk (same seed as resilience_service)."""
-    rng      = np.random.default_rng(42)
-    sal_rank = df["annual_salary"].rank(pct=True)
-    nexus_b  = df["_is_nexus"].astype(float) * 15
-    noise    = rng.normal(0, 5, len(df))
-    df       = df.copy()
-    df["impact_score"] = np.clip(sal_rank * 70 + nexus_b + noise, 0, 100).round(1)
-
-    sal_inv  = 1 - sal_rank
-    nexus_r  = df["_is_nexus"].astype(float) * 0.15
-    attr_raw = sal_inv * 0.6 + rng.uniform(0, 0.4, len(df)) - nexus_r
-    df["attrition_risk"] = np.clip(attr_raw, 0.01, 0.99).round(3)
-    return df
+_add_scores = add_scores  # shared scoring: backend/services/scoring.py
 
 
 def _compute_learning_velocity(df: pd.DataFrame, rng: np.random.Generator) -> pd.Series:
@@ -282,7 +270,6 @@ def run_ld_optimization(
     allocations: list[dict] = []
     total_cost  = 0.0
     total_impact_gain = 0.0
-    total_attr_red    = 0.0
 
     for _, row in df.iterrows():
         i = row["employee_id"]
@@ -310,9 +297,23 @@ def run_ld_optimization(
                 })
                 total_cost       += prog["cost"]
                 total_impact_gain += e["impact_delta"]
-                total_attr_red    += e["attrition_reduction"]
 
     unique_emps = len({a["employee_id"] for a in allocations})
+
+    # Org-level attrition effect: average risk drop per trained employee.
+    # Summing per-allocation reductions (the old behaviour) produced values
+    # above 100% (e.g. 10.49 -> "1049%"). Cap each employee's combined
+    # reduction at their current risk so nobody goes below zero.
+    per_emp_red: dict[str, float] = {}
+    per_emp_risk: dict[str, float] = {}
+    for a in allocations:
+        eid = a["employee_id"]
+        per_emp_red[eid] = per_emp_red.get(eid, 0.0) + a["attrition_reduction"]
+        per_emp_risk[eid] = a["attrition_risk"]
+    avg_attr_red = (
+        sum(min(red, per_emp_risk[eid]) for eid, red in per_emp_red.items()) / unique_emps
+        if unique_emps else 0.0
+    )
 
     return {
         "budget":                     budget,
@@ -320,7 +321,7 @@ def run_ld_optimization(
         "total_allocations":          len(allocations),
         "unique_employees":           unique_emps,
         "expected_impact_gain":       round(total_impact_gain, 2),
-        "expected_attrition_reduction": round(total_attr_red, 4),
+        "expected_attrition_reduction": round(avg_attr_red, 4),
         "gap_closures":               len(_critical_gap_programs(df)) if close_gaps else 0,
         "allocations":                allocations,
         "status":                     "Optimal" if status == 1 else "Feasible",
